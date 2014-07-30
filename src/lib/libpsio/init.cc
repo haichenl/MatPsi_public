@@ -48,6 +48,7 @@ psio_address PSIO_ZERO = { 0, 0 };
 
 PSIO::PSIO()
 {
+    _psio_manager_ = boost::shared_ptr<PSIOManager>(new PSIOManager);
     int i, j;
 
     psio_unit = (psio_ud *) malloc(sizeof(psio_ud)*PSIO_MAXUNIT);

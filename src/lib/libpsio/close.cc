@@ -71,7 +71,7 @@ void PSIO::close(unsigned int unit, int keep) {
       psio_error(unit,PSIO_ERROR_CLOSE);
     /* Delete the file completely if requested */
     if(!keep) unlink(this_unit->vol[i].path);
-    PSIOManager::shared_object()->close_file(std::string(this_unit->vol[i].path), unit, (keep ? true : false));
+    _psio_manager_->close_file(std::string(this_unit->vol[i].path), unit, (keep ? true : false));
 
     free(this_unit->vol[i].path);
     this_unit->vol[i].path = NULL;

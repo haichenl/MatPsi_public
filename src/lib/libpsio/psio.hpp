@@ -8,6 +8,7 @@
 #include <queue>
 
 #include <libpsio/config.h>
+#include <boost/shared_ptr.hpp>
 
 namespace boost {
 template <class T>
@@ -287,7 +288,7 @@ public:
     static std::string get_default_namespace() { return default_namespace_; }
 
     /// Change file FILENO from NS1 to NS2
-    static void change_file_namespace(unsigned int fileno, const std::string & ns1, const std::string & ns2);
+    void change_file_namespace(unsigned int fileno, const std::string & ns1, const std::string & ns2);
 
     /// Return the global shared object
     static boost::shared_ptr<PSIO> shared_object();
@@ -351,6 +352,7 @@ private:
 
 public:
     void set_pid(const std::string &pid) { pid_ = pid; }
+    boost::shared_ptr<PSIOManager> _psio_manager_;
 };
 
 }

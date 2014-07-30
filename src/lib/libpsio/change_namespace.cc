@@ -39,7 +39,7 @@ void PSIO::change_file_namespace(unsigned int unit, const std::string & ns1, con
     _default_psio_lib_->get_filename(unit, &old_name, true);
     _default_psio_lib_->get_filename(unit, &new_name, true);
     //_default_psio_lib_->get_volpath(unit, 0, &path);  
-    const char* path = PSIOManager::shared_object()->get_file_path(unit).c_str();
+    const char* path = _psio_manager_->get_file_path(unit).c_str();
 
     old_fullpath = (char*) malloc( (strlen(path)+strlen(old_name)+80)*sizeof(char));
     new_fullpath = (char*) malloc( (strlen(path)+strlen(new_name)+80)*sizeof(char));
@@ -49,7 +49,7 @@ void PSIO::change_file_namespace(unsigned int unit, const std::string & ns1, con
     //printf("%s\n",old_fullpath);
     //printf("%s\n",new_fullpath);
 
-    PSIOManager::shared_object()->move_file(std::string(old_fullpath), std::string(new_fullpath)); 
+    _psio_manager_->move_file(std::string(old_fullpath), std::string(new_fullpath)); 
 
     if (WorldComm->me() == 0)
         ::rename(old_fullpath,new_fullpath);
