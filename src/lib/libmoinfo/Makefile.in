@@ -21,8 +21,8 @@ LIBOBJ = $(TRUECSRC:%.c=%.o) $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(INC)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libmoinfo
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libmoinfo
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libmoinfo
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libmoinfo
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

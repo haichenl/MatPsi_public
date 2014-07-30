@@ -53,8 +53,8 @@ LIBOBJ = $(CXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: dpd.h
-	$(MKDIRS) $(DESTDIR)$(incdir)/libdpd
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdpd
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libdpd
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdpd
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

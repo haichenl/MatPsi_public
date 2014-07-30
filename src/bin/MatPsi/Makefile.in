@@ -30,7 +30,7 @@ endif
 
 TRUECXXSRC = MatPsi_mex.cpp
 DEPENDINCLUDE = $(notdir $(wildcard $(srcdir)/*.h))
-LIBOBJ = $(TRUECXXSRC:%.cpp=%.o)
+LIBOBJ = $(TRUECXXSRC:%.cpp=%.mex*)
 
 include ../MakeRules
 
@@ -38,4 +38,7 @@ include ../MakeRules
 	#~ $(MKDIRS) $(DESTDIR)$(incdir)/MatPsi
 	#~ $(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/MatPsi
 
-
+install:: $(PSITARGET)
+	$(MKDIRS) $(prefix)
+	$(INSTALL) $(PSITARGET)/*.mex* $(prefix)
+	-cp $(PSITARGET)/@MatPsi $(prefix) -r

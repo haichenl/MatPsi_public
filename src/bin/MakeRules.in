@@ -37,26 +37,23 @@ all: default
 %.$(OBJSUF): %.cc
 	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -c $< $(OUTPUT_OPTION)
 
-%.$(OBJSUF): %.cpp
+%.mex*: %.cpp
 	$(MEX) $(MEXFLAGS) $(LIBDIRS) $(START_EXPORT) $(PSILIBS) $(END_EXPORT) $(FILTEREDLDLIBS) $(CXXINCLUDE) $< 
 	$(MKDIRS) $(PSITARGET)
-	cp *.mex* $(PSITARGET)
-	cp `dirname $<`/@MatPsi $(PSITARGET) -r
+	$(INSTALL) *.mex* $(PSITARGET)
+	-cp `dirname $<`/@MatPsi $(PSITARGET) -r
+	
 
 #
 # do installations
 #
 
-install:: install_inc
+#install:: install_inc
 
-install_inc::
+#install_inc::
 
 $(PSITARGET): $(LIBOBJ)
-#	$(MKDIRS) $(PSITARGET)
-#	cp *.mex* $(PSITARGET)
-#	cp 'dirname $<'/@MatPsi $(PSITARGET) -r
-#	$(AR) $(ARFLAGS) $(PSITARGET) $^
-#	$(RANLIB)  $(PSITARGET)
+
 
 #
 # clean up

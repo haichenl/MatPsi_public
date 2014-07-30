@@ -31,8 +31,8 @@ newmm_rking.o: newmm_rking.cc
 	$(CXX) $(CXXDBG) $(CXXDEF) $(CXXOTH) $(CXXINC) -c $< $(OUTPUT_OPTION)
 
 install_inc:: qt.h
-	$(MKDIRS) $(DESTDIR)$(incdir)/libqt
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libqt
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libqt
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libqt
 
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"

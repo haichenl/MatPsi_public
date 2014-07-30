@@ -30,8 +30,8 @@ cov_radii.h     masses.h        psi4-def.h          symmetry.h
 install: install_inc
 
 install_inc: $(HEADERS)
-	$(MKDIRS) $(DESTDIR)$(incdir)
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)
+#	$(MKDIRS) $(DESTDIR)$(incdir)
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)
 
 $(top_srcdir)/configure: $(top_srcdir)/configure.ac $(top_srcdir)/aclocal.m4
 	cd $(top_srcdir) && autoconf

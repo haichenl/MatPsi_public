@@ -23,8 +23,8 @@ LIBOBJ = $(CXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: iwl.h iwl.hpp config.h
-	$(MKDIRS) $(DESTDIR)$(incdir)/libiwl
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libiwl
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libiwl
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libiwl
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

@@ -16,8 +16,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libsapt_solver
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libsapt_solver
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libsapt_solver
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libsapt_solver
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

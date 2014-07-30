@@ -25,8 +25,8 @@ LIBOBJ = $(TRUECSRC:%.c=%.o) $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(INC)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libpsio
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libpsio
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libpsio
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libpsio
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

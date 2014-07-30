@@ -13,8 +13,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libfunctional
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libfunctional
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libfunctional
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libfunctional
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

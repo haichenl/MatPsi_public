@@ -13,8 +13,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libdisp
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdisp
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libdisp
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdisp
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

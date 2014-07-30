@@ -18,8 +18,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libthce   
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libthce   
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libthce   
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libthce   
 
 #~ ifneq ($(DODEPEND),no)
 #~ include $(LIBOBJ:%.o=%.d)

@@ -17,8 +17,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libdiis
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdiis
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libdiis
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libdiis
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

@@ -135,7 +135,7 @@ case $target_os in
     ;;
 esac
 
-AC_ARG_WITH(mex,[  --with-mex               which MEX compiler to use],[
+AC_ARG_WITH(mex,[  --with-mex              which Matlab MEX compiler to use],[
 MEX=$withval
 ])
 AC_SUBST(MEX)
@@ -959,7 +959,7 @@ AC_CONFIG_FILES([
           src/lib/libsapt_solver/Makefile
           src/lib/libfunctional/Makefile
           src/lib/libdisp/Makefile
-          src/lib/libplugin/Makefile
+
           src/lib/lib3index/Makefile
 
           bin/psi4-config

@@ -18,8 +18,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libmints
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libmints
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libmints
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libmints
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)

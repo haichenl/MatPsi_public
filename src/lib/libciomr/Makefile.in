@@ -52,5 +52,5 @@ include ../MakeRules
 
 
 install_inc:: libciomr.h
-	$(MKDIRS) $(DESTDIR)$(incdir)/libciomr
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libciomr
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libciomr
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libciomr

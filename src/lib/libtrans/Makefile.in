@@ -29,8 +29,8 @@ LIBOBJ = $(TRUECXXSRC:%.cc=%.o)
 include ../MakeRules
 
 install_inc:: $(DEPENDINCLUDE)
-	$(MKDIRS) $(DESTDIR)$(incdir)/libtrans
-	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libtrans
+#	$(MKDIRS) $(DESTDIR)$(incdir)/libtrans
+#	$(INSTALL_INCLUDE) $^ $(DESTDIR)$(incdir)/libtrans
 
 #~ ifneq "$(MAKECMDGOALS)" "clean"
 #~ include $(LIBOBJ:%.o=%.d)
