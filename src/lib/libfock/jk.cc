@@ -55,7 +55,7 @@ JK::JK( boost::shared_ptr<BasisSet> primary) :
 JK::~JK()
 {
 }
-boost::shared_ptr<JK> JK::build_JK()
+boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 {
     Options& options = Process::environment.options;
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
@@ -63,7 +63,7 @@ boost::shared_ptr<JK> JK::build_JK()
 
     if (options.get_str("SCF_TYPE") == "CD") {
 
-        CDJK* jk = new CDJK(primary,options.get_double("CHOLESKY_TOLERANCE"));
+        CDJK* jk = new CDJK(primary,options.get_double("CHOLESKY_TOLERANCE"), psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -86,7 +86,7 @@ boost::shared_ptr<JK> JK::build_JK()
 
         boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(parser, primary->molecule(), "DF_BASIS_SCF");
 
-        DFJK* jk = new DFJK(primary,auxiliary);
+        DFJK* jk = new DFJK(primary,auxiliary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -109,7 +109,7 @@ boost::shared_ptr<JK> JK::build_JK()
 
         boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(parser, primary->molecule(), "DF_BASIS_SCF");
 
-        FastDFJK* jk = new FastDFJK(primary,auxiliary);
+        FastDFJK* jk = new FastDFJK(primary,auxiliary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -140,7 +140,7 @@ boost::shared_ptr<JK> JK::build_JK()
 
     } else if (options.get_str("SCF_TYPE") == "PK") {
 
-        PKJK* jk = new PKJK(primary);;
+        PKJK* jk = new PKJK(primary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -186,7 +186,7 @@ boost::shared_ptr<JK> JK::build_JK()
 #if 0
     } else if (options.get_str("SCF_TYPE") == "PS") {
 
-        PSJK* jk = new PSJK(primary,options);
+        PSJK* jk = new PSJK(primary,options, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -1148,9 +1148,10 @@ void DiskJK::postiterations()
     delete[] so2index_;
 }
 
-PKJK::PKJK(boost::shared_ptr<BasisSet> primary) :
+PKJK::PKJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
     JK(primary)
 {
+    psio_ = psio_in;
     common_init();
 }
 
@@ -1166,7 +1167,7 @@ void PKJK::common_init()
 void PKJK::print_header() const
 {
     if (print_) {
-        fprintf(outfile, "  ==> DiskJK: Disk-Based J/K Matrices <==\n\n");
+        fprintf(outfile, "  ==> PKJK: Disk-Based J/K Matrices <==\n\n");
 
         fprintf(outfile, "    J tasked:          %11s\n", (do_J_ ? "Yes" : "No"));
         fprintf(outfile, "    K tasked:          %11s\n", (do_K_ ? "Yes" : "No"));
@@ -1181,7 +1182,7 @@ void PKJK::print_header() const
 
 void PKJK::preiterations()
 {
-    psio_ = _default_psio_lib_;
+    //~ psio_ = _default_psio_lib_;
 
     bool file_was_open = psio_->open_check(pk_file_);
 //    if(!file_was_open);
@@ -2284,9 +2285,10 @@ void DirectJK::build_JK(std::vector<boost::shared_ptr<TwoBodyAOInt> >& ints,
 }
 
 DFJK::DFJK(boost::shared_ptr<BasisSet> primary,
-   boost::shared_ptr<BasisSet> auxiliary) :
+   boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in) :
    JK(primary), auxiliary_(auxiliary)
 {
+    psio_ = psio_in;
     common_init();
 }
 DFJK::~DFJK()
@@ -2302,7 +2304,7 @@ void DFJK::common_init()
     condition_ = 1.0E-12;
     unit_ = PSIF_DFSCF_BJ;
     is_core_ = true;
-    psio_ = PSIO::shared_object();
+    //~ psio_ = PSIO::shared_object();
 }
 SharedVector DFJK::iaia(SharedMatrix Ci, SharedMatrix Ca)
 {
@@ -4184,8 +4186,8 @@ void DFJK::block_wK(double** Qlmnp, double** Qrmnp, int naux)
     }
 }
 
-CDJK::CDJK(boost::shared_ptr<BasisSet> primary, double cholesky_tolerance):
-    DFJK(primary,primary), cholesky_tolerance_(cholesky_tolerance)
+CDJK::CDJK(boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in):
+    DFJK(primary,primary, psio_in), cholesky_tolerance_(cholesky_tolerance)
 {
 }
 CDJK::~CDJK()
@@ -4283,9 +4285,10 @@ void CDJK::print_header() const
 }
 
 FastDFJK::FastDFJK(boost::shared_ptr<BasisSet> primary,
-   boost::shared_ptr<BasisSet> auxiliary) :
+   boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in) :
    JK(primary), auxiliary_(auxiliary)
 {
+    psio_ = psio_in;
     common_init();
 }
 FastDFJK::~FastDFJK()
@@ -4301,7 +4304,7 @@ void FastDFJK::common_init()
     condition_ = 1.0E-12;
     unit_ = PSIF_DFSCF_BJ;
     is_core_ = true;
-    psio_ = PSIO::shared_object();
+    //~ psio_ = PSIO::shared_object();
     metric_ = "COULOMB";
     theta_ = 1.0;
     domains_ = "DIATOMIC";
@@ -5015,9 +5018,10 @@ void FastDFJK::build_K(boost::shared_ptr<Matrix> Z,
 #if 0
 
 PSJK::PSJK(boost::shared_ptr<BasisSet> primary,
-    Options& options) :
+    Options& options, boost::shared_ptr<PSIO> psio_in) :
     JK(primary), options_(options)
 {
+    psio_ = psio_in;
     common_init();
 }
 PSJK::~PSJK()
@@ -5031,7 +5035,7 @@ void PSJK::common_init()
     #endif
     unit_ = PSIF_DFSCF_BJ;
     theta_ = 0.3;
-    psio_ = PSIO::shared_object();
+    //~ psio_ = PSIO::shared_object();
     dealiasing_ = "QUADRATURE";
 }
 void PSJK::print_header() const

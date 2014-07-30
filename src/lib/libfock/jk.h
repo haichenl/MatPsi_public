@@ -270,7 +270,7 @@ public:
     * @param options Options reference, with preset parameters
     * @return abstract JK object, tuned in with preset options
     */
-    static boost::shared_ptr<JK> build_JK();
+    static boost::shared_ptr<JK> build_JK(boost::shared_ptr<PSIO> psio_in);
 
     // => Knobs <= //
 
@@ -535,7 +535,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    PKJK(boost::shared_ptr<BasisSet> primary);
+    PKJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
     /// Destructor
     virtual ~PKJK();
 
@@ -721,7 +721,7 @@ public:
      * @param auxiliary auxiliary basis set for this system.
      */
     DFJK( boost::shared_ptr<BasisSet> primary,
-       boost::shared_ptr<BasisSet> auxiliary);
+       boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
     virtual ~DFJK();
@@ -810,7 +810,7 @@ public:
      *        structure as this molecule
      * @param tol tolerance for cholesky decomposition.
      */
-    CDJK( boost::shared_ptr<BasisSet> primary, double cholesky_tolerance);
+    CDJK( boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
     virtual ~CDJK();
@@ -916,7 +916,7 @@ public:
      * @param auxiliary auxiliary basis set for this system.
      */
     FastDFJK( boost::shared_ptr<BasisSet> primary,
-       boost::shared_ptr<BasisSet> auxiliary);
+       boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
     virtual ~FastDFJK();
@@ -1128,7 +1128,7 @@ public:
      * @param options, Options reference used to build grid
      */
     PSJK(boost::shared_ptr<BasisSet> primary,
-        Options& options);
+        Options& options, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
     virtual ~PSJK();
