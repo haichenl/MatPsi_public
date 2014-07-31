@@ -372,7 +372,7 @@ void CUHF::compute_orbital_gradient(bool save_diis)
     if (save_diis){
         if (initialized_diis_manager_ == false) {
             diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(
-                                                               max_diis_vectors_, "HF DIIS vector", DIISManager::LargestError,
+                                                               max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError,
                                                                DIISManager::OnDisk));
             diis_manager_->set_error_vector_size(2, DIISEntry::Matrix,
                                                  grad_a.get(), DIISEntry::Matrix, grad_b.get());

@@ -44,7 +44,7 @@ namespace psi{
  * @param psio: the PSIO object to use for I/O.  Do not specify if DPD is being used.
  */
 DIISManager::DIISManager(int maxSubspaceSize,
-                         const std::string& label,
+                         const std::string& label, boost::shared_ptr<PSIO> psio_in,
                          RemovalPolicy removalPolicy,
                          StoragePolicy storagePolicy):
             _maxSubspaceSize(maxSubspaceSize),
@@ -52,7 +52,7 @@ DIISManager::DIISManager(int maxSubspaceSize,
             _storagePolicy(storagePolicy),
             _errorVectorSize(0),
             _vectorSize(0),
-            _psio(_default_psio_lib_),
+            _psio(psio_in),
             _entryCount(0),
             _label(label)
 {

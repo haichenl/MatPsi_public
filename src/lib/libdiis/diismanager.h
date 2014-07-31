@@ -58,7 +58,7 @@ class DIISManager{
          */
         enum RemovalPolicy {LargestError, OldestAdded};
 
-        DIISManager(int maxSubspaceSize, const std::string& label,
+        DIISManager(int maxSubspaceSize, const std::string& label, boost::shared_ptr<PSIO> psio_in,
                     RemovalPolicy = LargestError,
                     StoragePolicy = OnDisk);
         DIISManager() {_maxSubspaceSize = 0;}
