@@ -126,6 +126,8 @@ protected:
     /// Print level
     int print_;
 
+    boost::shared_ptr<PSIO> psio_;
+    
     /// Molecule (fo convenience)
     boost::shared_ptr<Molecule> molecule_;
     /// Primary basis set
@@ -172,7 +174,7 @@ protected:
 
 public:
 
-    DFTensor(boost::shared_ptr<BasisSet> primary,
+    DFTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
              boost::shared_ptr<BasisSet> auxiliary,
              SharedMatrix C,
              int nocc,

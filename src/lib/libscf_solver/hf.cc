@@ -584,7 +584,7 @@ void HF::form_H()
         int nao = basisset_->nao();
 
         // Set up AO->SO transformation matrix (u)
-        MintsHelper helper(options_, 0);
+        MintsHelper helper(psio_, options_, 0);
         SharedMatrix aotoso = helper.petite_list(true)->aotoso();
         int *col_offset = new int[nirrep_];
         col_offset[0] = 0;
@@ -1437,7 +1437,7 @@ double HF::compute_energy()
     }
 
     if(attempt_number_ == 1){
-        boost::shared_ptr<MintsHelper> mints (new MintsHelper(options_, 0));
+        boost::shared_ptr<MintsHelper> mints (new MintsHelper(psio_, options_, 0));
         mints->one_electron_integrals();
 
         integrals();
@@ -1744,7 +1744,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
     }
 
     if(attempt_number_ == 1){
-        boost::shared_ptr<MintsHelper> mints (new MintsHelper(options_, 0));
+        boost::shared_ptr<MintsHelper> mints (new MintsHelper(psio_, options_, 0));
         mints->one_electron_integrals();
         
 

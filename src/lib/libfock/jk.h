@@ -438,6 +438,8 @@ public:
  * integral technology
  */
 class DiskJK : public JK {
+    
+    boost::shared_ptr<PSIO> psio_;
 
     /// Absolute AO index to relative SO index
     int* so2index_;
@@ -466,7 +468,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    DiskJK(boost::shared_ptr<BasisSet> primary);
+    DiskJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
     /// Destructor
     virtual ~DiskJK();
 

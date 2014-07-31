@@ -42,7 +42,7 @@ using namespace psi;
 
 namespace psi {
 
-PSTensorII::PSTensorII(boost::shared_ptr<BasisSet> primary,
+PSTensorII::PSTensorII(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
                    SharedMatrix C,
                    int nocc,
                    int nvir,
@@ -53,6 +53,7 @@ PSTensorII::PSTensorII(boost::shared_ptr<BasisSet> primary,
     primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
     naocc_(naocc), navir_(navir), memory_(memory), options_(options)
 {
+    psio_ = psio_in;
     common_init();
 }
 PSTensorII::~PSTensorII()
@@ -612,7 +613,7 @@ SharedMatrix PSTensorII::Amo()
 }
 SharedMatrix PSTensorII::Imo()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper());
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
     return mints->mo_eri(C_,C_);
 }
 SharedMatrix PSTensorII::Ipsmo()
@@ -846,7 +847,7 @@ void PSTensorII::form_Cdd()
         Cdd_->print();
 }
 // Older PSTensor
-PSTensor::PSTensor(boost::shared_ptr<BasisSet> primary,
+PSTensor::PSTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
                    SharedMatrix C,
                    int nocc,
                    int nvir,
@@ -857,6 +858,7 @@ PSTensor::PSTensor(boost::shared_ptr<BasisSet> primary,
     primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
     naocc_(naocc), navir_(navir), options_(options), omega_(omega)
 {
+    psio_ = psio_in;
     common_init();
 }
 PSTensor::~PSTensor()
@@ -1699,7 +1701,7 @@ SharedMatrix PSTensor::Amo()
 }
 SharedMatrix PSTensor::Imo()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper());
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
     return mints->mo_eri(C_,C_);
 }
 SharedMatrix PSTensor::Ipsmo()

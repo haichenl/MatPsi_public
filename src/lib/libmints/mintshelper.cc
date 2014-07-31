@@ -93,27 +93,31 @@ public:
 };
 
 
-MintsHelper::MintsHelper(Options & options, int print)
+MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, Options & options, int print)
     : options_(options), print_(print)
 {
+    psio_ = psio_in;
     init_helper();
 }
 
-MintsHelper::MintsHelper(boost::shared_ptr<BasisSet> basis)
+MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis)
     : options_(Process::environment.options), print_(0)
 {
+    psio_ = psio_in;
     init_helper(basis);
 }
 
-MintsHelper::MintsHelper()
+MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in)
     : options_(Process::environment.options), print_(0)
 {
+    psio_ = psio_in;
     init_helper();
 }
 
-MintsHelper::MintsHelper(boost::shared_ptr<Wavefunction> wavefunction)
+MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction)
     : options_(wavefunction->options())
 {
+    psio_ = psio_in;
     init_helper(wavefunction);
 }
 
@@ -124,11 +128,11 @@ MintsHelper::~MintsHelper()
 void MintsHelper::init_helper(boost::shared_ptr<Wavefunction> wavefunction)
 {
     if (wavefunction) {
-        psio_ = wavefunction->psio();
+        //~ psio_ = wavefunction->psio();
         molecule_ = wavefunction->molecule();
     }
     else {
-        psio_ = _default_psio_lib_;
+        //~ psio_ = _default_psio_lib_;
         molecule_ = boost::shared_ptr<Molecule>(Process::environment.molecule());
     }
 
@@ -155,7 +159,7 @@ void MintsHelper::init_helper(boost::shared_ptr<BasisSet> basis)
 {
     basisset_ = basis;
     molecule_ = basis->molecule();
-    psio_ = _default_psio_lib_;
+    //~ psio_ = _default_psio_lib_;
 
     // Make sure molecule is valid.
     molecule_->update_geometry();

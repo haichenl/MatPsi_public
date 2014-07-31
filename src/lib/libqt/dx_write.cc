@@ -48,7 +48,7 @@ boost::shared_ptr<Molecule> molecule;
 boost::shared_ptr<BasisSet> basis;
 boost::shared_ptr<Wavefunction> wfn;
 
-void dx_write(Options& options,double **D)
+void dx_write(boost::shared_ptr<PSIO> psio, Options& options,double **D)
 {
   double dens;
   double **delta;
@@ -70,7 +70,7 @@ void dx_write(Options& options,double **D)
   delta = block_matrix(nmo, nmo); // Dirac delta function 
 
   // Set up AO->SO transformation matrix (u)
-  MintsHelper helper(options, 0);
+  MintsHelper helper(psio, options, 0);
   SharedMatrix aotoso = helper.petite_list(true)->aotoso();
   int *col_offset = new int[wfn->nirrep()];
   col_offset[0] = 0;

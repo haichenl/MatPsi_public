@@ -55,9 +55,10 @@ using namespace psi;
 
 namespace psi {
 
-PseudoTrial::PseudoTrial() : 
+PseudoTrial::PseudoTrial(boost::shared_ptr<PSIO> psio_in) : 
     options_(Process::environment.options)
 {
+    psio_ = psio_in;
     common_init();
 }
 
@@ -711,7 +712,7 @@ void PseudoTrial::form_A()
 
 void PseudoTrial::form_I()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper());
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
     I_ = mints->ao_eri();
     I_->print();
 }

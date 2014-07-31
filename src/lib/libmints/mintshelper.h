@@ -71,13 +71,13 @@ public:
     void init_helper(boost::shared_ptr<BasisSet> basis);
 
     /// Constructor, just lines references up
-    MintsHelper(Options&, int print = 1);
+    MintsHelper(boost::shared_ptr<PSIO> psio_in, Options&, int print = 1);
     /// Constructor, uses a basis set
-    MintsHelper(boost::shared_ptr<BasisSet> basis);
+    MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis);
     /// Constructor, uses globals
-    MintsHelper();
+    MintsHelper(boost::shared_ptr<PSIO> psio_in);
     /// Constructor, using wavefunction
-    MintsHelper(boost::shared_ptr<Wavefunction> wavefunction);
+    MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction);
     /// Destructor, does nothing
     ~MintsHelper();
 

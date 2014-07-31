@@ -25,6 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <libpsio/psio.hpp>
 
 namespace psi {
 
@@ -70,10 +71,11 @@ public:
 
 class NBOWriter
 {
+    boost::shared_ptr<PSIO> psio_;
     boost::shared_ptr<Wavefunction> wavefunction_;
 
 public:
-    NBOWriter(boost::shared_ptr<Wavefunction> wavefunction);
+    NBOWriter(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction);
 
     void write(const std::string &filename);
 };
