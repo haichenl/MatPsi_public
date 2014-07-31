@@ -35,6 +35,8 @@
 
 #include <cstdio>
 #include <string>
+#include <boost/shared_ptr.hpp>
+#include <libpsio/psio.hpp>
 
 // I think this is forward-declaring class Options -CDS
 namespace psi {
