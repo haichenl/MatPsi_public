@@ -79,6 +79,9 @@ class OrbitalSpace;
 class Wavefunction
 {
 protected:
+
+    Process::Environment& process_environment_;
+    
     /// Name of the wavefunction
     std::string name_;
 
@@ -231,8 +234,8 @@ private:
 
 public:
     /// Set the PSIO object.
-    Wavefunction(Options & options, boost::shared_ptr<PSIO> psio);
-    Wavefunction(Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio);
+    Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
     /**
     * Copy the contents of another Wavefunction into this one.
     * Useful at the beginning of correlated wavefunction computations.
@@ -490,6 +493,8 @@ public:
 
     /// Set if this is a CIM computation
     void CIMSet(bool value,int nactive_occupied);
+    
+    boost::shared_ptr<Chkpt> get_chkpt() { return chkpt_; }
 };
 
 }

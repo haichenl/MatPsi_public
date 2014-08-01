@@ -71,7 +71,7 @@ protected:
 public:
 
     /// Default constructor, for python
-    FittingMetric();
+    FittingMetric(Process::Environment& process_environment_in);
     /// DF Fitting Metric
     FittingMetric(boost::shared_ptr<BasisSet> aux, bool force_C1 = false);
     /// DF Fitting Metric
@@ -126,6 +126,7 @@ protected:
     /// Print level
     int print_;
 
+    Process::Environment& process_environment_;
     boost::shared_ptr<PSIO> psio_;
     
     /// Molecule (fo convenience)
@@ -174,7 +175,7 @@ protected:
 
 public:
 
-    DFTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
+    DFTensor(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
              boost::shared_ptr<BasisSet> auxiliary,
              SharedMatrix C,
              int nocc,

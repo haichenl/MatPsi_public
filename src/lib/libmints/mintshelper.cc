@@ -93,29 +93,29 @@ public:
 };
 
 
-MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, Options & options, int print)
-    : options_(options), print_(print)
+MintsHelper::MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, Options & options, int print)
+    : process_environment_(process_environment_in), options_(options), print_(print)
 {
     psio_ = psio_in;
     init_helper();
 }
 
-MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis)
-    : options_(Process::environment.options), print_(0)
+MintsHelper::MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis)
+    : process_environment_(process_environment_in), options_(process_environment_in.options), print_(0)
 {
     psio_ = psio_in;
     init_helper(basis);
 }
 
-MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in)
-    : options_(Process::environment.options), print_(0)
+MintsHelper::MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in)
+    : process_environment_(process_environment_in), options_(process_environment_in.options), print_(0)
 {
     psio_ = psio_in;
     init_helper();
 }
 
-MintsHelper::MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction)
-    : options_(wavefunction->options())
+MintsHelper::MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction)
+    : process_environment_(process_environment_in), options_(wavefunction->options())
 {
     psio_ = psio_in;
     init_helper(wavefunction);
@@ -133,7 +133,7 @@ void MintsHelper::init_helper(boost::shared_ptr<Wavefunction> wavefunction)
     }
     else {
         //~ psio_ = _default_psio_lib_;
-        molecule_ = boost::shared_ptr<Molecule>(Process::environment.molecule());
+        molecule_ = boost::shared_ptr<Molecule>(process_environment_.molecule());
     }
 
     if (molecule_.get() == 0) {
@@ -149,7 +149,7 @@ void MintsHelper::init_helper(boost::shared_ptr<Wavefunction> wavefunction)
         basisset_ = wavefunction->basisset();
     else if (!basisset_){
         boost::shared_ptr<BasisSetParser> parser (new Gaussian94BasisSetParser());
-        basisset_ = boost::shared_ptr<BasisSet>(BasisSet::construct(parser, molecule_, "BASIS"));
+        basisset_ = boost::shared_ptr<BasisSet>(BasisSet::construct(process_environment_, parser, molecule_, "BASIS"));
     }
 
     common_init();
@@ -191,7 +191,7 @@ void MintsHelper::common_init()
     factory_->init_with(dimension, dimension);
 
     // Integral cutoff
-    cutoff_ = Process::environment.options.get_double("INTS_TOLERANCE");
+    cutoff_ = process_environment_.options.get_double("INTS_TOLERANCE");
 }
 
 boost::shared_ptr<PetiteList> MintsHelper::petite_list() const
@@ -239,7 +239,7 @@ void MintsHelper::integrals()
     std::vector<boost::shared_ptr<TwoBodyAOInt> > tb;
     for (int i=0; i<WorldComm->nthread(); ++i)
         tb.push_back(boost::shared_ptr<TwoBodyAOInt>(integral_->eri()));
-    boost::shared_ptr<TwoBodySOInt> eri(new TwoBodySOInt(tb, integral_));
+    boost::shared_ptr<TwoBodySOInt> eri(new TwoBodySOInt(process_environment_, tb, integral_));
 
     // Print out some useful information
     fprintf(outfile, "   Calculation information:\n");
@@ -318,7 +318,7 @@ void MintsHelper::integrals_erf(double w)
     std::vector<boost::shared_ptr<TwoBodyAOInt> > tb;
     for (int i=0; i<WorldComm->nthread(); ++i)
         tb.push_back(boost::shared_ptr<TwoBodyAOInt>(integral_->erf_eri(omega)));
-    boost::shared_ptr<TwoBodySOInt> erf(new TwoBodySOInt(tb, integral_));
+    boost::shared_ptr<TwoBodySOInt> erf(new TwoBodySOInt(process_environment_, tb, integral_));
 
     // Let the user know what we're doing.
     fprintf(outfile, "      Computing non-zero ERF integrals (omega = %.3f)...", omega); fflush(outfile);
@@ -350,7 +350,7 @@ void MintsHelper::integrals_erfc(double w)
     std::vector<boost::shared_ptr<TwoBodyAOInt> > tb;
     for (int i=0; i<WorldComm->nthread(); ++i)
         tb.push_back(boost::shared_ptr<TwoBodyAOInt>(integral_->erf_complement_eri(omega)));
-    boost::shared_ptr<TwoBodySOInt> erf(new TwoBodySOInt(tb, integral_));
+    boost::shared_ptr<TwoBodySOInt> erf(new TwoBodySOInt(process_environment_, tb, integral_));
 
     // Let the user know what we're doing.
     fprintf(outfile, "      Computing non-zero ERFComplement integrals..."); fflush(outfile);

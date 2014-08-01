@@ -50,13 +50,13 @@ using namespace boost;
 
 namespace psi {
 
-RBase::RBase() :
-    Wavefunction(Process::environment.options,_default_psio_lib_)
+RBase::RBase(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) :
+    Wavefunction(process_environment_in, process_environment_.options, psio_in)
 {
     common_init();
 }
-RBase::RBase(bool flag) :
-    Wavefunction(Process::environment.options,_default_psio_lib_) 
+RBase::RBase(Process::Environment& process_environment_in, bool flag, boost::shared_ptr<PSIO> psio_in) :
+    Wavefunction(process_environment_in, process_environment_.options, psio_in) 
 {
     fprintf(outfile, "Dirty hack %s\n\n", (flag ? "true" : "false"));
 }
@@ -66,7 +66,7 @@ RBase::~RBase()
 }
 void RBase::common_init()
 {
-    boost::shared_ptr<Wavefunction> ref = Process::environment.wavefunction();
+    boost::shared_ptr<Wavefunction> ref = process_environment_.wavefunction();
     
     if (!ref) {
         // Try to build an RHF from Checkpoint
@@ -106,7 +106,7 @@ void RBase::common_init()
         // Hack on a hack
         psio_->close(32,1);
 
-        RBase* refp = new RBase(true);
+        RBase* refp = new RBase(process_environment_, true, psio_);
     
         for (int h = 0;h < nirrep; h++) {
             refp->nmopi_[h] = orbspi[h];
@@ -127,7 +127,7 @@ void RBase::common_init()
         refp->epsilon_a_ = epsilon;
 
         ref = boost::shared_ptr<Wavefunction>(refp);
-        Process::environment.set_wavefunction(ref); 
+        process_environment_.set_wavefunction(ref); 
     }
 
     set_reference(ref);
@@ -177,7 +177,7 @@ void RBase::preiterations()
             jk_ = (static_cast<psi::scf::HF*>(reference_wavefunction_.get()))->jk();
             fprintf(outfile,"    Reusing JK object from SCF.\n\n");
         } else {
-            jk_ = JK::build_JK(psio_);
+            jk_ = JK::build_JK(process_environment_, psio_);
             unsigned long int effective_memory = (unsigned long int)(0.125 * options_.get_double("CPHF_MEM_SAFETY_FACTOR") * memory_);
             jk_->set_memory(effective_memory);
             jk_->initialize();
@@ -186,7 +186,7 @@ void RBase::preiterations()
 
     if (!v_) {
         if (options_.get_str("MODULE") == "RCPKS" || options_.get_str("MODULE") == "RTDA" || options_.get_str("MODULE") == "RTDDFT") {
-            v_ = VBase::build_V(options_, "RK");
+            v_ = VBase::build_V(process_environment_, options_, "RK");
             v_->initialize();
         }
     }
@@ -196,7 +196,7 @@ void RBase::postiterations()
     jk_.reset();
 }
 
-RCPHF::RCPHF()
+RCPHF::RCPHF(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RBase::RBase(process_environment_in, psio_in)
 {
 }
 RCPHF::~RCPHF()
@@ -386,7 +386,7 @@ double RCPHF::compute_energy()
     return 0.0;
 }
 
-RCIS::RCIS()
+RCIS::RCIS(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RBase::RBase(process_environment_in, psio_in)
 {
 }
 RCIS::~RCIS()
@@ -1058,7 +1058,7 @@ double RCIS::compute_energy()
     if (options_.get_str("SOLVER_TYPE") == "DL")
         solver = DLRSolver::build_solver(options_,H);
     else if (options_.get_str("SOLVER_TYPE") == "RAYLEIGH")
-        solver = RayleighRSolver::build_solver(options_,H);
+        solver = RayleighRSolver::build_solver(process_environment_, options_,H);
 
     // Extra Knobs
     H->set_print(print_);
@@ -1178,7 +1178,7 @@ double RCIS::compute_energy()
     return 0.0;
 }
 
-RTDHF::RTDHF()
+RTDHF::RTDHF(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RBase(process_environment_in, psio_in)
 {
 }
 RTDHF::~RTDHF()
@@ -1299,7 +1299,7 @@ double RTDHF::compute_energy()
     return 0.0;
 }
 
-RCPKS::RCPKS() : RCPHF()
+RCPKS::RCPKS(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RCPHF(process_environment_in, psio_in)
 {
 }
 RCPKS::~RCPKS()
@@ -1397,7 +1397,7 @@ double RCPKS::compute_energy()
     return 0.0;
 }
 
-RTDA::RTDA() : RCIS()
+RTDA::RTDA(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RCIS(process_environment_in, psio_in)
 {
 }
 RTDA::~RTDA()
@@ -1547,7 +1547,7 @@ double RTDA::compute_energy()
     return 0.0;
 }
 
-RTDDFT::RTDDFT() : RTDHF()
+RTDDFT::RTDDFT(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : RTDHF(process_environment_in, psio_in)
 {
 }
 RTDDFT::~RTDDFT()

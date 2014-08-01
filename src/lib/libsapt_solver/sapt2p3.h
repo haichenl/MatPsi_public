@@ -104,7 +104,7 @@ protected:
     int, int, int);
 
 public:
-  SAPT2p3(Options& options, boost::shared_ptr<PSIO> psio, 
+  SAPT2p3(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
     boost::shared_ptr<Chkpt> chkpt);
   virtual ~SAPT2p3();
 

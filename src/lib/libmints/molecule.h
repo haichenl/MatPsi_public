@@ -29,6 +29,7 @@
 #include <map>
 
 #include "typedefs.h"
+#include <psi4-dec.h>
 
 #define LINEAR_A_TOL 1.0E-2 //When sin(a) is below this, we consider the angle to be linear
 #define DEFAULT_SYM_TOL 1.0E-8
@@ -290,7 +291,7 @@ public:
     void set_basis_by_label(const std::string& label, const std::string& name, const std::string& type="BASIS");
 
     /// Number of frozen core for molecule given freezing state
-    int nfrozen_core(const std::string& depth = "");
+    int nfrozen_core(Process::Environment& process_environment_in, const std::string& depth = "");
 
     /// @{
     /// Tests to see of an atom is at the passed position with a given tolerance
@@ -483,7 +484,7 @@ public:
      *
      * @param text: a string providing the user's input
      */
-    static boost::shared_ptr<Molecule> create_molecule_from_string(const std::string &geom);
+    static boost::shared_ptr<Molecule> create_molecule_from_string(Process::Environment& process_environment_in, const std::string &geom);
 
     /**
      * Regenerates a input file molecule specification string

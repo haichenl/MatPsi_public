@@ -119,7 +119,7 @@ public:
   virtual bool same_a_b_orbs() const { return reference_wavefunction_->same_a_b_orbs(); }
   virtual bool same_a_b_dens() const { return reference_wavefunction_->same_a_b_dens(); }
 
-  SAPT(Options& options, boost::shared_ptr<PSIO> psio,
+  SAPT(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio,
     boost::shared_ptr<Chkpt> chkpt);
   virtual ~SAPT();
 

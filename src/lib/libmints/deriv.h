@@ -49,6 +49,9 @@ class CdSalcList;
 
 class Deriv
 {
+    Process::Environment& process_environment_;
+    boost::shared_ptr<PSIO> psio_;
+    
     const boost::shared_ptr<Wavefunction> wfn_;
     boost::shared_ptr<IntegralFactory> integral_;
     boost::shared_ptr<BasisSet> basis_;
@@ -95,7 +98,9 @@ public:
      * \param project_out_translations remove translations from the CdSalcs
      * \param project_out_rotations remove rotations from the CdSalcs
      */
-    Deriv(const boost::shared_ptr<Wavefunction>& wave,
+    Deriv(Process::Environment& process_environment_in, 
+          boost::shared_ptr<PSIO> psio_in, 
+          const boost::shared_ptr<Wavefunction>& wave,
           char needed_irreps=0x1,
           bool project_out_translations=true,
           bool project_out_rotations=true);

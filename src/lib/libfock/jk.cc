@@ -47,23 +47,23 @@ using namespace psi;
 
 namespace psi {
 
-JK::JK( boost::shared_ptr<BasisSet> primary) :
-    primary_(primary)
+JK::JK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) :
+    process_environment_(process_environment_in), primary_(primary)
 {
     common_init();
 }
 JK::~JK()
 {
 }
-boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
+boost::shared_ptr<JK> JK::build_JK(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in)
 {
-    Options& options = Process::environment.options;
+    Options& options = process_environment_in.options;
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    boost::shared_ptr<BasisSet> primary = BasisSet::construct(parser, Process::environment.molecule(), "BASIS");
+    boost::shared_ptr<BasisSet> primary = BasisSet::construct(process_environment_in, parser, process_environment_in.molecule(), "BASIS");
 
     if (options.get_str("SCF_TYPE") == "CD") {
 
-        CDJK* jk = new CDJK(primary,options.get_double("CHOLESKY_TOLERANCE"), psio_in);
+        CDJK* jk = new CDJK(process_environment_in, primary,options.get_double("CHOLESKY_TOLERANCE"), psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -84,9 +84,9 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 
     } else if (options.get_str("SCF_TYPE") == "DF") {
 
-        boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(parser, primary->molecule(), "DF_BASIS_SCF");
+        boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(process_environment_in, parser, primary->molecule(), "DF_BASIS_SCF");
 
-        DFJK* jk = new DFJK(primary,auxiliary, psio_in);
+        DFJK* jk = new DFJK(process_environment_in, primary,auxiliary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -107,9 +107,9 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 
     } else if (options.get_str("SCF_TYPE") == "FAST_DF") {
 
-        boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(parser, primary->molecule(), "DF_BASIS_SCF");
+        boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(process_environment_in, parser, primary->molecule(), "DF_BASIS_SCF");
 
-        FastDFJK* jk = new FastDFJK(primary,auxiliary, psio_in);
+        FastDFJK* jk = new FastDFJK(process_environment_in, primary,auxiliary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -140,7 +140,7 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 
     } else if (options.get_str("SCF_TYPE") == "PK") {
 
-        PKJK* jk = new PKJK(primary, psio_in);
+        PKJK* jk = new PKJK(process_environment_in, primary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -153,7 +153,7 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 
     } else if (options.get_str("SCF_TYPE") == "OUT_OF_CORE") {
 
-        DiskJK* jk = new DiskJK(primary, psio_in);
+        DiskJK* jk = new DiskJK(process_environment_in, primary, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -168,7 +168,7 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 
     } else if (options.get_str("SCF_TYPE") == "DIRECT") {
 
-        DirectJK* jk = new DirectJK(primary);
+        DirectJK* jk = new DirectJK(process_environment_in, primary);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -186,7 +186,7 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
 #if 0
     } else if (options.get_str("SCF_TYPE") == "PS") {
 
-        PSJK* jk = new PSJK(primary,options, psio_in);
+        PSJK* jk = new PSJK(process_environment_in, primary,options, psio_in);
 
         if (options["INTS_TOLERANCE"].has_changed())
             jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
@@ -204,7 +204,7 @@ boost::shared_ptr<JK> JK::build_JK(boost::shared_ptr<PSIO> psio_in)
             jk->set_dealiasing(options.get_str("PS_DEALIASING"));
         if (options["DEALIAS_BASIS_SCF"].has_changed()) {
             if (options.get_str("DEALIAS_BASIS_SCF") != "") {
-                boost::shared_ptr<BasisSet> dealias = BasisSet::construct(parser, primary->molecule(), "DEALIAS_BASIS_SCF");
+                boost::shared_ptr<BasisSet> dealias = BasisSet::construct(process_environment_in, parser, primary->molecule(), "DEALIAS_BASIS_SCF");
                 jk->set_dealias_basis(dealias);
             }
         }
@@ -597,8 +597,8 @@ void JK::finalize()
     postiterations();
 }
 
-DiskJK::DiskJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
-   JK(primary)
+DiskJK::DiskJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
+   JK(process_environment_in, primary)
 {
     psio_ = psio_in;
     common_init();
@@ -625,7 +625,7 @@ void DiskJK::print_header() const
 }
 void DiskJK::preiterations()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     mints->integrals();
     if(do_wK_)
         mints->integrals_erf(omega_);
@@ -1149,8 +1149,8 @@ void DiskJK::postiterations()
     delete[] so2index_;
 }
 
-PKJK::PKJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
-    JK(primary)
+PKJK::PKJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
+    JK(process_environment_in, primary)
 {
     psio_ = psio_in;
     common_init();
@@ -1190,15 +1190,15 @@ void PKJK::preiterations()
         psio_->open(pk_file_, PSIO_OPEN_NEW);
 
     // Start by generating conventional integrals on disk
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     mints->integrals();
     if(do_wK_)
         mints->integrals_erf(omega_);
     mints.reset();
 
-    int nso   = Process::environment.wavefunction()->nso();
-    int *sopi = Process::environment.wavefunction()->nsopi();
-    int nirreps = Process::environment.wavefunction()->nirrep();
+    int nso   = process_environment_.wavefunction()->nso();
+    int *sopi = process_environment_.wavefunction()->nsopi();
+    int nirreps = process_environment_.wavefunction()->nirrep();
 
     so2symblk_ = new int[nso];
     so2index_  = new int[nso];
@@ -1491,8 +1491,8 @@ void PKJK::preiterations()
 
 void PKJK::compute_JK()
 {
-    int nirreps = Process::environment.wavefunction()->nirrep();
-    int *sopi   = Process::environment.wavefunction()->nsopi();
+    int nirreps = process_environment_.wavefunction()->nirrep();
+    int *sopi   = process_environment_.wavefunction()->nsopi();
 
     bool file_was_open = psio_->open_check(pk_file_);
 //    if(!file_was_open);
@@ -1759,8 +1759,8 @@ void PKJK::postiterations()
 }
 
 
-DirectJK::DirectJK(boost::shared_ptr<BasisSet> primary) :
-   JK(primary)
+DirectJK::DirectJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) :
+   JK(process_environment_in, primary)
 {
     common_init();
 }
@@ -2285,9 +2285,9 @@ void DirectJK::build_JK(std::vector<boost::shared_ptr<TwoBodyAOInt> >& ints,
     }
 }
 
-DFJK::DFJK(boost::shared_ptr<BasisSet> primary,
+DFJK::DFJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
    boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in) :
-   JK(primary), auxiliary_(auxiliary)
+   JK(process_environment_in, primary), auxiliary_(auxiliary)
 {
     psio_ = psio_in;
     common_init();
@@ -4187,8 +4187,8 @@ void DFJK::block_wK(double** Qlmnp, double** Qrmnp, int naux)
     }
 }
 
-CDJK::CDJK(boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in):
-    DFJK(primary,primary, psio_in), cholesky_tolerance_(cholesky_tolerance)
+CDJK::CDJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in):
+    DFJK(process_environment_in, primary,primary, psio_in), cholesky_tolerance_(cholesky_tolerance)
 {
 }
 CDJK::~CDJK()
@@ -4239,7 +4239,7 @@ void CDJK::initialize_JK_core()
 
     if (df_ints_io_ == "SAVE") {
         // stick ncholesky in process environment for other codes that may use the integrals
-        Process::environment.globals["NAUX (SCF)"] = (double)ncholesky_;
+        process_environment_.globals["NAUX (SCF)"] = (double)ncholesky_;
 
         psio_->open(unit_,PSIO_OPEN_NEW);
         psio_->write_entry(unit_, "(Q|mn) Integrals", (char*) Qmnp[0], sizeof(double) * ntri * ncholesky_);
@@ -4285,9 +4285,9 @@ void CDJK::print_header() const
     }
 }
 
-FastDFJK::FastDFJK(boost::shared_ptr<BasisSet> primary,
+FastDFJK::FastDFJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
    boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in) :
-   JK(primary), auxiliary_(auxiliary)
+   JK(process_environment_in, primary), auxiliary_(auxiliary)
 {
     psio_ = psio_in;
     common_init();
@@ -5018,9 +5018,9 @@ void FastDFJK::build_K(boost::shared_ptr<Matrix> Z,
 
 #if 0
 
-PSJK::PSJK(boost::shared_ptr<BasisSet> primary,
+PSJK::PSJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
     Options& options, boost::shared_ptr<PSIO> psio_in) :
-    JK(primary), options_(options)
+    JK(process_environment_in, primary), options_(options)
 {
     psio_ = psio_in;
     common_init();
@@ -5676,8 +5676,8 @@ void PSJK::build_JK_debug(const std::string& op, double theta)
     }
 }
 
-DirectJK::DirectJK(boost::shared_ptr<BasisSet> primary) :
-   JK(primary)
+DirectJK::DirectJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) :
+   JK(process_environment_in, primary)
 {
     common_init();
 }

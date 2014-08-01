@@ -39,6 +39,7 @@ class CdSalcList;
 class MintsHelper {
 
 private:
+    Process::Environment& process_environment_;
     /// The Options reference for basis sets and things
     Options& options_;
     boost::shared_ptr<PSIO> psio_;
@@ -71,13 +72,13 @@ public:
     void init_helper(boost::shared_ptr<BasisSet> basis);
 
     /// Constructor, just lines references up
-    MintsHelper(boost::shared_ptr<PSIO> psio_in, Options&, int print = 1);
+    MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, Options&, int print = 1);
     /// Constructor, uses a basis set
-    MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis);
+    MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> basis);
     /// Constructor, uses globals
-    MintsHelper(boost::shared_ptr<PSIO> psio_in);
+    MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     /// Constructor, using wavefunction
-    MintsHelper(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction);
+    MintsHelper(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction);
     /// Destructor, does nothing
     ~MintsHelper();
 

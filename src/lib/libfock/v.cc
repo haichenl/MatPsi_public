@@ -35,10 +35,10 @@ using namespace psi;
 
 namespace psi {
 
-VBase::VBase(boost::shared_ptr<SuperFunctional> functional,
+VBase::VBase(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
     boost::shared_ptr<BasisSet> primary,
     Options& options):
-    functional_(functional), primary_(primary), options_(options)
+    process_environment_(process_environment_in), functional_(functional), primary_(primary), options_(options)
 {
     common_init();
 }
@@ -50,10 +50,10 @@ void VBase::common_init()
     print_ = options_.get_int("PRINT");
     debug_ = options_.get_int("DEBUG");
 }
-boost::shared_ptr<VBase> VBase::build_V(Options& options, const std::string& type)
+boost::shared_ptr<VBase> VBase::build_V(Process::Environment& process_environment_in, Options& options, const std::string& type)
 {
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    boost::shared_ptr<BasisSet> primary = BasisSet::construct(parser, Process::environment.molecule(), "BASIS");
+    boost::shared_ptr<BasisSet> primary = BasisSet::construct(process_environment_in, parser, process_environment_in.molecule(), "BASIS");
 
     int depth = 1; // By default, do first partials of the kernel
     if (type == "RK" || type == "UK")
@@ -64,13 +64,13 @@ boost::shared_ptr<VBase> VBase::build_V(Options& options, const std::string& typ
 
     boost::shared_ptr<VBase> v;
     if (type == "RV") {
-        v = boost::shared_ptr<VBase>(new RV(functional,primary,options));
+        v = boost::shared_ptr<VBase>(new RV(process_environment_in, functional,primary,options));
     } else if (type == "UV") {
-        v = boost::shared_ptr<VBase>(new UV(functional,primary,options));
+        v = boost::shared_ptr<VBase>(new UV(process_environment_in, functional,primary,options));
     } else if (type == "RK") {
-        v = boost::shared_ptr<VBase>(new RK(functional,primary,options));
+        v = boost::shared_ptr<VBase>(new RK(process_environment_in, functional,primary,options));
     } else if (type == "UK") { 
-        v = boost::shared_ptr<VBase>(new UK(functional,primary,options));
+        v = boost::shared_ptr<VBase>(new UK(process_environment_in, functional,primary,options));
     } else {
         throw PSIEXCEPTION("V: V type is not recognized");    
     }
@@ -357,7 +357,7 @@ void VBase::AO2USO()
 void VBase::initialize()
 {
     timer_on("V: Grid");
-    grid_ = boost::shared_ptr<DFTGrid>(new DFTGrid(primary_->molecule(),primary_,options_));
+    grid_ = boost::shared_ptr<DFTGrid>(new DFTGrid(process_environment_, primary_->molecule(),primary_,options_));
     timer_off("V: Grid");
 }
 void VBase::compute()
@@ -393,9 +393,9 @@ void VBase::print_header() const
     grid_->print(outfile,print_);
 }
 
-RV::RV(boost::shared_ptr<SuperFunctional> functional,
+RV::RV(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
     boost::shared_ptr<BasisSet> primary,
-    Options& options) : VBase(functional,primary,options)
+    Options& options) : VBase(process_environment_in, functional,primary,options)
 {
 }
 RV::~RV()
@@ -832,9 +832,9 @@ SharedMatrix RV::compute_gradient()
     return G;
 }
 
-UV::UV(boost::shared_ptr<SuperFunctional> functional,
+UV::UV(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
     boost::shared_ptr<BasisSet> primary,
-    Options& options) : VBase(functional,primary,options)
+    Options& options) : VBase(process_environment_in, functional,primary,options)
 {
 }
 UV::~UV()
@@ -1365,9 +1365,9 @@ SharedMatrix UV::compute_gradient()
     return G;
 }
 
-RK::RK(boost::shared_ptr<SuperFunctional> functional,
+RK::RK(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
     boost::shared_ptr<BasisSet> primary,
-    Options& options) : RV(functional,primary,options)
+    Options& options) : RV(process_environment_in, functional,primary,options)
 {
 }
 RK::~RK()
@@ -1382,9 +1382,9 @@ void RK::compute_V()
     // TODO
 }
 
-UK::UK(boost::shared_ptr<SuperFunctional> functional,
+UK::UK(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
     boost::shared_ptr<BasisSet> primary,
-    Options& options) : UV(functional,primary,options)
+    Options& options) : UV(process_environment_in, functional,primary,options)
 {
 }
 UK::~UK()

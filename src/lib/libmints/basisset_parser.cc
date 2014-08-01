@@ -160,7 +160,7 @@ vector<string> BasisSetParser::string_to_vector(const std::string &data)
 }
 
 std::vector<GaussianShell>
-Gaussian94BasisSetParser::parse(const string& symbol, const std::vector<std::string> &lines)
+Gaussian94BasisSetParser::parse(Process::Environment& process_environment_in, const string& symbol, const std::vector<std::string> &lines)
 {
     // Regular expressions that we'll be checking for.
     regex cartesian("^\\s*cartesian\\s*", regbase::icase);
@@ -210,14 +210,14 @@ Gaussian94BasisSetParser::parse(const string& symbol, const std::vector<std::str
         if (!force_puream_or_cartesian_) {
             if (regex_match(line, what, cartesian)) {
                 gaussian_type = Cartesian;
-                if (Process::environment.options.get_global("PUREAM").has_changed()) {
-                    gaussian_type = ((Process::environment.options.get_global("PUREAM").to_integer()) ? Pure : Cartesian);
+                if (process_environment_in.options.get_global("PUREAM").has_changed()) {
+                    gaussian_type = ((process_environment_in.options.get_global("PUREAM").to_integer()) ? Pure : Cartesian);
             }
                 continue;
             } else if (regex_match(line, what, spherical)) {
                 gaussian_type = Pure;
-                if (Process::environment.options.get_global("PUREAM").has_changed()) {
-                    gaussian_type = ((Process::environment.options.get_global("PUREAM").to_integer()) ? Pure : Cartesian);
+                if (process_environment_in.options.get_global("PUREAM").has_changed()) {
+                    gaussian_type = ((process_environment_in.options.get_global("PUREAM").to_integer()) ? Pure : Cartesian);
                 }
                 continue;
             }

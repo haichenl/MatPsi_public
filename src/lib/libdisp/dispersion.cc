@@ -63,9 +63,9 @@ Dispersion::Dispersion()
 Dispersion::~Dispersion()
 {
 }
-boost::shared_ptr<Dispersion> Dispersion::build(const std::string & name, double s6, double p1, double p2, double p3)
+boost::shared_ptr<Dispersion> Dispersion::build(Process::Environment& process_environment_in, const std::string & name, double s6, double p1, double p2, double p3)
 {
-    Options& options = Process::environment.options;
+    Options& options = process_environment_in.options;
     if (options["DFT_DISPERSION_PARAMETERS"].has_changed()) {
         int temp = options["DFT_DISPERSION_PARAMETERS"].size();
         if (temp > 0) { s6 = options["DFT_DISPERSION_PARAMETERS"][0].to_double(); }

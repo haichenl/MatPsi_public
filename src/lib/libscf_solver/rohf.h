@@ -74,8 +74,8 @@ protected:
 
     void common_init();
 public:
-    ROHF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    ROHF(Options& options, boost::shared_ptr<PSIO> psio);
+    ROHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    ROHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     virtual ~ROHF();
     virtual bool same_a_b_orbs() const { return restricted_; }
     virtual bool same_a_b_dens() const { return false; }

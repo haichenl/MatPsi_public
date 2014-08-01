@@ -24,8 +24,8 @@
 
 namespace psi { namespace sapt {
 
-SAPT::SAPT(Options& options, boost::shared_ptr<PSIO> psio, 
-  boost::shared_ptr<Chkpt> chkpt) : Wavefunction(options, psio, chkpt)
+SAPT::SAPT(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
+  boost::shared_ptr<Chkpt> chkpt) : Wavefunction(process_environment_in, options, psio, chkpt)
 {
 #ifdef HAVE_MKL
   mkl_set_dynamic(1);
@@ -75,11 +75,11 @@ void SAPT::initialize()
   vBAB_ = NULL;
 
   boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-  ribasis_ = boost::shared_ptr<BasisSet>(BasisSet::construct(parser, molecule_, 
+  ribasis_ = boost::shared_ptr<BasisSet>(BasisSet::construct(process_environment_, parser, molecule_, 
     "DF_BASIS_SAPT"));
   elst_basis_ = 0;
   if (options_.get_str("DF_BASIS_ELST") != "") {
-    elstbasis_ = boost::shared_ptr<BasisSet>(BasisSet::construct(parser, 
+    elstbasis_ = boost::shared_ptr<BasisSet>(BasisSet::construct(process_environment_, parser, 
       molecule_,"DF_BASIS_ELST"));
     elst_basis_ = 1;
   }
@@ -98,7 +98,7 @@ void SAPT::initialize()
   ghostsA.push_back(1);
   boost::shared_ptr<Molecule> monomerA = molecule_->extract_subsets(realsA,
     ghostsA);
-  foccA_ = monomerA->nfrozen_core(options_.get_str("FREEZE_CORE"));
+  foccA_ = monomerA->nfrozen_core(process_environment_, options_.get_str("FREEZE_CORE"));
 
   std::vector<int> realsB;
   realsB.push_back(1);
@@ -106,7 +106,7 @@ void SAPT::initialize()
   ghostsB.push_back(0);
   boost::shared_ptr<Molecule> monomerB = molecule_->extract_subsets(realsB,
     ghostsB);
-  foccB_ = monomerB->nfrozen_core(options_.get_str("FREEZE_CORE"));
+  foccB_ = monomerB->nfrozen_core(process_environment_, options_.get_str("FREEZE_CORE"));
 
   natomsA_ = 0;
   natomsB_ = 0;
@@ -318,7 +318,7 @@ void SAPT::get_denom()
   for (int s=0; s<nvirB_; s++)
     evals_virB->set(0,s,evalsB_[s+noccB_]);
 
-  denom_ = SAPTDenominator::buildDenominator(
+  denom_ = SAPTDenominator::buildDenominator(process_environment_,
     options_.get_str("DENOMINATOR_ALGORITHM"),
     evals_aoccA, evals_virA, evals_aoccB, evals_virB, 
     options_.get_double("DENOMINATOR_DELTA"), debug_);

@@ -50,7 +50,7 @@ public:
     virtual ~Denominator();
 
     // Factory method, algorithm should be LAPLACE or CHOLESKY
-    static boost::shared_ptr<Denominator> buildDenominator(const std::string& algorithm,
+    static boost::shared_ptr<Denominator> buildDenominator(Process::Environment& process_environment_in, const std::string& algorithm,
             boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta);
 
     double delta() const { return delta_; }
@@ -63,6 +63,9 @@ public:
 class LaplaceDenominator : public Denominator {
 
 protected:
+    
+    Process::Environment& process_environment_;
+    
     // Fully split denominator (w in rows, i in columns)
     SharedMatrix denominator_occ_;
     // Fully split denominator (w in rows, a in columns)
@@ -70,7 +73,7 @@ protected:
 
     void decompose();
 public:
-    LaplaceDenominator(boost::shared_ptr<Vector> eps_occ_, boost::shared_ptr<Vector> eps_vir, double delta);
+    LaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector> eps_occ_, boost::shared_ptr<Vector> eps_vir, double delta);
     ~LaplaceDenominator();
     void debug();
     SharedMatrix denominator_occ() const { return denominator_occ_; }
@@ -121,7 +124,7 @@ public:
     virtual ~SAPTDenominator();
 
     // Factory method, algorithm should be LAPLACE or CHOLESKY
-    static boost::shared_ptr<SAPTDenominator> buildDenominator(const std::string& algorithm,
+    static boost::shared_ptr<SAPTDenominator> buildDenominator(Process::Environment& process_environment_in, const std::string& algorithm,
             boost::shared_ptr<Vector> eps_occA, boost::shared_ptr<Vector> eps_virA,
             boost::shared_ptr<Vector> eps_occB, boost::shared_ptr<Vector> eps_virB,
             double delta, bool debug = false);
@@ -137,6 +140,9 @@ public:
 class SAPTLaplaceDenominator : public SAPTDenominator {
 
 protected:
+    
+    Process::Environment& process_environment_;
+    
     // Fully split denominator (w in rows, a in columns) (monomer A)
     SharedMatrix denominator_occA_;
     // Fully split denominator (w in rows, r in columns) (monomer A)
@@ -150,7 +156,7 @@ protected:
     void check_split(boost::shared_ptr<Vector>, boost::shared_ptr<Vector>,
       SharedMatrix, SharedMatrix);
 public:
-    SAPTLaplaceDenominator(boost::shared_ptr<Vector>, boost::shared_ptr<Vector>,
+    SAPTLaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector>, boost::shared_ptr<Vector>,
       boost::shared_ptr<Vector>, boost::shared_ptr<Vector>, double, bool debug = false);
     ~SAPTLaplaceDenominator();
 
@@ -174,6 +180,8 @@ public:
 
 class TLaplaceDenominator {
 
+    Process::Environment& process_environment_;
+    
     // Pointer to active occupied orbital eigenvalues
     boost::shared_ptr<Vector> eps_occ_;
     // Pointer to active virtual orbital eigenvalues
@@ -190,7 +198,7 @@ class TLaplaceDenominator {
 
     virtual void decompose();
 public:
-    TLaplaceDenominator(boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta);
+    TLaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta);
     virtual ~TLaplaceDenominator();
 
     double delta() const { return delta_; }

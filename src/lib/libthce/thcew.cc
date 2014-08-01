@@ -51,8 +51,8 @@ using namespace boost;
 
 namespace psi {
 
-THCEW::THCEW() :
-    Wavefunction(Process::environment.options, boost::shared_ptr<PSIO>(new PSIO()), _default_chkpt_lib_)
+THCEW::THCEW(Process::Environment& process_environment_in) :
+    Wavefunction(process_environment_in, process_environment_in.options, boost::shared_ptr<PSIO>(new PSIO()), process_environment_.wavefunction()->get_chkpt())
 {
     common_init();
 }
@@ -64,7 +64,7 @@ void THCEW::common_init()
     print_ = options_.get_int("PRINT");
     debug_ = options_.get_int("DEBUG");
 
-    reference_wavefunction_ = Process::environment.wavefunction();
+    reference_wavefunction_ = process_environment_.wavefunction();
     if (!reference_wavefunction_) {
         throw PSIEXCEPTION("THCEW: Run SCF first");
     }
@@ -76,8 +76,8 @@ void THCEW::common_init()
 
     thce_ = boost::shared_ptr<THCE>(new THCE());
 }
-RTHCEW::RTHCEW() : 
-    THCEW()
+RTHCEW::RTHCEW(Process::Environment& process_environment_in) : 
+    THCEW(process_environment_in)
 {
     common_init();
 }

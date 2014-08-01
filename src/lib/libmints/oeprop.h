@@ -64,6 +64,9 @@ class BasisSet;
 class Prop {
 
 protected:
+
+    Process::Environment& process_environment_;
+    
     /// Print flag
     int print_;
     /// Debug flag
@@ -116,7 +119,7 @@ protected:
 public:
 
     /// Build a Prop object with C, epsilon, and restricted buit from wfn
-    Prop(boost::shared_ptr<Wavefunction> wfn);
+    Prop(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn);
     /// Virtual destructor
     virtual ~Prop();
 
@@ -272,9 +275,9 @@ protected:
     Vector3 compute_center(const double *property) const;
 public:
     /// Constructor, uses globals
-    OEProp(boost::shared_ptr<Wavefunction> wfn);
+    OEProp(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn);
     /// Constructor, uses globals and Process::environment::reference wavefunction
-    OEProp();
+    OEProp(Process::Environment& process_environment_in);
     /// Destructor
     virtual ~OEProp();
 
@@ -393,9 +396,9 @@ protected:
 
 public:
     /// Constructor, uses globals
-    GridProp(boost::shared_ptr<Wavefunction> wfn);
+    GridProp(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn);
     /// Constructor, uses globals and Process::environment::reference wavefunction
-    GridProp();
+    GridProp(Process::Environment& process_environment_in);
     /// Destructor
     virtual ~GridProp();
 

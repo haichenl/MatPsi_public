@@ -85,10 +85,13 @@ public:
         int nangpts;
     };
 protected:
+    
+    Process::Environment& process_environment_;
+    
     /// A copy of the options used, for printing purposes.
     MolecularGridOptions options_;
 public:
-    MolecularGrid(boost::shared_ptr<Molecule> molecule);
+    MolecularGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule);
     virtual ~MolecularGrid();   
 
     /// Build the grid
@@ -139,11 +142,11 @@ protected:
 public:
 
     /// Constructor to use for autogeneration
-    PseudospectralGrid(boost::shared_ptr<Molecule> molecule,
+    PseudospectralGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
                        boost::shared_ptr<BasisSet> primary, 
                        Options& options); 
     /// Construtor to use for semiautomatic generation with grid file
-    PseudospectralGrid(boost::shared_ptr<Molecule> molecule,
+    PseudospectralGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
                        boost::shared_ptr<BasisSet> primary, 
                        const std::string& filename, 
                        Options& options); 
@@ -162,7 +165,7 @@ protected:
     Options& options_;
 
 public:
-    DFTGrid(boost::shared_ptr<Molecule> molecule,
+    DFTGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
             boost::shared_ptr<BasisSet> primary,
             Options& options);
     virtual ~DFTGrid();

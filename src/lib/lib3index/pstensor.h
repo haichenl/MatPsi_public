@@ -112,6 +112,7 @@ protected:
     /// Memory available to this algorithm, in doubles
     unsigned long int memory_;
     
+    Process::Environment& process_environment_;
     boost::shared_ptr<PSIO> psio_;
     
     /// Molecule (for convenience)
@@ -247,7 +248,7 @@ protected:
     SharedMatrix O_;
 
 public:
-    PSTensorII(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary, 
+    PSTensorII(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary, 
              SharedMatrix C,
              int nocc,
              int nvir,
@@ -293,6 +294,7 @@ protected:
     /// Print level
     int print_;
 
+    Process::Environment& process_environment_;
     boost::shared_ptr<PSIO> psio_;
     
     /// Molecule (fo convenience)
@@ -417,7 +419,7 @@ protected:
 
 public:
 
-    PSTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary, 
+    PSTensor(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary, 
              SharedMatrix C,
              int nocc,
              int nvir,
@@ -466,7 +468,9 @@ protected:
     // Print flag
     int print_;
     
+    Process::Environment& process_environment_;
     boost::shared_ptr<PSIO> psio_;
+    
     // options 
     Options& options_;
     // Molecule
@@ -626,7 +630,7 @@ protected:
 
 public:
 
-    PseudoTrial(boost::shared_ptr<PSIO> psio_in);
+    PseudoTrial(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     ~PseudoTrial();
     
     SharedMatrix getI() const;

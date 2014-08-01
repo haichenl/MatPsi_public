@@ -131,7 +131,9 @@ class IntegralTransform{
          * @param initialize         Whether to initialize during construction or not.  Useful if some
          *                           options need to be tweaked before initialization.
          */
-        IntegralTransform(boost::shared_ptr<Wavefunction> wfn,
+        IntegralTransform(Process::Environment& process_environment_in,
+                          boost::shared_ptr<PSIO> psio_in, 
+                          boost::shared_ptr<Wavefunction> wfn,
                           SpaceVec spaces,
                           TransformationType transformationType = Restricted,
                           OutputType outputType = DPDOnly,
@@ -139,7 +141,9 @@ class IntegralTransform{
                           FrozenOrbitals frozenOrbitals = OccAndVir,
                           bool initialize = true);
 
-        IntegralTransform(SharedMatrix c,
+        IntegralTransform(Process::Environment& process_environment_in, 
+                          boost::shared_ptr<PSIO> psio_in, 
+                          SharedMatrix c,
                           SharedMatrix i,
                           SharedMatrix a,
                           SharedMatrix v,
@@ -240,6 +244,9 @@ class IntegralTransform{
         void reset_so_int() { alreadyPresorted_ = false; }
 
     protected:
+        
+        Process::Environment& process_environment_;
+        
         void check_initialized();
         void common_initialize();
 

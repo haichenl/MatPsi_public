@@ -71,6 +71,9 @@ class TwoBodySOInt
 #endif
 {
 protected:
+    
+    Process::Environment& process_environment_;
+    
     std::vector<boost::shared_ptr<TwoBodyAOInt> > tb_;
     boost::shared_ptr<IntegralFactory> integral_;
 
@@ -115,15 +118,15 @@ protected:
     void common_init();
 public:
     // Constructor, assuming 1 thread
-    TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt>&,
+    TwoBodySOInt(Process::Environment& process_environment_in, const boost::shared_ptr<TwoBodyAOInt>&,
                  const boost::shared_ptr<IntegralFactory>&);
     // Constructor, using vector of AO objects for threading
-    TwoBodySOInt(const std::vector<boost::shared_ptr<TwoBodyAOInt> > &tb,
+    TwoBodySOInt(Process::Environment& process_environment_in, const std::vector<boost::shared_ptr<TwoBodyAOInt> > &tb,
                  const boost::shared_ptr<IntegralFactory>& integral);
-    TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt>& aoint,
+    TwoBodySOInt(Process::Environment& process_environment_in, const boost::shared_ptr<TwoBodyAOInt>& aoint,
                  const boost::shared_ptr<IntegralFactory>& intfac,
                  const CdSalcList& cdsalcs);
-    TwoBodySOInt(const std::vector<boost::shared_ptr<TwoBodyAOInt> >& tb,
+    TwoBodySOInt(Process::Environment& process_environment_in, const std::vector<boost::shared_ptr<TwoBodyAOInt> >& tb,
                  const boost::shared_ptr<IntegralFactory>& integral,
                  const CdSalcList& cdsalcs);
 

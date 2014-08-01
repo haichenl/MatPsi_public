@@ -47,12 +47,12 @@ using namespace boost;
 
 namespace psi { namespace scf {
 
-UHF::UHF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) : HF(options, psio, chkpt)
+UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) : HF(process_environment_in, options, psio, chkpt)
 {
     common_init();
 }
 
-UHF::UHF(Options& options, boost::shared_ptr<PSIO> psio) : HF(options, psio)
+UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio) : HF(process_environment_in, options, psio)
 {
     common_init();
 }
@@ -268,7 +268,7 @@ void UHF::compute_orbital_gradient(bool save_fock)
 
     if(save_fock){
         if (initialized_diis_manager_ == false) {
-            diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
+            diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
             diis_manager_->set_error_vector_size(2,
                                                  DIISEntry::Matrix, gradient_a.get(),
                                                  DIISEntry::Matrix, gradient_b.get());
@@ -302,9 +302,9 @@ void UHF::stability_analysis()
         spaces.push_back(MOSpace::occ);
         spaces.push_back(MOSpace::vir);
         // Ref wfn is really "this"
-        boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
+        boost::shared_ptr<Wavefunction> wfn = process_environment_.wavefunction();
 #define ID(x) ints.DPD_ID(x)
-        IntegralTransform ints(wfn, spaces, IntegralTransform::Unrestricted, IntegralTransform::DPDOnly,
+        IntegralTransform ints(process_environment_, psio_, wfn, spaces, IntegralTransform::Unrestricted, IntegralTransform::DPDOnly,
                                IntegralTransform::QTOrder, IntegralTransform::None);
         ints.set_keep_dpd_so_ints(true);
         ints.set_keep_iwl_so_ints(true);

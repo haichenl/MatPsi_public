@@ -253,8 +253,8 @@ void MoldenWriter::write(const std::string &filename)
     fclose(molden);
 }
 
-NBOWriter::NBOWriter(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction)
-    : wavefunction_(wavefunction)
+NBOWriter::NBOWriter(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<Wavefunction> wavefunction)
+    : process_environment_(process_environment_in), wavefunction_(wavefunction)
 {
     psio_ = psio_in;
 
@@ -271,7 +271,7 @@ void NBOWriter::write(const std::string &filename)
         { 351, 352, 353, 354, 355, 356, 357 } //f
     };
 
-    MintsHelper helper = MintsHelper(psio_);
+    MintsHelper helper = MintsHelper(process_environment_, psio_);
     SharedMatrix sotoao = helper.petite_list()->sotoao();
 
     FILE *file47 = fopen(filename.c_str(), "a");

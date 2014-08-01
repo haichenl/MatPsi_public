@@ -43,10 +43,11 @@ namespace psi{
  * @param storagePolicy: How to store the DIIS vectors
  * @param psio: the PSIO object to use for I/O.  Do not specify if DPD is being used.
  */
-DIISManager::DIISManager(int maxSubspaceSize,
+DIISManager::DIISManager(Process::Environment& process_environment_in, int maxSubspaceSize,
                          const std::string& label, boost::shared_ptr<PSIO> psio_in,
                          RemovalPolicy removalPolicy,
                          StoragePolicy storagePolicy):
+            process_environment_(process_environment_in),
             _maxSubspaceSize(maxSubspaceSize),
             _removalPolicy(removalPolicy),
             _storagePolicy(storagePolicy),
@@ -436,7 +437,7 @@ DIISManager::extrapolate(int numQuantities, ...)
     Matrix *matrix;
     double *array;
     va_list args;
-    int print  = Process::environment.options.get_int("PRINT");
+    int print  = process_environment_.options.get_int("PRINT");
     if(print > 2) fprintf(outfile, "DIIS coefficients: ");
     for(int n = 0; n < _subspace.size(); ++n){
         double coefficient = coefficients[n];

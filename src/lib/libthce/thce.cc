@@ -675,7 +675,8 @@ boost::shared_ptr<Tensor> CoreTensor::build(const std::string& name,
 }
 void CoreTensor::print(FILE* fh, int level) const
 {
-    const int print_ncol = Process::environment.options.get_int("MAT_NUM_COLUMN_PRINT"); 
+    //~ const int print_ncol = Process::environment.options.get_int("MAT_NUM_COLUMN_PRINT"); 
+    const int print_ncol = 5;
     if (level >= 0) {
         fprintf(fh, "  => CoreTensor %s <=\n\n", name_.c_str());
         fprintf(fh, "    Order   = %11d\n", order_);

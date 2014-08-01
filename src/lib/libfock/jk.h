@@ -153,6 +153,8 @@ class JK {
 
 protected:
 
+    Process::Environment& process_environment_;
+
     // => Utility Variables <= //
 
     /// Print flag, defaults to 1
@@ -258,7 +260,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    JK(boost::shared_ptr<BasisSet> primary);
+    JK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary);
 
     /// Destructor
     virtual ~JK();
@@ -270,7 +272,7 @@ public:
     * @param options Options reference, with preset parameters
     * @return abstract JK object, tuned in with preset options
     */
-    static boost::shared_ptr<JK> build_JK(boost::shared_ptr<PSIO> psio_in);
+    static boost::shared_ptr<JK> build_JK(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
 
     // => Knobs <= //
 
@@ -468,7 +470,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    DiskJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
+    DiskJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
     /// Destructor
     virtual ~DiskJK();
 
@@ -537,7 +539,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    PKJK(boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
+    PKJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in);
     /// Destructor
     virtual ~PKJK();
 
@@ -600,7 +602,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    DirectJK(boost::shared_ptr<BasisSet> primary);
+    DirectJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary);
     /// Destructor
     virtual ~DirectJK();
 
@@ -722,7 +724,7 @@ public:
      *        structure as this molecule
      * @param auxiliary auxiliary basis set for this system.
      */
-    DFJK( boost::shared_ptr<BasisSet> primary,
+    DFJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
        boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
@@ -812,7 +814,7 @@ public:
      *        structure as this molecule
      * @param tol tolerance for cholesky decomposition.
      */
-    CDJK( boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in);
+    CDJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, double cholesky_tolerance, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
     virtual ~CDJK();
@@ -917,7 +919,7 @@ public:
      *        structure as this molecule
      * @param auxiliary auxiliary basis set for this system.
      */
-    FastDFJK( boost::shared_ptr<BasisSet> primary,
+    FastDFJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
        boost::shared_ptr<BasisSet> auxiliary, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor
@@ -1036,7 +1038,7 @@ public:
      *        C matrices must have the same spatial symmetry
      *        structure as this molecule
      */
-    DirectJK(boost::shared_ptr<BasisSet> primary);
+    DirectJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary);
     /// Destructor
     virtual ~DirectJK();
 
@@ -1129,7 +1131,7 @@ public:
      *        structure as this molecule
      * @param options, Options reference used to build grid
      */
-    PSJK(boost::shared_ptr<BasisSet> primary,
+    PSJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
         Options& options, boost::shared_ptr<PSIO> psio_in);
 
     /// Destructor

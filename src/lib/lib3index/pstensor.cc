@@ -42,7 +42,7 @@ using namespace psi;
 
 namespace psi {
 
-PSTensorII::PSTensorII(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
+PSTensorII::PSTensorII(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
                    SharedMatrix C,
                    int nocc,
                    int nvir,
@@ -50,7 +50,7 @@ PSTensorII::PSTensorII(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisS
                    int navir,
                    ULI memory,
                    Options& options) :
-    primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
+    process_environment_(process_environment_in), primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
     naocc_(naocc), navir_(navir), memory_(memory), options_(options)
 {
     psio_ = psio_in;
@@ -177,10 +177,10 @@ void PSTensorII::print_header()
 void PSTensorII::buildGrid()
 {
     if (options_.get_str("PS_GRID_FILE") == "") {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_,
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_,
             primary_, options_));
     } else {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_,
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_,
             primary_, options_.get_str("PS_GRID_FILE"), options_));
     }
 
@@ -207,7 +207,7 @@ void PSTensorII::buildDealiasSet()
 
         boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
         molecule_->set_basis_all_atoms(options_.get_str("DEALIAS_BASIS_CC"),"DEALIAS_BASIS");
-        dealias_ = BasisSet::construct(parser,molecule_,"DEALIAS_BASIS");
+        dealias_ = BasisSet::construct(process_environment_, parser,molecule_,"DEALIAS_BASIS");
     }
 
     if (print_) {
@@ -613,7 +613,7 @@ SharedMatrix PSTensorII::Amo()
 }
 SharedMatrix PSTensorII::Imo()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     return mints->mo_eri(C_,C_);
 }
 SharedMatrix PSTensorII::Ipsmo()
@@ -847,7 +847,7 @@ void PSTensorII::form_Cdd()
         Cdd_->print();
 }
 // Older PSTensor
-PSTensor::PSTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
+PSTensor::PSTensor(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
                    SharedMatrix C,
                    int nocc,
                    int nvir,
@@ -855,7 +855,7 @@ PSTensor::PSTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> 
                    int navir,
                    Options& options,
                    double omega) :
-    primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
+    process_environment_(process_environment_in), primary_(primary), C_(C), nocc_(nocc), nvir_(nvir),
     naocc_(naocc), navir_(navir), options_(options), omega_(omega)
 {
     psio_ = psio_in;
@@ -950,7 +950,7 @@ void PSTensor::buildDealiasSet()
         } else {
             fprintf(outfile,"  Dealias Basis Read from %s", options_.get_str("DEALIAS_BASIS_CC").c_str());
             molecule_->set_basis_all_atoms(options_.get_str("DEALIAS_BASIS_CC"),"DEALIAS_BASIS");
-            dealias_ = BasisSet::construct(parser,molecule_,"DEALIAS_BASIS");
+            dealias_ = BasisSet::construct(process_environment_, parser,molecule_,"DEALIAS_BASIS");
         }
         dealias_->print_by_level(outfile,print_);
     }
@@ -962,10 +962,10 @@ void PSTensor::buildDealiasSet()
 void PSTensor::buildGrid()
 {
     if (options_.get_str("PS_GRID_FILE") == "") {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_,
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_,
             primary_, options_));
     } else {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_,
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_,
             primary_, options_.get_str("PS_GRID_FILE"), options_));
     }
 
@@ -1701,7 +1701,7 @@ SharedMatrix PSTensor::Amo()
 }
 SharedMatrix PSTensor::Imo()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     return mints->mo_eri(C_,C_);
 }
 SharedMatrix PSTensor::Ipsmo()

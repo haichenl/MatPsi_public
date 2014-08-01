@@ -206,11 +206,11 @@ int Process::Environment::get_n_threads() const {return nthread_; }
 int Process::Arguments::argc() const { return arguments_.size(); }
 
 namespace psi {
-void die_if_not_converged()
+void die_if_not_converged(Process::Environment& process_environment_in)
 {
   fprintf(outfile, "Iterations did not converge.");
 
-  if (Process::environment.options.get_bool("DIE_IF_NOT_CONVERGED"))
+  if (process_environment_in.options.get_bool("DIE_IF_NOT_CONVERGED"))
     throw PSIEXCEPTION("Iterations did not converge.");
   else {
     fprintf(stderr, "Iterations did not converge.");

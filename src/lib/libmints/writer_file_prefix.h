@@ -27,7 +27,7 @@
 
 namespace psi {
 
-std::string get_writer_file_prefix(void);
+std::string get_writer_file_prefix(Process::Environment& process_environment_in);
 
 }
 

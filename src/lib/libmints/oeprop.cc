@@ -47,7 +47,7 @@ using namespace std;
 
 namespace psi {
 
-Prop::Prop(boost::shared_ptr<Wavefunction> wfn) : wfn_(wfn)
+Prop::Prop(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn) : process_environment_(process_environment_in), wfn_(wfn)
 {
     if (wfn_.get() == NULL)
         throw PSIEXCEPTION("Prop: Wavefunction is null");
@@ -727,11 +727,11 @@ SharedMatrix Prop::overlap_so()
     return S;
 }
 
-OEProp::OEProp(boost::shared_ptr<Wavefunction> wfn) : Prop(wfn_)
+OEProp::OEProp(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn) : Prop(process_environment_in, wfn_)
 {
     common_init();
 }
-OEProp::OEProp() : Prop(Process::environment.wavefunction())
+OEProp::OEProp(Process::Environment& process_environment_in) : Prop(process_environment_in, process_environment_in.wavefunction())
 {
     common_init();
 }
@@ -763,7 +763,7 @@ Vector3 OEProp::compute_center(const double *property) const
 void OEProp::common_init()
 {
     // See if the user specified the origin
-    Options &options = Process::environment.options;
+    Options &options = process_environment_.options;
 
     print_ = options.get_int("PRINT");
 
@@ -983,7 +983,7 @@ void OEProp::compute_multipoles(int order, bool transition)
             /*- Process::environment.globals["DIPOLE Y"] -*/
             /*- Process::environment.globals["32-POLE XXXXX"] -*/
             /*- Process::environment.globals["32-POLE XXXXY"] -*/
-            Process::environment.globals[upper_name] = tot;
+            process_environment_.globals[upper_name] = tot;
             ++address;
         }
         fprintf(outfile, "\n");
@@ -1032,7 +1032,7 @@ void OEProp::compute_esp_at_nuclei()
         fprintf(outfile, "  %3d %2s           %16.12f\n",
                 atom1+1, mol->label(atom1).c_str(), nuc+elec);
         /*- Process::environment.globals["ESP AT CENTER n"] -*/
-        Process::environment.globals[s.str()] = nuc+elec;
+        process_environment_.globals[s.str()] = nuc+elec;
     }
     fprintf(outfile, " ---------------------------------------------\n");
 }
@@ -1117,13 +1117,13 @@ void OEProp::compute_dipole(bool transition)
     // Dipole components in Debye
     std::stringstream s;
     s << title_ << " DIPOLE X";
-    Process::environment.globals[s.str()] = de[0]*dfac;
+    process_environment_.globals[s.str()] = de[0]*dfac;
     s.str(std::string());
     s << title_ << " DIPOLE Y";
-    Process::environment.globals[s.str()] = de[1]*dfac;
+    process_environment_.globals[s.str()] = de[1]*dfac;
     s.str(std::string());
     s << title_ << " DIPOLE Z";
-    Process::environment.globals[s.str()] = de[2]*dfac;
+    process_environment_.globals[s.str()] = de[2]*dfac;
 
     fflush(outfile);
 }
@@ -1210,22 +1210,22 @@ void OEProp::compute_quadrupole(bool transition)
     // Quadrupole components in Debye Ang
     std::stringstream s;
     s << title_ << " QUADRUPOLE XX";
-    Process::environment.globals[s.str()] = qe[0]*dfac;
+    process_environment_.globals[s.str()] = qe[0]*dfac;
     s.str(std::string());
     s << title_ << " QUADRUPOLE YY";
-    Process::environment.globals[s.str()] = qe[3]*dfac;
+    process_environment_.globals[s.str()] = qe[3]*dfac;
     s.str(std::string());
     s << title_ << " QUADRUPOLE ZZ";
-    Process::environment.globals[s.str()] = qe[5]*dfac;
+    process_environment_.globals[s.str()] = qe[5]*dfac;
     s.str(std::string());
     s << title_ << " QUADRUPOLE XY";
-    Process::environment.globals[s.str()] = qe[1]*dfac;
+    process_environment_.globals[s.str()] = qe[1]*dfac;
     s.str(std::string());
     s << title_ << " QUADRUPOLE XZ";
-    Process::environment.globals[s.str()] = qe[2]*dfac;
+    process_environment_.globals[s.str()] = qe[2]*dfac;
     s.str(std::string());
     s << title_ << " QUADRUPOLE YZ";
-    Process::environment.globals[s.str()] = qe[4]*dfac;
+    process_environment_.globals[s.str()] = qe[4]*dfac;
 
     fflush(outfile);
 }
@@ -1879,11 +1879,11 @@ void OEProp::compute_no_occupations(int max_num)
     fflush(outfile);
 }
 
-GridProp::GridProp(boost::shared_ptr<Wavefunction> wfn) : filename_("out.grid"), Prop(wfn)
+GridProp::GridProp(Process::Environment& process_environment_in, boost::shared_ptr<Wavefunction> wfn) : filename_("out.grid"), Prop(process_environment_in, wfn)
 {
     common_init();
 }
-GridProp::GridProp() : filename_("out.grid"), Prop(Process::environment.wavefunction())
+GridProp::GridProp(Process::Environment& process_environment_in) : filename_("out.grid"), Prop(process_environment_in, process_environment_in.wavefunction())
 {
     common_init();
 }

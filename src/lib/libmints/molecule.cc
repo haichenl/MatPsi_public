@@ -653,11 +653,11 @@ void Molecule::rotate_full(const Matrix& R)
     set_full_geometry(new_geom);
 }
 
-int Molecule::nfrozen_core(const std::string& depth)
+int Molecule::nfrozen_core(Process::Environment& process_environment_in, const std::string& depth)
 {
     string local = depth;
     if (depth.empty())
-        local = Process::environment.options.get_str("FREEZE_CORE");
+        local = process_environment_in.options.get_str("FREEZE_CORE");
 
     if (local == "FALSE") {
         return 0;
@@ -838,7 +838,7 @@ int Molecule::multiplicity() const
     return multiplicity_;
 }
 
-boost::shared_ptr<Molecule> Molecule::create_molecule_from_string(const std::string &text)
+boost::shared_ptr<Molecule> Molecule::create_molecule_from_string(Process::Environment& process_environment_in, const std::string &text)
 {
     smatch reMatches;
     // Split the input at newlines, storing the result in "lines"
@@ -846,7 +846,7 @@ boost::shared_ptr<Molecule> Molecule::create_molecule_from_string(const std::str
     boost::split(lines, text, boost::is_any_of("\n"));
 
     boost::shared_ptr<Molecule> mol(new Molecule);
-    std::string units = Process::environment.options.get_str("UNITS");
+    std::string units = process_environment_in.options.get_str("UNITS");
 
     if(boost::iequals(units, "ANG") || boost::iequals(units, "ANGSTROM") || boost::iequals(units, "ANGSTROMS")) {
         mol->set_units(Angstrom);

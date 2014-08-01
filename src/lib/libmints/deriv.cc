@@ -64,7 +64,7 @@ public:
     CorrelatedFunctor() {
         throw PSIEXCEPTION("CorrelatedRestrictedFunctor(): Default constructor called. This shouldn't happen.");
     }
-    CorrelatedFunctor(SharedVector results) : psio_(_default_psio_lib_)
+    CorrelatedFunctor(SharedVector results, boost::shared_ptr<PSIO> psio_in) : psio_(psio_in)
     {
         nthread = WorldComm->nthread();
         result.push_back(results);
@@ -419,17 +419,21 @@ public:
     }
 };
 
-Deriv::Deriv(const boost::shared_ptr<Wavefunction>& wave,
+Deriv::Deriv(Process::Environment& process_environment_in, 
+             boost::shared_ptr<PSIO> psio_in, 
+             const boost::shared_ptr<Wavefunction>& wave,
              char needed_irreps,
              bool project_out_translations,
              bool project_out_rotations)
-    : wfn_(wave),
+    : process_environment_(process_environment_in), 
+      wfn_(wave),
       cdsalcs_(wave->molecule(),
           wave->matrix_factory(),
           needed_irreps,
           project_out_translations,
           project_out_rotations)
 {
+    psio_ = psio_in;
     integral_ = wave->integral();
     basis_    = wave->basisset();
     sobasis_  = wave->sobasisset();
@@ -462,7 +466,7 @@ SharedMatrix Deriv::compute()
     std::vector<boost::shared_ptr<TwoBodyAOInt> > ao_eri;
     for (int i=0; i<WorldComm->nthread(); ++i)
         ao_eri.push_back(boost::shared_ptr<TwoBodyAOInt>(integral_->eri(1)));
-    TwoBodySOInt so_eri(ao_eri, integral_, cdsalcs_);
+    TwoBodySOInt so_eri(process_environment_, ao_eri, integral_, cdsalcs_);
 
     // A certain optimization can be used if we know we only need totally symmetric
     // derivatives.
@@ -588,7 +592,9 @@ SharedMatrix Deriv::compute()
             vector<boost::shared_ptr<MOSpace> > spaces;
             spaces.push_back(MOSpace::all);
             boost::shared_ptr<IntegralTransform> ints_transform = boost::shared_ptr<IntegralTransform>(
-                        new IntegralTransform(wfn_,
+                        new IntegralTransform(process_environment_, 
+                                              psio_, 
+                                              wfn_,
                                               spaces,
                                               wfn_->same_a_b_orbs() ? IntegralTransform::Restricted : IntegralTransform::Unrestricted, // Transformation type
                                               IntegralTransform::DPDOnly,    // Output buffer
@@ -599,17 +605,17 @@ SharedMatrix Deriv::compute()
 
             Da = factory_->create_shared_matrix("SO-basis OPDM");
             Db = factory_->create_shared_matrix("NULL");
-            Da->load(_default_psio_lib_, PSIF_AO_OPDM);
+            Da->load(psio_, PSIF_AO_OPDM);
             X = factory_->create_shared_matrix("SO-basis Lagrangian");
-            X->load(_default_psio_lib_, PSIF_AO_OPDM);
+            X->load(psio_, PSIF_AO_OPDM);
             // The CC lagrangian is defined with a different prefactor to SCF / MP2, so we account for it here
             X->scale(0.5);
 
-            _default_psio_lib_->open(PSIF_AO_TPDM, PSIO_OPEN_OLD);
-            CorrelatedFunctor functor(TPDMcont_vector);
+            psio_->open(PSIF_AO_TPDM, PSIO_OPEN_OLD);
+            CorrelatedFunctor functor(TPDMcont_vector, psio_);
             so_eri.compute_integrals_deriv1(functor);
             functor.finalize();
-            _default_psio_lib_->close(PSIF_AO_TPDM, 1);
+            psio_->close(PSIF_AO_TPDM, 1);
 
             for (int cd=0; cd < cdsalcs_.ncd(); ++cd)
                 TPDMcont[cd] = TPDMcont_vector->get(cd);

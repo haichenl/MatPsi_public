@@ -151,7 +151,7 @@ protected:
   double **wABS_;
 
 public:
-  SAPT0(Options& options, boost::shared_ptr<PSIO> psio, 
+  SAPT0(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
     boost::shared_ptr<Chkpt> chkpt);
   virtual ~SAPT0();
 

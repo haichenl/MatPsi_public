@@ -73,9 +73,9 @@ protected:
     
 public:
 
-    RBase();
+    RBase(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     // TODO: Remove AS SOON AS POSSIBLE, such a dirty hack
-    RBase(bool flag);
+    RBase(Process::Environment& process_environment_in, bool flag, boost::shared_ptr<PSIO> psio_in);
     virtual ~RBase();
 
     virtual bool same_a_b_orbs() const { return true; }
@@ -158,7 +158,7 @@ protected:
     virtual std::pair<SharedMatrix, SharedMatrix > ADao(SharedMatrix T1);
 
 public:
-    RCIS();
+    RCIS(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RCIS();
 
     virtual double compute_energy();
@@ -179,7 +179,7 @@ protected:
     virtual void print_header();
 
 public:
-    RTDHF();
+    RTDHF(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RTDHF();
 
     virtual double compute_energy();
@@ -206,7 +206,7 @@ protected:
     std::set<std::string> tasks_;
 
 public:
-    RCPHF();
+    RCPHF(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RCPHF();
 
     /// Solve for all perturbations currently in b 
@@ -228,7 +228,7 @@ protected:
     virtual void print_header();
 
 public:
-    RCPKS();
+    RCPKS(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RCPKS();
 
     virtual double compute_energy();
@@ -240,7 +240,7 @@ protected:
     virtual void print_header();
 
 public:
-    RTDA();
+    RTDA(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RTDA();
 
     virtual double compute_energy();
@@ -252,7 +252,7 @@ protected:
     virtual void print_header();
 
 public:
-    RTDDFT();
+    RTDDFT(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in);
     virtual ~RTDDFT();
 
     virtual double compute_energy();

@@ -39,7 +39,7 @@ using namespace psi;
 
 namespace psi {
 
-DFTensor::DFTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
+DFTensor::DFTensor(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> primary,
                    boost::shared_ptr<BasisSet> auxiliary,
                    SharedMatrix C,
                    int nocc,
@@ -47,7 +47,7 @@ DFTensor::DFTensor(boost::shared_ptr<PSIO> psio_in, boost::shared_ptr<BasisSet> 
                    int naocc,
                    int navir,
                    Options& options) :
-    primary_(primary), auxiliary_(auxiliary), C_(C), nocc_(nocc), nvir_(nvir),
+    process_environment_(process_environment_in), primary_(primary), auxiliary_(auxiliary), C_(C), nocc_(nocc), nvir_(nvir),
     naocc_(naocc), navir_(navir), options_(options)
 {
     psio_ = psio_in;
@@ -284,7 +284,7 @@ SharedMatrix DFTensor::Qmo()
 }
 SharedMatrix DFTensor::Imo()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     return mints->mo_eri(C_,C_);
 }
 SharedMatrix DFTensor::Idfmo()

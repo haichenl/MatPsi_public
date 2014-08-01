@@ -343,8 +343,8 @@ protected:
     void dump_to_checkpoint();
 
 public:
-    HF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    HF(Options& options, boost::shared_ptr<PSIO> psio);
+    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     
     SharedMatrix sotoao() { return SO2AO_;} // wavefunction already has aotoso() 
     double EHF() { return E_; }

@@ -55,8 +55,8 @@ using namespace psi;
 
 namespace psi {
 
-PseudoTrial::PseudoTrial(boost::shared_ptr<PSIO> psio_in) : 
-    options_(Process::environment.options)
+PseudoTrial::PseudoTrial(Process::Environment& process_environment_in, boost::shared_ptr<PSIO> psio_in) : 
+    process_environment_(process_environment_in), options_(process_environment_.options)
 {
     psio_ = psio_in;
     common_init();
@@ -134,7 +134,7 @@ void PseudoTrial::print_header()
 
 void PseudoTrial::form_molecule()
 {
-    molecule_ = Process::environment.molecule(); 
+    molecule_ = process_environment_.molecule(); 
     fprintf(outfile," => Molecule <= \n\n");
     molecule_->print();
 }
@@ -145,7 +145,7 @@ void PseudoTrial::form_bases()
 
     // Primary
     molecule_->set_basis_all_atoms(options_.get_str("BASIS"),"BASIS");
-    primary_ = BasisSet::construct(parser,molecule_,"BASIS");  
+    primary_ = BasisSet::construct(process_environment_, parser,molecule_,"BASIS");  
     nso_ = primary_->nbf();   
  
     fprintf(outfile," => Primary Basis Set <= \n\n");
@@ -162,7 +162,7 @@ void PseudoTrial::form_bases()
     } else {
         fprintf(outfile,"  Dealias Basis Read from %s", options_.get_str("DEALIAS_BASIS_CC").c_str()); 
         molecule_->set_basis_all_atoms(options_.get_str("DEALIAS_BASIS_CC"),"DEALIAS_BASIS");
-        dealias_ = BasisSet::construct(parser,molecule_,"DEALIAS_BASIS");  
+        dealias_ = BasisSet::construct(process_environment_, parser,molecule_,"DEALIAS_BASIS");  
 
     }
     do_dealias_ = true;
@@ -176,9 +176,9 @@ void PseudoTrial::form_grid()
 {
 
     if (options_.get_str("PS_GRID_FILE") != "") {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_, primary_, options_.get_str("PS_GRID_FILE"), options_));
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_, primary_, options_.get_str("PS_GRID_FILE"), options_));
     } else {
-        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(molecule_, primary_, options_));
+        grid_ = boost::shared_ptr<PseudospectralGrid>(new PseudospectralGrid(process_environment_, molecule_, primary_, options_));
     }
 
     grid_->print();
@@ -712,7 +712,7 @@ void PseudoTrial::form_A()
 
 void PseudoTrial::form_I()
 {
-    boost::shared_ptr<MintsHelper> mints(new MintsHelper(psio_));
+    boost::shared_ptr<MintsHelper> mints(new MintsHelper(process_environment_, psio_));
     I_ = mints->ao_eri();
     I_->print();
 }

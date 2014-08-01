@@ -43,7 +43,7 @@ protected:
     void common_init();
 
 public:
-    THCEW();
+    THCEW(Process::Environment& process_environment_in);
     virtual ~THCEW();
 
 }; 
@@ -147,7 +147,7 @@ protected:
     void build_meth_ia(boost::shared_ptr<Matrix> X);
 
 public:
-    RTHCEW();
+    RTHCEW(Process::Environment& process_environment_in);
     virtual ~RTHCEW();
 };
 

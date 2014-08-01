@@ -88,8 +88,8 @@ protected:
     void save_density_and_energy();
 
 public:
-    RHF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    RHF(Options& options, boost::shared_ptr<PSIO> psio);
+    RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     virtual ~RHF();
     
     // Finalize memory/files

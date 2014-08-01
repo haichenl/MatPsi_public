@@ -50,14 +50,14 @@ using namespace boost;
 
 namespace psi { namespace scf {
 
-ROHF::ROHF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
-    : HF(options, psio, chkpt)
+ROHF::ROHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
+    : HF(process_environment_in, options, psio, chkpt)
 {
     common_init();
 }
 
-ROHF::ROHF(Options& options, boost::shared_ptr<PSIO> psio)
-    : HF(options, psio)
+ROHF::ROHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio)
+    : HF(process_environment_in, options, psio)
 {
     common_init();
 }
@@ -288,7 +288,7 @@ void ROHF::compute_orbital_gradient(bool save_diis)
 
     if(save_diis){
         if (initialized_diis_manager_ == false) {
-            diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
+            diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
             diis_manager_->set_error_vector_size(1, DIISEntry::Matrix, soFeff_.get());
             diis_manager_->set_vector_size(1, DIISEntry::Matrix, soFeff_.get());
             initialized_diis_manager_ = true;
@@ -520,9 +520,9 @@ void ROHF::stability_analysis()
         spaces.push_back(MOSpace::occ);
         spaces.push_back(MOSpace::vir);
         // Ref wfn is really "this"
-        boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
+        boost::shared_ptr<Wavefunction> wfn = process_environment_.wavefunction();
 #define ID(x) ints.DPD_ID(x)
-        IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted, IntegralTransform::DPDOnly,
+        IntegralTransform ints(process_environment_, psio_, wfn, spaces, IntegralTransform::Restricted, IntegralTransform::DPDOnly,
                                IntegralTransform::QTOrder, IntegralTransform::None);
         ints.set_keep_dpd_so_ints(true);
         ints.transform_tei(MOSpace::occ, MOSpace::vir, MOSpace::occ, MOSpace::vir);

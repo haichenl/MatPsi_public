@@ -2987,7 +2987,7 @@ class OrientationMgr
     static SymmetryType sphericalTopMatrix(boost::shared_ptr<Molecule> origmol, LVector const &center, LMatrix *Q_out);
 public:
     // Use the constructor to determine the standard orientation, and use `MoveIntoPosition' to apply it to a mass-point.
-    OrientationMgr(boost::shared_ptr<Molecule> mol);
+    OrientationMgr(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> mol);
     inline MassPoint MoveIntoPosition(MassPoint mp, int A)
     {
         LVector oldpos = {mp.x, mp.y, mp.z};
@@ -3362,7 +3362,7 @@ OrientationMgr::SymmetryType OrientationMgr::sphericalTopMatrix(boost::shared_pt
     }
 }
 
-OrientationMgr::OrientationMgr(boost::shared_ptr<Molecule> mol)
+OrientationMgr::OrientationMgr(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> mol)
 {
     int QQ = 0; // We need `Q' to be a rotation matrix.
     LVector center = {0, 0, 0}; // Center of charge
@@ -3422,7 +3422,7 @@ OrientationMgr::OrientationMgr(boost::shared_ptr<Molecule> mol)
         // Q is fine the way it is.
     }
 
-    if (Process::environment.options.get_int("DEBUG") > 0) {
+    if (process_environment_in.options.get_int("DEBUG") > 0) {
         fprintf(outfile, "\n  => MolecularGrid: Standard Orientation for %s <= \n", mol->name().c_str());
         fprintf(outfile, "  Total Charge: %d\n", QQ);
         fprintf(outfile, "  Symmetry: %s\n", symmetryNames[symtype]);
@@ -3512,7 +3512,7 @@ void MolecularGrid::buildGridFromOptions(MolecularGridOptions const& opt)
 
     std::vector<MassPoint> grid; // This is just for the first pass.
 
-    OrientationMgr std_orientation(molecule_);
+    OrientationMgr std_orientation(process_environment_, molecule_);
     RadialPruneMgr prune(opt);
     NuclearWeightMgr nuc(molecule_, opt.nucscheme);
 
@@ -3829,10 +3829,10 @@ void BlockOPoints::print(FILE* out, int print)
         fprintf(out, "\n\n");
     }
 }
-DFTGrid::DFTGrid(boost::shared_ptr<Molecule> molecule,
+DFTGrid::DFTGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
                  boost::shared_ptr<BasisSet> primary,
                  Options& options) :
-    MolecularGrid(molecule), primary_(primary), options_(options)
+    MolecularGrid(process_environment_in, molecule), primary_(primary), options_(options)
 {
     buildGridFromOptions();
 }
@@ -3869,18 +3869,18 @@ void DFTGrid::buildGridFromOptions()
 }
 
 
-PseudospectralGrid::PseudospectralGrid(boost::shared_ptr<Molecule> molecule,
+PseudospectralGrid::PseudospectralGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
                                        boost::shared_ptr<BasisSet> primary,
                                        Options& options) :
-    MolecularGrid(molecule), primary_(primary), filename_(""),  options_(options)
+    MolecularGrid(process_environment_in, molecule), primary_(primary), filename_(""),  options_(options)
 {
     buildGridFromOptions();
 }
-PseudospectralGrid::PseudospectralGrid(boost::shared_ptr<Molecule> molecule,
+PseudospectralGrid::PseudospectralGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule,
                                        boost::shared_ptr<BasisSet> primary,
                                        const std::string& filename,
                                        Options& options) :
-    MolecularGrid(molecule), primary_(primary), filename_(filename), options_(options)
+    MolecularGrid(process_environment_in, molecule), primary_(primary), filename_(filename), options_(options)
 {
     buildGridFromFile();
 }
@@ -4095,8 +4095,8 @@ void PseudospectralGrid::buildGridFromOptions()
     postProcess(extents, max_points, min_points, max_radius);
 }
 
-MolecularGrid::MolecularGrid(boost::shared_ptr<Molecule> molecule) :
-    molecule_(molecule), npoints_(0), max_points_(0), max_functions_(0), debug_(0)
+MolecularGrid::MolecularGrid(Process::Environment& process_environment_in, boost::shared_ptr<Molecule> molecule) :
+    process_environment_(process_environment_in), molecule_(molecule), npoints_(0), max_points_(0), max_functions_(0), debug_(0)
 {
 }
 MolecularGrid::~MolecularGrid()
@@ -4112,7 +4112,7 @@ MolecularGrid::~MolecularGrid()
 void MolecularGrid::block(int max_points, int min_points, double max_radius)
 {
     // Hack
-    Options& options_ = Process::environment.options;
+    Options& options_ = process_environment_.options;
 
     // Reassign
     boost::shared_ptr<GridBlocker> blocker;

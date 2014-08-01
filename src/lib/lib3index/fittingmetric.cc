@@ -53,10 +53,10 @@ using namespace psi;
 
 namespace psi {
 
-FittingMetric::FittingMetric()
+FittingMetric::FittingMetric(Process::Environment& process_environment_in)
 {
-    Options& opt = Process::environment.options;
-    boost::shared_ptr<Molecule> molecule = Process::environment.molecule();
+    Options& opt = process_environment_in.options;
+    boost::shared_ptr<Molecule> molecule = process_environment_in.molecule();
 
     if (molecule.get() == 0) {
         fprintf(outfile, "  Active molecule not set!");
@@ -68,9 +68,9 @@ FittingMetric::FittingMetric()
 
     // Grab the auxiliary bases (use the SCF tags for now)
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    aux_ = BasisSet::construct(parser, molecule, "DF_BASIS_SCF");
+    aux_ = BasisSet::construct(process_environment_in, parser, molecule, "DF_BASIS_SCF");
     if (opt.get_str("POISSON_BASIS_SCF") != "") {
-        pois_ =  BasisSet::construct(parser, molecule, "POISSON_BASIS_SCF");
+        pois_ =  BasisSet::construct(process_environment_in, parser, molecule, "POISSON_BASIS_SCF");
         is_poisson_ = true;
     } else {
         is_poisson_ = false;

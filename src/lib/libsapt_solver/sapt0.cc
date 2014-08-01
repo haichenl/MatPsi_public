@@ -25,8 +25,8 @@
 
 namespace psi { namespace sapt {
 
-SAPT0::SAPT0(Options& options, boost::shared_ptr<PSIO> psio,
-  boost::shared_ptr<Chkpt> chkpt) : SAPT(options, psio, chkpt),
+SAPT0::SAPT0(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio,
+  boost::shared_ptr<Chkpt> chkpt) : SAPT(process_environment_in, options, psio, chkpt),
   e_elst10_(0.0),
   e_exch10_(0.0),
   e_exch10_s2_(0.0),
@@ -223,16 +223,16 @@ void SAPT0::print_results()
   fprintf(outfile,"    Total SCS-SAPT0    %16.8lf mH %16.8lf kcal mol^-1\n",
     e_sapt0_scs_*1000.0,e_sapt0_scs_*pc_hartree2kcalmol);
 
-  Process::environment.globals["SAPT ELST ENERGY"] = tot_elst;
-  Process::environment.globals["SAPT EXCH ENERGY"] = tot_exch;
-  Process::environment.globals["SAPT IND ENERGY"] = tot_ind;
-  Process::environment.globals["SAPT CT ENERGY"] = e_ind20_ + e_exch_ind20_;
-  Process::environment.globals["SAPT DISP ENERGY"] = tot_disp;
-  Process::environment.globals["SAPT SCS-DISP ENERGY"] = tot_scs_disp;
-  Process::environment.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
-  Process::environment.globals["SAPT SCS-SAPT0 ENERGY"] = e_sapt0_scs_;
-  Process::environment.globals["SAPT ENERGY"] = e_sapt0_;
-  Process::environment.globals["CURRENT ENERGY"] = Process::environment.globals["SAPT ENERGY"];
+  process_environment_.globals["SAPT ELST ENERGY"] = tot_elst;
+  process_environment_.globals["SAPT EXCH ENERGY"] = tot_exch;
+  process_environment_.globals["SAPT IND ENERGY"] = tot_ind;
+  process_environment_.globals["SAPT CT ENERGY"] = e_ind20_ + e_exch_ind20_;
+  process_environment_.globals["SAPT DISP ENERGY"] = tot_disp;
+  process_environment_.globals["SAPT SCS-DISP ENERGY"] = tot_scs_disp;
+  process_environment_.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
+  process_environment_.globals["SAPT SCS-SAPT0 ENERGY"] = e_sapt0_scs_;
+  process_environment_.globals["SAPT ENERGY"] = e_sapt0_;
+  process_environment_.globals["CURRENT ENERGY"] = process_environment_.globals["SAPT ENERGY"];
 }
 
 void SAPT0::check_memory()

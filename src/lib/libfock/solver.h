@@ -385,6 +385,7 @@ class RayleighRSolver : public DLRSolver {
 
 protected:
 
+    Process::Environment& process_environment_;
     /// Turn an eigenproblem into a linear equations problem 
     boost::shared_ptr<CGRSolver> cg_;
 
@@ -400,12 +401,12 @@ public:
     // => Constructors <= //
 
     /// Constructor
-    RayleighRSolver(boost::shared_ptr<RHamiltonian> H);  
+    RayleighRSolver(Process::Environment& process_environment_in, boost::shared_ptr<RHamiltonian> H);  
     /// Destructor
     virtual ~RayleighRSolver();
 
     /// Static constructor, uses Options object
-    static boost::shared_ptr<RayleighRSolver> build_solver(Options& options,
+    static boost::shared_ptr<RayleighRSolver> build_solver(Process::Environment& process_environment_in, Options& options,
         boost::shared_ptr<RHamiltonian> H);
 
     // => Required Methods <= //

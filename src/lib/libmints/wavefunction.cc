@@ -56,15 +56,15 @@ double df[MAX_DF];
 double bc[MAX_BC][MAX_BC];
 double fac[MAX_FAC];
 
-Wavefunction::Wavefunction(Options & options, boost::shared_ptr<PSIO> psio) :
-    options_(options), psio_(psio)
+Wavefunction::Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
+    process_environment_(process_environment_in), options_(options), psio_(psio)
 {
     chkpt_ = boost::shared_ptr<Chkpt>(new Chkpt(psio.get(), PSIO_OPEN_OLD));
     common_init();
 }
 
-Wavefunction::Wavefunction(Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
-    options_(options), psio_(psio), chkpt_(chkpt)
+Wavefunction::Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
+    process_environment_(process_environment_in), options_(options), psio_(psio), chkpt_(chkpt)
 {
     common_init();
 }
@@ -136,11 +136,11 @@ void Wavefunction::common_init()
     Wavefunction::initialize_singletons();
 
     // Take the molecule from the environment
-    molecule_ = Process::environment.molecule();
+    molecule_ = process_environment_.molecule();
 
     // Load in the basis set
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    basisset_ = BasisSet::construct(parser, molecule_, "BASIS");
+    basisset_ = BasisSet::construct(process_environment_, parser, molecule_, "BASIS");
 
     // Check the point group of the molecule. If it is not set, set it.
     if (!molecule_->point_group()) {
@@ -176,7 +176,7 @@ void Wavefunction::common_init()
     frzvpi_   = Dimension(nirrep_, "Frozen virtual orbitals per irrep");
 
     // Obtain memory amount from the environment
-    memory_ = Process::environment.get_memory();
+    memory_ = process_environment_.get_memory();
 
     nso_ = basisset_->nbf();
     nmo_ = basisset_->nbf();
@@ -209,7 +209,7 @@ void Wavefunction::common_init()
 
 void Wavefunction::map_irreps(std::vector<int*> &arrays)
 {
-    boost::shared_ptr<PointGroup> full = Process::environment.parent_symmetry();
+    boost::shared_ptr<PointGroup> full = process_environment_.parent_symmetry();
     // If the parent symmetry hasn't been set, no displacements have been made
     if(!full) return;
     boost::shared_ptr<PointGroup> sub = molecule_->point_group();
@@ -344,7 +344,7 @@ void Wavefunction::call_preiteration_callbacks()
     std::vector<void*>::const_iterator iter;
     for (iter = precallbacks_.begin(); iter != precallbacks_.end(); ++iter) {
         if ((PyObject*)*iter != Py_None)
-            boost::python::call<void>((PyObject*)*iter, Process::environment.wavefunction());
+            boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
     }
 }
 void Wavefunction::call_postiteration_callbacks()
@@ -352,7 +352,7 @@ void Wavefunction::call_postiteration_callbacks()
     std::vector<void*>::const_iterator iter;
     for (iter = postcallbacks_.begin(); iter != postcallbacks_.end(); ++iter) {
         if ((PyObject*)*iter != Py_None)
-            boost::python::call<void>((PyObject*)*iter, Process::environment.wavefunction());
+            boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
     }
 }
 

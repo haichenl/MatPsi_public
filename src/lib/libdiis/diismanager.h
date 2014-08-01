@@ -27,6 +27,8 @@
 #include <vector>
 #include <map>
 
+#include <psi4-dec.h>
+
 namespace boost {
 template<class T>
 class shared_ptr;
@@ -58,10 +60,10 @@ class DIISManager{
          */
         enum RemovalPolicy {LargestError, OldestAdded};
 
-        DIISManager(int maxSubspaceSize, const std::string& label, boost::shared_ptr<PSIO> psio_in,
+        DIISManager(Process::Environment& process_environment_in, int maxSubspaceSize, const std::string& label, boost::shared_ptr<PSIO> psio_in,
                     RemovalPolicy = LargestError,
                     StoragePolicy = OnDisk);
-        DIISManager() {_maxSubspaceSize = 0;}
+        DIISManager(Process::Environment& process_environment_in) : process_environment_(process_environment_in) {_maxSubspaceSize = 0;}
         ~DIISManager();
 
         void set_error_vector_size(int numQuantities, ...);
@@ -74,6 +76,9 @@ class DIISManager{
         /// The number of vectors currently in the subspace
         int subspace_size();
     protected:
+        
+        Process::Environment& process_environment_;
+        
         int get_next_entry_id();
 
         /// How the vectors are handled in memory

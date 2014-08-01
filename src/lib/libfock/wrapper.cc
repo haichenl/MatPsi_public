@@ -44,32 +44,32 @@ using namespace boost;
 namespace psi { 
 namespace libfock {
 
-PsiReturnType libfock(Options & options)
+PsiReturnType libfock(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio_in)
 {
     tstart();
 
     boost::shared_ptr<RBase> wfn;
 
     if (options.get_str("MODULE") == "RCPHF") {
-        RCPHF* cphf(new RCPHF());
+        RCPHF* cphf(new RCPHF(process_environment_in, psio_in));
         for (int i = 0; i < options["CPHF_TASKS"].size(); i++) {
             cphf->add_task(options["CPHF_TASKS"][i].to_string());
         }
         wfn = boost::shared_ptr<RBase>(cphf);
     } else if (options.get_str("MODULE") == "RCIS") {
-        wfn = boost::shared_ptr<RBase>(new RCIS());
+        wfn = boost::shared_ptr<RBase>(new RCIS(process_environment_in, psio_in));
     } else if (options.get_str("MODULE") == "RTDHF") {
-        wfn = boost::shared_ptr<RBase>(new RTDHF());
+        wfn = boost::shared_ptr<RBase>(new RTDHF(process_environment_in, psio_in));
     } else if (options.get_str("MODULE") == "RCPKS") {
-        RCPKS* cphf(new RCPKS());
+        RCPKS* cphf(new RCPKS(process_environment_in, psio_in));
         for (int i = 0; i < options["CPHF_TASKS"].size(); i++) {
             cphf->add_task(options["CPHF_TASKS"][i].to_string());
         }
         wfn = boost::shared_ptr<RBase>(cphf);
     } else if (options.get_str("MODULE") == "RTDA") {
-        wfn = boost::shared_ptr<RBase>(new RTDA());
+        wfn = boost::shared_ptr<RBase>(new RTDA(process_environment_in, psio_in));
     } else if (options.get_str("MODULE") == "RTDDFT") {
-        wfn = boost::shared_ptr<RBase>(new RTDDFT());
+        wfn = boost::shared_ptr<RBase>(new RTDDFT(process_environment_in, psio_in));
     } else {
         throw PSIEXCEPTION("Libfock: Applications module not recognized");
     }

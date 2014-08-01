@@ -34,6 +34,7 @@
 #include "molecule.h"
 
 #include <boost/shared_ptr.hpp>
+#include <psi4-dec.h>
 
 namespace psi {
 
@@ -285,7 +286,7 @@ public:
      * @param basisnames Name of the basis set for each atom in molecule to search for in pbasis.dat
      * @return A new basis set object constructed from the information passed in.
      */
-    static boost::shared_ptr<BasisSet> construct(const boost::shared_ptr<BasisSetParser>& parser,
+    static boost::shared_ptr<BasisSet> construct(Process::Environment& process_environment_in, const boost::shared_ptr<BasisSetParser>& parser,
         const boost::shared_ptr<Molecule>& mol,
         const std::string& type);
 

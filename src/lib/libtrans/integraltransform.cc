@@ -36,15 +36,18 @@
 using namespace boost;
 using namespace psi;
 
-IntegralTransform::IntegralTransform(shared_ptr<Wavefunction> wfn,
+IntegralTransform::IntegralTransform(Process::Environment& process_environment_in, 
+                                     boost::shared_ptr<PSIO> psio_in, 
+                                     shared_ptr<Wavefunction> wfn,
                                      SpaceVec spaces,
                                      TransformationType transformationType,
                                      OutputType outputType,
                                      MOOrdering moOrdering,
                                      FrozenOrbitals frozenOrbitals,
                                      bool init):
+            process_environment_(process_environment_in),
             initialized_(false),
-            psio_(_default_psio_lib_),
+            psio_(psio_in),
             wfn_(wfn),
             transformationType_(transformationType),
             uniqueSpaces_(spaces),
@@ -87,9 +90,9 @@ IntegralTransform::IntegralTransform(shared_ptr<Wavefunction> wfn,
 {
     // Implement set/get functions to customize any of this stuff.  Delayed initialization
     // is possible in case any of these variables need to be changed before setup.
-    memory_ = Process::environment.get_memory();
+    memory_ = process_environment_.get_memory();
 
-    labels_  = Process::environment.molecule()->irrep_labels();
+    labels_  = process_environment_.molecule()->irrep_labels();
     nirreps_ = wfn->nirrep();
     nmo_     = wfn->nmo();
     nso_     = wfn->nso();
@@ -107,7 +110,9 @@ IntegralTransform::IntegralTransform(shared_ptr<Wavefunction> wfn,
 }
 
 
-IntegralTransform::IntegralTransform(SharedMatrix c,
+IntegralTransform::IntegralTransform(Process::Environment& process_environment_in, 
+                                     boost::shared_ptr<PSIO> psio_in, 
+                                     SharedMatrix c,
                                      SharedMatrix i,
                                      SharedMatrix a,
                                      SharedMatrix v,
@@ -117,8 +122,9 @@ IntegralTransform::IntegralTransform(SharedMatrix c,
                                      MOOrdering moOrdering,
                                      FrozenOrbitals frozenOrbitals,
                                      bool init):
+    process_environment_(process_environment_in),
     initialized_(false),
-    psio_(_default_psio_lib_),
+    psio_(psio_in),
     transformationType_(transformationType),
     uniqueSpaces_(spaces),
     moOrdering_(moOrdering),
@@ -168,7 +174,7 @@ IntegralTransform::IntegralTransform(SharedMatrix c,
     tpdmAlreadyPresorted_(false),
     soIntTEIFile_(PSIF_SO_TEI)
 {
-    memory_ = Process::environment.get_memory();
+    memory_ = process_environment_.get_memory();
 
     nirreps_ = c->nirrep();
     nmo_     = c->ncol() + i->ncol() + a->ncol() + v->ncol();
@@ -199,7 +205,7 @@ IntegralTransform::IntegralTransform(SharedMatrix c,
 void
 IntegralTransform::initialize()
 {
-    print_         = Process::environment.options.get_int("PRINT");
+    print_         = process_environment_.options.get_int("PRINT");
     printTei_      = print_ > 5;
     useIWL_        = outputType_ == IWLAndDPD || outputType_ == IWLOnly;
     useDPD_        = outputType_ == IWLAndDPD || outputType_ == DPDOnly;

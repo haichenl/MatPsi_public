@@ -58,10 +58,10 @@ namespace psi {
 ** \ingroup MINTS
 */
 
-std::string get_writer_file_prefix(void)
+std::string get_writer_file_prefix(Process::Environment& process_environment_in)
 {
 
-  std::string label = Process::environment.options.get_str("WRITER_FILE_LABEL");
+  std::string label = process_environment_in.options.get_str("WRITER_FILE_LABEL");
   if (label != "") {
     return(label);
   }
@@ -83,7 +83,7 @@ std::string get_writer_file_prefix(void)
     prefix = outfile_name;
   }
 
-  std::string molecule_name = Process::environment.molecule()->name();
+  std::string molecule_name = process_environment_in.molecule()->name();
   if (molecule_name != "") {
     prefix += "." + molecule_name;
   }

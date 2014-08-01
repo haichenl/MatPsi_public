@@ -50,6 +50,8 @@ protected:
     int debug_;
     /// Print flag
     int print_;
+    
+    Process::Environment& process_environment_;
     /// Options object, used to build grid
     Options& options_;
     /// Basis set used in the integration
@@ -100,12 +102,12 @@ protected:
     /// Set things up
     void common_init();
 public:
-    VBase(boost::shared_ptr<SuperFunctional> functional,
+    VBase(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
         boost::shared_ptr<BasisSet> primary,
         Options& options);
     virtual ~VBase();
     
-    static boost::shared_ptr<VBase> build_V(Options& options, const std::string& type = "RV");
+    static boost::shared_ptr<VBase> build_V(Process::Environment& process_environment_in, Options& options, const std::string& type = "RV");
 
     boost::shared_ptr<BasisSet> basis() const { return primary_; }
     boost::shared_ptr<SuperFunctional> functional() const { return functional_; }
@@ -144,7 +146,7 @@ protected:
     virtual void compute_V();
 
 public:
-    RV(boost::shared_ptr<SuperFunctional> functional,
+    RV(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
         boost::shared_ptr<BasisSet> primary,
         Options& options);
     virtual ~RV();
@@ -165,7 +167,7 @@ protected:
     virtual void compute_V();
 
 public:
-    UV(boost::shared_ptr<SuperFunctional> functional,
+    UV(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
         boost::shared_ptr<BasisSet> primary,
         Options& options);
     virtual ~UV();
@@ -186,7 +188,7 @@ protected:
     virtual void compute_V();
 
 public:
-    RK(boost::shared_ptr<SuperFunctional> functional,
+    RK(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
         boost::shared_ptr<BasisSet> primary,
         Options& options);
     virtual ~RK();
@@ -202,7 +204,7 @@ protected:
     virtual void compute_V();
 
 public:
-    UK(boost::shared_ptr<SuperFunctional> functional,
+    UK(Process::Environment& process_environment_in, boost::shared_ptr<SuperFunctional> functional,
         boost::shared_ptr<BasisSet> primary,
         Options& options);
     virtual ~UK();

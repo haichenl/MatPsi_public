@@ -132,7 +132,7 @@ protected:
     const char *, double *, double *, int, int, int, int, int, int);
 
 public:
-  SAPT2p(Options& options, boost::shared_ptr<PSIO> psio,
+  SAPT2p(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio,
     boost::shared_ptr<Chkpt> chkpt);
   virtual ~SAPT2p();
 

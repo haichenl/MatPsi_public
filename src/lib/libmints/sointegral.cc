@@ -359,12 +359,12 @@ void OneBodySOInt::compute_deriv1(std::vector<SharedMatrix > result,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TwoBodySOInt::TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt> &tb,
+TwoBodySOInt::TwoBodySOInt(Process::Environment& process_environment_in, const boost::shared_ptr<TwoBodyAOInt> &tb,
                            const boost::shared_ptr<IntegralFactory>& integral) :
 #if HAVE_MADNESS
     madness::WorldObject<TwoBodySOInt>(*WorldComm->get_madworld()),
 #endif
-    integral_(integral), only_totally_symmetric_(false), cdsalcs_(0)
+    process_environment_(process_environment_in), integral_(integral), only_totally_symmetric_(false), cdsalcs_(0)
 {
     tb_.push_back(tb);
     common_init();
@@ -373,12 +373,12 @@ TwoBodySOInt::TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt> &tb,
 #endif
 }
 
-TwoBodySOInt::TwoBodySOInt(const std::vector<boost::shared_ptr<TwoBodyAOInt> > &tb,
+TwoBodySOInt::TwoBodySOInt(Process::Environment& process_environment_in, const std::vector<boost::shared_ptr<TwoBodyAOInt> > &tb,
                            const boost::shared_ptr<IntegralFactory>& integral) :
 #if HAVE_MADNESS
     madness::WorldObject<TwoBodySOInt>(*WorldComm->get_madworld()),
 #endif
-    tb_(tb), integral_(integral), only_totally_symmetric_(false), cdsalcs_(0)
+    process_environment_(process_environment_in), tb_(tb), integral_(integral), only_totally_symmetric_(false), cdsalcs_(0)
 {
     common_init();
 #if HAVE_MADNESS
@@ -386,13 +386,13 @@ TwoBodySOInt::TwoBodySOInt(const std::vector<boost::shared_ptr<TwoBodyAOInt> > &
 #endif
 }
 
-TwoBodySOInt::TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt>& tb,
+TwoBodySOInt::TwoBodySOInt(Process::Environment& process_environment_in, const boost::shared_ptr<TwoBodyAOInt>& tb,
                            const boost::shared_ptr<IntegralFactory>& integral,
                            const CdSalcList& cdsalcs) :
 #if HAVE_MADNESS
     madness::WorldObject<TwoBodySOInt>(*WorldComm->get_madworld()),
 #endif
-    integral_(integral), only_totally_symmetric_(false), cdsalcs_(&cdsalcs)
+    process_environment_(process_environment_in), integral_(integral), only_totally_symmetric_(false), cdsalcs_(&cdsalcs)
 {
     tb_.push_back(tb);
     common_init();
@@ -401,13 +401,13 @@ TwoBodySOInt::TwoBodySOInt(const boost::shared_ptr<TwoBodyAOInt>& tb,
 #endif
 }
 
-TwoBodySOInt::TwoBodySOInt(const std::vector<boost::shared_ptr<TwoBodyAOInt> >& tb,
+TwoBodySOInt::TwoBodySOInt(Process::Environment& process_environment_in, const std::vector<boost::shared_ptr<TwoBodyAOInt> >& tb,
                            const boost::shared_ptr<IntegralFactory>& integral,
                            const CdSalcList& cdsalcs) :
 #if HAVE_MADNESS
     madness::WorldObject<TwoBodySOInt>(*WorldComm->get_madworld()),
 #endif
-    tb_(tb), integral_(integral), only_totally_symmetric_(false), cdsalcs_(&cdsalcs)
+    process_environment_(process_environment_in), tb_(tb), integral_(integral), only_totally_symmetric_(false), cdsalcs_(&cdsalcs)
 {
     common_init();
 #if HAVE_MADNESS
@@ -508,7 +508,7 @@ void TwoBodySOInt::common_init()
         }
     }
 
-    cutoff_ = Process::environment.options.get_double("INTS_TOLERANCE");
+    cutoff_ = process_environment_.options.get_double("INTS_TOLERANCE");
 }
 
 TwoBodySOInt::~TwoBodySOInt()

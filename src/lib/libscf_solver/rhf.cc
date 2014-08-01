@@ -62,14 +62,14 @@ using namespace std;
 
 namespace psi { namespace scf {
 
-RHF::RHF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
-    : HF(options, psio, chkpt)
+RHF::RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
+    : HF(process_environment_in, options, psio, chkpt)
 {
     common_init();
 }
 
-RHF::RHF(Options& options, boost::shared_ptr<PSIO> psio)
-    : HF(options, psio)
+RHF::RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio)
+    : HF(process_environment_in, options, psio)
 {
     common_init();
 }
@@ -174,9 +174,9 @@ void RHF::compute_orbital_gradient(bool save_fock)
     if(save_fock){
         if (initialized_diis_manager_ == false) {
             if (scf_type_ == "direct")
-                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::InCore));
+                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::InCore));
             else
-                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
+                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
             diis_manager_->set_error_vector_size(1, DIISEntry::Matrix, gradient.get());
             diis_manager_->set_vector_size(1, DIISEntry::Matrix, Fa_.get());
             initialized_diis_manager_ = true;
@@ -406,8 +406,8 @@ void RHF::stability_analysis()
         spaces.push_back(MOSpace::occ);
         spaces.push_back(MOSpace::vir);
         // Ref wfn is really "this"
-        boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
-        IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted, IntegralTransform::DPDOnly,
+        boost::shared_ptr<Wavefunction> wfn = process_environment_.wavefunction();
+        IntegralTransform ints(process_environment_, psio_, wfn, spaces, IntegralTransform::Restricted, IntegralTransform::DPDOnly,
                                IntegralTransform::QTOrder, IntegralTransform::None);
         ints.set_keep_dpd_so_ints(true);
         ints.transform_tei(MOSpace::occ, MOSpace::vir, MOSpace::occ, MOSpace::vir);

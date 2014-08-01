@@ -1315,8 +1315,8 @@ void DLRSolver::subspaceCollapse()
     }
 }
 
-RayleighRSolver::RayleighRSolver(boost::shared_ptr<RHamiltonian> H) : 
-    DLRSolver(H)
+RayleighRSolver::RayleighRSolver(Process::Environment& process_environment_in, boost::shared_ptr<RHamiltonian> H) : 
+    process_environment_(process_environment_in), DLRSolver(H)
 {
     name_ = "RayleighR"; 
     precondition_maxiter_ = 1;
@@ -1326,10 +1326,10 @@ RayleighRSolver::RayleighRSolver(boost::shared_ptr<RHamiltonian> H) :
 RayleighRSolver::~RayleighRSolver()
 {
 }
-boost::shared_ptr<RayleighRSolver> RayleighRSolver::build_solver(Options& options,
+boost::shared_ptr<RayleighRSolver> RayleighRSolver::build_solver(Process::Environment& process_environment_in, Options& options,
     boost::shared_ptr<RHamiltonian> H)
 {
-    boost::shared_ptr<RayleighRSolver> solver(new RayleighRSolver(H));
+    boost::shared_ptr<RayleighRSolver> solver(new RayleighRSolver(process_environment_in, H));
 
     if (options["PRINT"].has_changed()) {
         solver->set_print(options.get_int("PRINT") + 1);
@@ -1401,7 +1401,7 @@ void RayleighRSolver::print_header() const
 void RayleighRSolver::initialize()
 {
     DLRSolver::initialize();
-    cg_ = CGRSolver::build_solver(Process::environment.options, H_);
+    cg_ = CGRSolver::build_solver(process_environment_.options, H_);
     cg_->set_print(1);
 } 
 void RayleighRSolver::finalize()

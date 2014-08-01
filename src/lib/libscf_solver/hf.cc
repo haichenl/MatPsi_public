@@ -69,16 +69,16 @@ using namespace psi;
 
 namespace psi { namespace scf {
 
-HF::HF(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
-    : Wavefunction(options, psio, chkpt),
+HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
+    : Wavefunction(process_environment_in, options, psio, chkpt),
       nuclear_dipole_contribution_(3),
       nuclear_quadrupole_contribution_(6)
 {
     common_init();
 }
 
-HF::HF(Options& options, boost::shared_ptr<PSIO> psio)
-    : Wavefunction(options, psio),
+HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio)
+    : Wavefunction(process_environment_in, options, psio),
       nuclear_dipole_contribution_(3),
       nuclear_quadrupole_contribution_(6)
 {
@@ -131,7 +131,7 @@ void HF::common_init()
     if (options_["DOCC"].has_changed()) {
         input_docc_ = true;
         // Map the symmetry of the input DOCC, to account for displacements
-        boost::shared_ptr<PointGroup> old_pg = Process::environment.parent_symmetry();
+        boost::shared_ptr<PointGroup> old_pg = process_environment_.parent_symmetry();
         if(old_pg){
             // This is one of a series of displacements;  check the dimension against the parent point group
             int full_nirreps = old_pg->char_table().nirrep();
@@ -166,7 +166,7 @@ void HF::common_init()
     if (options_["SOCC"].has_changed()) {
         input_socc_ = true;
         // Map the symmetry of the input SOCC, to account for displacements
-        boost::shared_ptr<PointGroup> old_pg = Process::environment.parent_symmetry();
+        boost::shared_ptr<PointGroup> old_pg = process_environment_.parent_symmetry();
         if(old_pg){
             // This is one of a series of displacements;  check the dimension against the parent point group
             int full_nirreps = old_pg->char_table().nirrep();
@@ -354,7 +354,7 @@ void HF::integrals()
 
     // Build the JK from options, symmetric type
     try {
-        jk_ = JK::build_JK(psio_);
+        jk_ = JK::build_JK(process_environment_, psio_);
     }
     catch(const BasisSetNotFound& e) {
         if (options_.get_str("SCF_TYPE") == "DF" || options_.get_int("DF_SCF_GUESS") == 1) {
@@ -364,7 +364,7 @@ void HF::integrals()
             fprintf(outfile, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
             options_.set_str("SCF", "SCF_TYPE", "PK");
             options_.set_bool("SCF", "DF_SCF_GUESS", false);
-            jk_ = JK::build_JK(psio_);
+            jk_ = JK::build_JK(process_environment_, psio_);
         }
         else
             throw; // rethrow the error
@@ -373,7 +373,7 @@ void HF::integrals()
     // Tell the JK to print
     jk_->set_print(print_);
     // Give the JK 75% of the memory
-    jk_->set_memory((ULI)(options_.get_double("SCF_MEM_SAFETY_FACTOR")*(Process::environment.get_memory() / 8L)));
+    jk_->set_memory((ULI)(options_.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
 
     // DFT sometimes needs custom stuff
     if ((options_.get_str("REFERENCE") == "UKS" || options_.get_str("REFERENCE") == "RKS")) {
@@ -584,7 +584,7 @@ void HF::form_H()
         int nao = basisset_->nao();
 
         // Set up AO->SO transformation matrix (u)
-        MintsHelper helper(psio_, options_, 0);
+        MintsHelper helper(process_environment_, psio_, options_, 0);
         SharedMatrix aotoso = helper.petite_list(true)->aotoso();
         int *col_offset = new int[nirrep_];
         col_offset[0] = 0;
@@ -899,7 +899,7 @@ void HF::compute_fcpi()
         if (options_.get_int("NUM_FROZEN_DOCC") != 0) {
             nfzc = options_.get_int("NUM_FROZEN_DOCC");
         } else {
-            nfzc = molecule_->nfrozen_core(options_.get_str("FREEZE_CORE"));
+            nfzc = molecule_->nfrozen_core(process_environment_, options_.get_str("FREEZE_CORE"));
         }
         // Print out orbital energies.
         std::vector<std::pair<double, int> > pairs;
@@ -1250,7 +1250,7 @@ void HF::load_orbitals()
 
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser(old_forced_puream));
     molecule_->set_basis_all_atoms(basisname, "DUAL_BASIS_SCF");
-    boost::shared_ptr<BasisSet> dual_basis = BasisSet::construct(parser, molecule_, "DUAL_BASIS_SCF");
+    boost::shared_ptr<BasisSet> dual_basis = BasisSet::construct(process_environment_, parser, molecule_, "DUAL_BASIS_SCF");
 
     psio_->read_entry(PSIF_SCF_MOS,"SCF ENERGY",(char *) &(E_),sizeof(double));
 
@@ -1437,7 +1437,7 @@ double HF::compute_energy()
     }
 
     if(attempt_number_ == 1){
-        boost::shared_ptr<MintsHelper> mints (new MintsHelper(psio_, options_, 0));
+        boost::shared_ptr<MintsHelper> mints (new MintsHelper(process_environment_, psio_, options_, 0));
         mints->one_electron_integrals();
 
         integrals();
@@ -1563,7 +1563,7 @@ double HF::compute_energy()
         form_D();
         timer_off("Form D");
 
-        Process::environment.globals["SCF ITERATION ENERGY"] = E_;
+        process_environment_.globals["SCF ITERATION ENERGY"] = E_;
 
         // After we've built the new D, damp the update if
         if(damping_performed_) damp_update();
@@ -1641,7 +1641,7 @@ double HF::compute_energy()
 
         // Properties
         if (print_) {
-            boost::shared_ptr<OEProp> oe(new OEProp());
+            boost::shared_ptr<OEProp> oe(new OEProp(process_environment_));
             oe->set_title("SCF");
             oe->add("DIPOLE");
 
@@ -1685,7 +1685,7 @@ double HF::compute_energy()
             psio_->close(PSIF_CHKPT, 1);
 
         // Throw if we didn't converge?
-        die_if_not_converged();
+        die_if_not_converged(process_environment_);
     }
 
     // Orbitals are always saved, in case an MO guess is requested later
@@ -1744,7 +1744,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
     }
 
     if(attempt_number_ == 1){
-        boost::shared_ptr<MintsHelper> mints (new MintsHelper(psio_, options_, 0));
+        boost::shared_ptr<MintsHelper> mints (new MintsHelper(process_environment_, psio_, options_, 0));
         mints->one_electron_integrals();
         
 
@@ -1876,7 +1876,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
         form_D();
         timer_off("Form D");
 
-        Process::environment.globals["SCF ITERATION ENERGY"] = E_;
+        process_environment_.globals["SCF ITERATION ENERGY"] = E_;
 
         // After we've built the new D, damp the update if
         if(damping_performed_) damp_update();
@@ -1954,7 +1954,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
 
         // Properties
         if (print_) {
-            boost::shared_ptr<OEProp> oe(new OEProp());
+            boost::shared_ptr<OEProp> oe(new OEProp(process_environment_));
             oe->set_title("SCF");
             oe->add("DIPOLE");
 
@@ -1998,7 +1998,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
             psio_->close(PSIF_CHKPT, 1);
 
         // Throw if we didn't converge?
-        die_if_not_converged();
+        die_if_not_converged(process_environment_);
     }
 
     // Orbitals are always saved, in case an MO guess is requested later
@@ -2033,21 +2033,21 @@ void HF::print_energies()
         energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"] + energies_["-D"]); 
     fprintf(outfile, "\n");
     
-    Process::environment.globals["NUCLEAR REPULSION ENERGY"] = energies_["Nuclear"];
-    Process::environment.globals["ONE-ELECTRON ENERGY"] = energies_["One-Electron"];
-    Process::environment.globals["TWO-ELECTRON ENERGY"] = energies_["Two-Electron"];
+    process_environment_.globals["NUCLEAR REPULSION ENERGY"] = energies_["Nuclear"];
+    process_environment_.globals["ONE-ELECTRON ENERGY"] = energies_["One-Electron"];
+    process_environment_.globals["TWO-ELECTRON ENERGY"] = energies_["Two-Electron"];
     if (fabs(energies_["XC"]) > 1.0e-14) {
-        Process::environment.globals["DFT XC ENERGY"] = energies_["XC"];
-        Process::environment.globals["DFT FUNCTIONAL TOTAL ENERGY"] = energies_["Nuclear"] + 
+        process_environment_.globals["DFT XC ENERGY"] = energies_["XC"];
+        process_environment_.globals["DFT FUNCTIONAL TOTAL ENERGY"] = energies_["Nuclear"] + 
             energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"];
-        Process::environment.globals["DFT TOTAL ENERGY"] = energies_["Nuclear"] + 
+        process_environment_.globals["DFT TOTAL ENERGY"] = energies_["Nuclear"] + 
             energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"] + energies_["-D"];
     } else {
-        Process::environment.globals["HF TOTAL ENERGY"] = energies_["Nuclear"] + 
+        process_environment_.globals["HF TOTAL ENERGY"] = energies_["Nuclear"] + 
             energies_["One-Electron"] + energies_["Two-Electron"];
     }
     if (fabs(energies_["-D"]) > 1.0e-14) {
-        Process::environment.globals["DISPERSION CORRECTION ENERGY"] = energies_["-D"];
+        process_environment_.globals["DISPERSION CORRECTION ENERGY"] = energies_["-D"];
     }
 //  Comment so that autodoc utility will find this PSI variable
 //     It doesn't really belong here but needs to be linked somewhere

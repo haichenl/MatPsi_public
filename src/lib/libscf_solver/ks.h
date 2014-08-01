@@ -53,6 +53,7 @@ namespace scf{
 class KS {
 
 protected:
+    Process::Environment& process_environment_;
     /// KS Potential (the heart of the algorithm)
     boost::shared_ptr<VBase> potential_;
     /// Pointer to potential's functional
@@ -78,7 +79,7 @@ protected:
     void common_init();
 
 public:
-    KS(Options & options, boost::shared_ptr<PSIO> psio);
+    KS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio);
     virtual ~KS();
 };
 
@@ -99,8 +100,8 @@ protected:
 
     void common_init();
 public:
-    RKS(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    RKS(Options& options, boost::shared_ptr<PSIO> psio);
+    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     virtual ~RKS();
 };
 
@@ -125,8 +126,8 @@ protected:
 
     void common_init();
 public:
-    UKS(Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    UKS(Options& options, boost::shared_ptr<PSIO> psio);
+    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     virtual ~UKS();
 };
 

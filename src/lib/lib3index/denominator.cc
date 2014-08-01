@@ -78,12 +78,12 @@ Denominator::Denominator(boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Ve
 Denominator::~Denominator()
 {
 }
-boost::shared_ptr<Denominator> Denominator::buildDenominator(const std::string& algorithm,
+boost::shared_ptr<Denominator> Denominator::buildDenominator(Process::Environment& process_environment_in, const std::string& algorithm,
     boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta)
 {
     Denominator* d;
     if (algorithm == "LAPLACE") {
-        d = new LaplaceDenominator(eps_occ, eps_vir, delta);
+        d = new LaplaceDenominator(process_environment_in, eps_occ, eps_vir, delta);
     } else if (algorithm == "CHOLESKY") {
         d = new CholeskyDenominator(eps_occ, eps_vir, delta);
     } else {
@@ -93,8 +93,8 @@ boost::shared_ptr<Denominator> Denominator::buildDenominator(const std::string& 
     return boost::shared_ptr<Denominator>(d);
 }
 
-LaplaceDenominator::LaplaceDenominator(boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta) :
-    Denominator(eps_occ, eps_vir, delta)
+LaplaceDenominator::LaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta) :
+    process_environment_(process_environment_in), Denominator(eps_occ, eps_vir, delta)
 {
     decompose();
 }
@@ -153,7 +153,7 @@ void LaplaceDenominator::decompose()
     double R = B / A;
 
     // Pick appropriate quadrature file and read contents
-    std::string PSIDATADIR = Process::environment("PSIDATADIR");
+    std::string PSIDATADIR = process_environment_("PSIDATADIR");
     std::string err_table_filename = PSIDATADIR + "/quadratures/1_x/error.bin";
     std::string R_filename = PSIDATADIR + "/quadratures/1_x/R_avail.bin";
 
@@ -478,14 +478,14 @@ SAPTDenominator::SAPTDenominator(boost::shared_ptr<Vector> eps_occA,
 SAPTDenominator::~SAPTDenominator()
 {
 }
-boost::shared_ptr<SAPTDenominator> SAPTDenominator::buildDenominator(const std::string& algorithm,
+boost::shared_ptr<SAPTDenominator> SAPTDenominator::buildDenominator(Process::Environment& process_environment_in, const std::string& algorithm,
     boost::shared_ptr<Vector> eps_occA, boost::shared_ptr<Vector> eps_virA,
     boost::shared_ptr<Vector> eps_occB, boost::shared_ptr<Vector> eps_virB,
     double delta, bool debug)
 {
     SAPTDenominator* d;
     if (algorithm == "LAPLACE") {
-        d = new SAPTLaplaceDenominator(eps_occA, eps_virA, eps_occB, eps_virB, delta, debug);
+        d = new SAPTLaplaceDenominator(process_environment_in, eps_occA, eps_virA, eps_occB, eps_virB, delta, debug);
     } else if (algorithm == "CHOLESKY") {
         d = new SAPTCholeskyDenominator(eps_occA, eps_virA, eps_occB, eps_virB, delta, debug);
     } else {
@@ -539,10 +539,10 @@ void SAPTDenominator::check_denom(boost::shared_ptr<Vector> eps_occ,
     app_denom->print();
     err_denom->print();
 }
-SAPTLaplaceDenominator::SAPTLaplaceDenominator(boost::shared_ptr<Vector> eps_occA,
+SAPTLaplaceDenominator::SAPTLaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector> eps_occA,
   boost::shared_ptr<Vector> eps_virA, boost::shared_ptr<Vector> eps_occB,
   boost::shared_ptr<Vector> eps_virB, double delta, bool debug) :
-    SAPTDenominator(eps_occA, eps_virA, eps_occB, eps_virB, delta, debug)
+    process_environment_(process_environment_in), SAPTDenominator(eps_occA, eps_virA, eps_occB, eps_virB, delta, debug)
 {
     decompose();
 }
@@ -570,7 +570,7 @@ void SAPTLaplaceDenominator::decompose()
     double R = B / A;
 
     // Pick appropriate quadrature file and read contents
-    std::string PSIDATADIR = Process::environment("PSIDATADIR");
+    std::string PSIDATADIR = process_environment_("PSIDATADIR");
     std::string err_table_filename = PSIDATADIR + "/quadratures/1_x/error.bin";
     std::string R_filename = PSIDATADIR + "/quadratures/1_x/R_avail.bin";
 
@@ -1012,8 +1012,8 @@ void SAPTCholeskyDenominator::decompose()
     }
 }
 
-TLaplaceDenominator::TLaplaceDenominator(boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta) :
-    eps_occ_(eps_occ), eps_vir_(eps_vir), delta_(delta)
+TLaplaceDenominator::TLaplaceDenominator(Process::Environment& process_environment_in, boost::shared_ptr<Vector> eps_occ, boost::shared_ptr<Vector> eps_vir, double delta) :
+    process_environment_(process_environment_in), eps_occ_(eps_occ), eps_vir_(eps_vir), delta_(delta)
 {
     decompose();
 }
@@ -1035,7 +1035,7 @@ void TLaplaceDenominator::decompose()
     double R = B / A;
 
     // Pick appropriate quadrature file and read contents
-    std::string PSIDATADIR = Process::environment("PSIDATADIR");
+    std::string PSIDATADIR = process_environment_("PSIDATADIR");
     std::string err_table_filename = PSIDATADIR + "/quadratures/1_x/error.bin";
     std::string R_filename = PSIDATADIR + "/quadratures/1_x/R_avail.bin";
 

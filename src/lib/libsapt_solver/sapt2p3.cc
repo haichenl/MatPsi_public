@@ -25,8 +25,8 @@
 
 namespace psi { namespace sapt {
 
-SAPT2p3::SAPT2p3(Options& options, boost::shared_ptr<PSIO> psio, 
-  boost::shared_ptr<Chkpt> chkpt) : SAPT2p(options, psio, chkpt),
+SAPT2p3::SAPT2p3(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
+  boost::shared_ptr<Chkpt> chkpt) : SAPT2p(process_environment_in, options, psio, chkpt),
   e_elst13_(0.0),
   e_ind30_(0.0),
   e_exch_ind30_(0.0),

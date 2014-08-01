@@ -51,8 +51,8 @@ using namespace boost;
 
 namespace psi { namespace scf {
 
-KS::KS(Options & options, boost::shared_ptr<PSIO> psio) :
-    options_(options), psio_(psio)
+KS::KS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
+    process_environment_(process_environment_in), options_(options), psio_(psio)
 {
     common_init();
 }
@@ -62,15 +62,15 @@ KS::~KS()
 void KS::common_init()
 {
     // Take the molecule from the environment
-    molecule_ = Process::environment.molecule();
+    molecule_ = process_environment_.molecule();
 
     // Load in the basis set
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    basisset_ = BasisSet::construct(parser, molecule_, "BASIS");
+    basisset_ = BasisSet::construct(process_environment_, parser, molecule_, "BASIS");
     boost::shared_ptr<IntegralFactory> fact(new IntegralFactory(basisset_,basisset_,basisset_,basisset_));
     sobasisset_ = boost::shared_ptr<SOBasisSet>(new SOBasisSet(basisset_, fact));
 
-    potential_ = VBase::build_V(KS::options_,(options_.get_str("REFERENCE") == "RKS" ? "RV" : "UV"));
+    potential_ = VBase::build_V(process_environment_, KS::options_,(options_.get_str("REFERENCE") == "RKS" ? "RV" : "UV"));
     potential_->initialize();
     functional_ = potential_->functional();
 
@@ -78,13 +78,13 @@ void KS::common_init()
     potential_->print_header();
 
 }
-RKS::RKS(Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
-    RHF(options, psio, chkpt), KS(options,psio)
+RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
+    RHF(process_environment_in, options, psio, chkpt), KS(process_environment_in, options,psio)
 {
     common_init();
 }
-RKS::RKS(Options & options, boost::shared_ptr<PSIO> psio) :
-    RHF(options, psio), KS(options,psio)
+RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
+    RHF(process_environment_in, options, psio), KS(process_environment_in, options,psio)
 {
     common_init();
 }
@@ -239,13 +239,13 @@ void RKS::stability_analysis()
     throw PSIEXCEPTION("DFT stabilty analysis has not been implemented yet.  Sorry :(");
 }
 
-UKS::UKS(Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
-    UHF(options, psio, chkpt), KS(options,psio)
+UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
+    UHF(process_environment_in, options, psio, chkpt), KS(process_environment_in, options,psio)
 {
     common_init();
 }
-UKS::UKS(Options & options, boost::shared_ptr<PSIO> psio) :
-    UHF(options, psio), KS(options,psio)
+UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
+    UHF(process_environment_in, options, psio), KS(process_environment_in, options,psio)
 {
     common_init();
 }

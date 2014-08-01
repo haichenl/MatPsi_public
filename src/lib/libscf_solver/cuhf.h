@@ -101,9 +101,9 @@ protected:
     virtual void finalize();
 
 public:
-    CUHF(Options& options, boost::shared_ptr<PSIO> psio, 
+    CUHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
         boost::shared_ptr<Chkpt> chkpt);
-    CUHF(Options& options, boost::shared_ptr<PSIO> psio);
+    CUHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
     virtual ~CUHF();
 
     virtual bool same_a_b_orbs() const { return false; }

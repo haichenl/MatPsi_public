@@ -25,8 +25,8 @@
 
 namespace psi { namespace sapt {
 
-SAPT2p::SAPT2p(Options& options, boost::shared_ptr<PSIO> psio, 
-  boost::shared_ptr<Chkpt> chkpt) : SAPT2(options, psio, chkpt),
+SAPT2p::SAPT2p(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, 
+  boost::shared_ptr<Chkpt> chkpt) : SAPT2(process_environment_in, options, psio, chkpt),
   e_disp21_(0.0),
   e_disp22sdq_(0.0),
   e_disp22t_(0.0),
@@ -303,22 +303,22 @@ void SAPT2p::print_results()
       e_sapt2p_ccd_*1000.0,e_sapt2p_ccd_*pc_hartree2kcalmol);
   }
 
-  Process::environment.globals["SAPT ELST ENERGY"] = tot_elst;
-  Process::environment.globals["SAPT EXCH ENERGY"] = tot_exch;
-  Process::environment.globals["SAPT IND ENERGY"] = tot_ind;
-  Process::environment.globals["SAPT CT ENERGY"] = tot_ct;
-  Process::environment.globals["SAPT DISP ENERGY"] = tot_disp;
-  Process::environment.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
-  Process::environment.globals["SAPT SAPT2 ENERGY"] = e_sapt2_;
+  process_environment_.globals["SAPT ELST ENERGY"] = tot_elst;
+  process_environment_.globals["SAPT EXCH ENERGY"] = tot_exch;
+  process_environment_.globals["SAPT IND ENERGY"] = tot_ind;
+  process_environment_.globals["SAPT CT ENERGY"] = tot_ct;
+  process_environment_.globals["SAPT DISP ENERGY"] = tot_disp;
+  process_environment_.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
+  process_environment_.globals["SAPT SAPT2 ENERGY"] = e_sapt2_;
   if (mbpt_disp_) {
-      Process::environment.globals["SAPT SAPT2+ ENERGY"] = e_sapt2p_;
-      Process::environment.globals["SAPT ENERGY"] = e_sapt2p_;
-      Process::environment.globals["CURRENT ENERGY"] = Process::environment.globals["SAPT ENERGY"];
+      process_environment_.globals["SAPT SAPT2+ ENERGY"] = e_sapt2p_;
+      process_environment_.globals["SAPT ENERGY"] = e_sapt2p_;
+      process_environment_.globals["CURRENT ENERGY"] = process_environment_.globals["SAPT ENERGY"];
   }
   if (ccd_disp_) {
-      Process::environment.globals["SAPT SAPT2+(CCD) ENERGY"] = e_sapt2p_ccd_;
-      Process::environment.globals["SAPT ENERGY"] = e_sapt2p_ccd_;
-      Process::environment.globals["CURRENT ENERGY"] = Process::environment.globals["SAPT ENERGY"];
+      process_environment_.globals["SAPT SAPT2+(CCD) ENERGY"] = e_sapt2p_ccd_;
+      process_environment_.globals["SAPT ENERGY"] = e_sapt2p_ccd_;
+      process_environment_.globals["CURRENT ENERGY"] = process_environment_.globals["SAPT ENERGY"];
   }
 }
 

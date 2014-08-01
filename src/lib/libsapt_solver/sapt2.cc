@@ -25,8 +25,8 @@
 
 namespace psi { namespace sapt {
 
-SAPT2::SAPT2(Options& options, boost::shared_ptr<PSIO> psio,
-  boost::shared_ptr<Chkpt> chkpt) : SAPT(options, psio, chkpt),
+SAPT2::SAPT2(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio,
+  boost::shared_ptr<Chkpt> chkpt) : SAPT(process_environment_in, options, psio, chkpt),
   e_elst10_(0.0),
   e_elst12_(0.0),
   e_exch10_(0.0),
@@ -276,15 +276,15 @@ void SAPT2::print_results()
   fprintf(outfile,"    Total SAPT2        %16.8lf mH %16.8lf kcal mol^-1\n",
     e_sapt2_*1000.0,e_sapt2_*pc_hartree2kcalmol);
 
-  Process::environment.globals["SAPT ELST ENERGY"] = tot_elst;
-  Process::environment.globals["SAPT EXCH ENERGY"] = tot_exch;
-  Process::environment.globals["SAPT IND ENERGY"] = tot_ind;
-  Process::environment.globals["SAPT CT ENERGY"] = tot_ct;
-  Process::environment.globals["SAPT DISP ENERGY"] = tot_disp;
-  Process::environment.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
-  Process::environment.globals["SAPT SAPT2 ENERGY"] = e_sapt2_;
-  Process::environment.globals["SAPT ENERGY"] = e_sapt2_;
-  Process::environment.globals["CURRENT ENERGY"] = Process::environment.globals["SAPT ENERGY"];
+  process_environment_.globals["SAPT ELST ENERGY"] = tot_elst;
+  process_environment_.globals["SAPT EXCH ENERGY"] = tot_exch;
+  process_environment_.globals["SAPT IND ENERGY"] = tot_ind;
+  process_environment_.globals["SAPT CT ENERGY"] = tot_ct;
+  process_environment_.globals["SAPT DISP ENERGY"] = tot_disp;
+  process_environment_.globals["SAPT SAPT0 ENERGY"] = e_sapt0_;
+  process_environment_.globals["SAPT SAPT2 ENERGY"] = e_sapt2_;
+  process_environment_.globals["SAPT ENERGY"] = e_sapt2_;
+  process_environment_.globals["CURRENT ENERGY"] = process_environment_.globals["SAPT ENERGY"];
 }
 
 void SAPT2::df_integrals()

@@ -304,7 +304,7 @@ boost::shared_ptr<BasisSet> BasisSet::zero_ao_basis_set()
 //    return sozero;
 //}
 
-boost::shared_ptr<BasisSet> BasisSet::construct(const boost::shared_ptr<BasisSetParser>& parser,
+boost::shared_ptr<BasisSet> BasisSet::construct(Process::Environment& process_environment_in, const boost::shared_ptr<BasisSetParser>& parser,
         const boost::shared_ptr<Molecule>& mol,
         const std::string& type)
 {
@@ -320,7 +320,7 @@ boost::shared_ptr<BasisSet> BasisSet::construct(const boost::shared_ptr<BasisSet
     basisset->molecule_ = mol;
 
     // For each one try to load the basis set
-    const list<string>& user_list = Process::environment.user_basis_files;
+    const list<string>& user_list = process_environment_in.user_basis_files;
 
     // Map of GaussianShells
     //  basis           atom        gaussian shells
@@ -367,7 +367,7 @@ boost::shared_ptr<BasisSet> BasisSet::construct(const boost::shared_ptr<BasisSet
 
                 try {
                     // Need to wrap this is a try catch block
-                    basis_atom_shell[basis.first][symbol] = parser->parse(symbol, file);
+                    basis_atom_shell[basis.first][symbol] = parser->parse(process_environment_in, symbol, file);
 
                     if (WorldComm->me() == 0)
                         fprintf(outfile, "  Basis set %s for %s read from %s\n",
@@ -385,7 +385,7 @@ boost::shared_ptr<BasisSet> BasisSet::construct(const boost::shared_ptr<BasisSet
         }
 
         string filename = make_filename(basis.first);
-        string path = Process::environment("PSIDATADIR");
+        string path = process_environment_in("PSIDATADIR");
         vector<string> file;
 
         try {
@@ -396,7 +396,7 @@ boost::shared_ptr<BasisSet> BasisSet::construct(const boost::shared_ptr<BasisSet
                 if (atom.second.empty()){
                     if(file.empty()) file = parser->load_file(path + "/basis/" + filename);
                     // If not found this will throw...let it.
-                    basis_atom_shell[basis.first][symbol] = parser->parse(symbol, file);
+                    basis_atom_shell[basis.first][symbol] = parser->parse(process_environment_in, symbol, file);
                 }
             }
         }
