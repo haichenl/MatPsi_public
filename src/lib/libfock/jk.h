@@ -353,6 +353,14 @@ public:
      */
     void compute();
     /**
+     * Compute D/J/K for the current C
+     * Update values in your reference to
+     * C_left/C_right BEFORE calling this,
+     * renew your references to the matrices
+     * in D/J/K AFTER calling this.
+     */
+    void compute_from_D();
+    /**
      * Method to clear off memory without
      * totally destroying the object. The
      * object can be rebuilt later by calling
@@ -417,7 +425,7 @@ public:
      * may be changed in each call of compute();
      * @return D vector of D matrices
      */
-    const std::vector<SharedMatrix >& D() const { return D_; }
+    std::vector<SharedMatrix >& D() { return D_; }
 
     /**
     * Print header information regarding JK

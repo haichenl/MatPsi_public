@@ -15,8 +15,8 @@ using namespace psi;
 using namespace boost;
 
 namespace psi {
-    FILE* outfile = fopen("/dev/null", "w");
-    //FILE* outfile = stdout;
+    //FILE* outfile = fopen("/dev/null", "w");
+    FILE* outfile = stdout;
     char* psi_file_prefix = "matpsi";
     std::string outfile_name = "";
     extern int read_options(const std::string &name, Options & options, bool suppress_printing = false);
@@ -24,8 +24,10 @@ namespace psi {
 
 class MatPsi {
 protected:
-    Options options_; // for now, just use an independent Options object; 
+    //~ Options options_; // for now, just use an independent Options object; 
                       // in the future may be we should use independent Enviroment object as well 
+    Process::Environment process_environment_;
+    boost::shared_ptr<worldcomm> worldcomm_;
     
     std::string fakepid_; // serves as a fake pid 
     boost::shared_ptr<PSIO> psio_;
@@ -52,7 +54,7 @@ protected:
     void create_integral_factories();
     
     // initialize the directjk object 
-    void init_directjk(SharedMatrix OccMO, double cutoff = 1.0E-12);
+    void init_directjk(double cutoff = 1.0E-12);
     
 public:
     // constructor; takes in 2 strings and parse them 
@@ -65,7 +67,7 @@ public:
     void testmol() {Process::environment.molecule()->print();}
     
     // enable DirectJK object 
-    void UseDirectJK();
+    void UseDirectJK(double cutoff = 1.0E-12);
     
     // the string describing the molecule 
     std::string molecule_string() { return molstring_; }
@@ -145,6 +147,9 @@ public:
     void tei_alluniqJK(double* matptJ, double* matptK);
     
     // SCF related 
+    
+    SharedMatrix Density2J(SharedMatrix Density);
+    
     // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from occupied molecular orbital coefficient matrix, direct algorithm, consider no geometrical symmetry 
     SharedMatrix OccMO2J(SharedMatrix OccMO);
     
@@ -186,5 +191,9 @@ public:
     
     // restricted Hartree-Fock Fock matrix 
     SharedMatrix RHF_F();
+    
+    void switch_worldcomm() {
+        WorldComm = worldcomm_;
+    }
     
 };

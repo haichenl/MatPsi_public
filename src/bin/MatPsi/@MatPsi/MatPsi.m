@@ -175,6 +175,11 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('UseDirectJK', this.objectHandle, varargin{:});
         end
         
+        % Density2J, (nbasis, nbasis) matrix 
+        function varargout = Density2J(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('Density2J', this.objectHandle, varargin{:});
+        end
+        
         % OccMO2J, (nbasis, nbasis) matrix 
         function varargout = OccMO2J(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('OccMO2J', this.objectHandle, varargin{:});
@@ -243,6 +248,15 @@ classdef MatPsi < handle
         % RHF_F, (nbasis, nbasis) matrix  
         function varargout = RHF_F(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_F', this.objectHandle, varargin{:});
+        end
+        
+        % debugging
+        function varargout = printstatus(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('printstatus', this.objectHandle, varargin{:});
+        end
+        
+        function varargout = printdefault(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('printdefault', this.objectHandle, varargin{:});
         end
 
     end

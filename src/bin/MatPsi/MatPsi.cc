@@ -17,36 +17,34 @@ MatPsi::MatPsi(std::string molstring, std::string basisname, std::string path) {
 
 void MatPsi::common_init(std::string molstring, std::string basisname, int ncores, unsigned long int memory) {
     // some necessary initializations
-    Process::environment.initialize();
-    WorldComm = initialize_communicator(0, NULL);
-    Process::environment.options.set_read_globals(true);
-    read_options("", Process::environment.options, true);
-    Process::environment.options.set_read_globals(false);
-    Process::environment.options.set_global_int("MAXITER", 100);
-    Process::environment.set("PSIDATADIR", path_);
+    process_environment_.initialize();
+    worldcomm_ = initialize_communicator(0, NULL, process_environment_);
+    switch_worldcomm();
+    process_environment_.options.set_read_globals(true);
     
-    options_ = Process::environment.options;
-    options_.set_current_module("MatPsi");
+    read_options("", process_environment_.options, true);
+    process_environment_.options.set_read_globals(false);
+    process_environment_.set("PSIDATADIR", path_);
+    //~ process_environment_.options.set_current_module("MatPsi");
+    process_environment_.options.set_global_int("MAXITER", 100);
     
     Wavefunction::initialize_singletons();
     
     // initialize psio 
-    psio_init();
-    PSIO::shared_object()->set_pid(fakepid_);
     psio_ = boost::shared_ptr<PSIO>(new PSIO);
     psio_->set_pid(fakepid_);
     
     // create molecule object and set its basis set name 
     molstring_ = molstring;
     basisname_ = basisname;
-    molecule_ = psi::Molecule::create_molecule_from_string(molstring);
+    molecule_ = psi::Molecule::create_molecule_from_string(process_environment_, molstring);
     molecule_->set_basis_all_atoms(basisname);
     
-    Process::environment.set_molecule(molecule_);
+    process_environment_.set_molecule(molecule_);
     
     // set cores and memory 
-    Process::environment.set_n_threads(ncores); // these values are shared among all instances, so better be constants 
-    Process::environment.set_memory(memory);
+    process_environment_.set_n_threads(ncores); // these values are shared among all instances, so better be constants 
+    process_environment_.set_memory(memory);
     
     // create basis object and one & two electron integral factories 
 	create_basis();
@@ -62,7 +60,7 @@ void MatPsi::common_init(std::string molstring, std::string basisname, int ncore
 void MatPsi::create_basis() {
     // create basis object 
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
-    basis_ = BasisSet::construct(parser, molecule_, "BASIS");  
+    basis_ = BasisSet::construct(process_environment_, parser, molecule_, "BASIS");  
     boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
     molecule_->set_point_group(c1group); // creating basis set object change molecule's point group, for some reasons 
 }
@@ -75,15 +73,20 @@ void MatPsi::create_integral_factories() {
     eri_ = boost::shared_ptr<TwoBodyAOInt>(intfac_->eri());
 }
 
-void MatPsi::UseDirectJK() {
+void MatPsi::UseDirectJK(double cutoff) {
     // create directJK object
-    directjk_ = boost::shared_ptr<DirectJK>(new DirectJK(basis_));
+    directjk_ = boost::shared_ptr<DirectJK>(new DirectJK(process_environment_, basis_));
+    directjk_->set_cutoff(cutoff);
+    directjk_->initialize();
+    directjk_->remove_symmetry();
 }
 
 // destructor 
 MatPsi::~MatPsi() {
     if(rhf_ != NULL)
         RHF_finalize();
+    if(directjk_ != NULL)
+        directjk_->finalize();
 }
 
 void MatPsi::fix_mol() {
@@ -95,9 +98,9 @@ void MatPsi::fix_mol() {
 void MatPsi::free_mol() {
     // done by re-generating a new molecule object (and basis object etc.) while retaining the geometry 
     SharedMatrix oldgeom = geom();
-    molecule_ = psi::Molecule::create_molecule_from_string(molstring_);
+    molecule_ = psi::Molecule::create_molecule_from_string(process_environment_, molstring_);
     molecule_->set_basis_all_atoms(basisname_);
-    Process::environment.set_molecule(molecule_);
+    process_environment_.set_molecule(molecule_);
     create_basis(); // the molecule object isn't complete before we create the basis object, according to psi4 documentation 
     molecule_->set_geometry(*(oldgeom.get()));
     create_basis();
@@ -334,24 +337,41 @@ void MatPsi::tei_alluniqJK(double* matptJ, double* matptK) {
     }
 }
 
-void MatPsi::init_directjk(SharedMatrix OccMO, double cutoff) {
+void MatPsi::init_directjk(double cutoff) {
     directjk_->set_cutoff(cutoff);
     directjk_->initialize();
     directjk_->remove_symmetry();
+}
+
+SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
+    if(directjk_ == NULL) {
+        throw PSIEXCEPTION("Density2J: DirectJK object has not been enabled.");
+    }
+    
+    std::vector<SharedMatrix>& D = directjk_->D();
     std::vector<SharedMatrix>& C_left = directjk_->C_left();
     C_left.clear();
-    C_left.push_back(OccMO);
+    D.clear();
+    D.push_back(Density);
+    
+    directjk_->compute_from_D();
+    SharedMatrix Jnew = directjk_->J()[0];
+    Jnew->hermitivitize();
+    //~ directjk_->finalize();
+    return Jnew;
 }
 
 SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
     if(directjk_ == NULL) {
         throw PSIEXCEPTION("OccMO2J: DirectJK object has not been enabled.");
     }
-    init_directjk(OccMO);
+    std::vector<SharedMatrix>& C_left = directjk_->C_left();
+    C_left.clear();
+    C_left.push_back(OccMO);
     directjk_->compute();
     SharedMatrix Jnew = directjk_->J()[0];
     Jnew->hermitivitize();
-    directjk_->finalize();
+    //~ directjk_->finalize();
     return Jnew;
 }
 
@@ -359,11 +379,13 @@ SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
     if(directjk_ == NULL) {
         throw PSIEXCEPTION("OccMO2K: DirectJK object has not been enabled.");
     }
-    init_directjk(OccMO);
+    std::vector<SharedMatrix>& C_left = directjk_->C_left();
+    C_left.clear();
+    C_left.push_back(OccMO);
     directjk_->compute();
     SharedMatrix Knew = directjk_->K()[0];
     Knew->hermitivitize();
-    directjk_->finalize();
+    //~ directjk_->finalize();
     return Knew;
 }
 
@@ -371,24 +393,27 @@ SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
     if(directjk_ == NULL) {
         throw PSIEXCEPTION("OccMO2G: DirectJK object has not been enabled.");
     }
-    init_directjk(OccMO);
+    std::vector<SharedMatrix>& C_left = directjk_->C_left();
+    C_left.clear();
+    C_left.push_back(OccMO);
     directjk_->compute();
     SharedMatrix Gnew = directjk_->J()[0];
     Gnew->scale(2);
     Gnew->subtract(directjk_->K()[0]); // 2 J - K 
     Gnew->hermitivitize();
-    directjk_->finalize();
+    //~ directjk_->finalize();
     return Gnew;
 }
 
 double MatPsi::RHF() {
-    PSIO::shared_object()->set_pid(fakepid_); // have to set pid again as some other instances could have changed it, 
-                                              // and the JK object inside of rhf_ just stupidly uses the global psio object... 
     boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
     molecule_->set_point_group(c1group); // for safety 
-    Process::environment.set_molecule(molecule_);
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(options_, psio_));
-    Process::environment.set_wavefunction(rhf_);
+    
+    //~ Process::environment.options.set_global_int("MOM_START", 20);
+    //~ Process::environment.options.set_global_double("DAMPING_PERCENTAGE", 20.0);
+    
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy();
         rhf_->J()->scale(0.5);
@@ -403,13 +428,10 @@ double MatPsi::RHF() {
 }
 
 double MatPsi::RHF(SharedMatrix EnvMat) {
-    PSIO::shared_object()->set_pid(fakepid_); // have to set pid again as some other instances are gonna change it, 
-                                              // and the JK object just stupidly uses the global psio object... 
     boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
     molecule_->set_point_group(c1group); // for safety 
-    Process::environment.set_molecule(molecule_);
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(options_, psio_));
-    Process::environment.set_wavefunction(rhf_);
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy(EnvMat);
         rhf_->J()->scale(0.5);
@@ -425,13 +447,12 @@ double MatPsi::RHF(SharedMatrix EnvMat) {
 }
 
 void MatPsi::RHF_finalize() {
-    PSIO::shared_object()->set_pid(fakepid_);
     rhf_->extern_finalize();
-    PSIOManager::shared_object()->psiclean();
+    psio_->_psio_manager_->psiclean();
 }
 
 double MatPsi::RHF_EHF() { 
-    if(rhf_ == NULL) { // a trick to determine whether Hartree-Fock has been performed 
+    if(rhf_ == NULL) {
         throw PSIEXCEPTION("RHF_EHF: Hartree-Fock calculation has not been done.");
     }
     return rhf_->EHF(); 
@@ -458,7 +479,7 @@ SharedMatrix MatPsi::RHF_D() {
     return rhf_->Da(); 
 }
 
-SharedMatrix MatPsi::RHF_Ha() { // RHF_H leads to some very weird naming issues. 
+SharedMatrix MatPsi::RHF_Ha() { // RHF_H leads to naming issues due to "ifdef RHF_H" or something 
     if(rhf_ == NULL) {
         throw PSIEXCEPTION("RHF_H: Hartree-Fock calculation has not been done.");
     }
