@@ -138,7 +138,7 @@ public:
     static Environment get_environment();
 };
 
-void die_if_not_converged();
+void die_if_not_converged(Process::Environment& process_environment_);
 
 }
 
