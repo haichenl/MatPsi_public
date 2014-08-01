@@ -29,7 +29,7 @@
 
 namespace psi {
 
-void init_openmp();
+void init_openmp(Process::Environment& process_environment_in);
 
 }
 #endif // _psi_src_lib_libparallel_openmp_h_

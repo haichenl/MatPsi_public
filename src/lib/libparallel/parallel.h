@@ -35,13 +35,13 @@
 #include <cstdio>
 
 // Define the default parallel environment. In general, developers should just use this type.
-#if defined(HAVE_MPI)
-#   include <libparallel/mpi_wrapper.h>
-typedef psi::MPICommunicator            worldcomm;
-#else
+//~ #if defined(HAVE_MPI)
+//~ #   include <libparallel/mpi_wrapper.h>
+//~ typedef psi::MPICommunicator            worldcomm;
+//~ #else
 #   include <libparallel/local.h>
 typedef psi::LocalCommWrapper           worldcomm;
-#endif
+//~ #endif
 
 namespace psi {
 
@@ -50,12 +50,12 @@ namespace psi {
 
     // A templated version of init comunicator.
     template <typename comm_type>
-    static comm_type* initialize_specific_communicator(const int &argc, char **argv) {
-        return new comm_type(argc, argv);
+    static comm_type* initialize_specific_communicator(const int &argc, char **argv, Process::Environment& process_environment_in) {
+        return new comm_type(argc, argv, process_environment_in);
     }
 
     // Create a communicator from Comm typedef'ed above.
-    boost::shared_ptr<worldcomm> initialize_communicator(const int &argc, char **argv);
+    boost::shared_ptr<worldcomm> initialize_communicator(const int &argc, char **argv, Process::Environment& process_environment_in);
 }
 
 //#include "threaded_storage.h"

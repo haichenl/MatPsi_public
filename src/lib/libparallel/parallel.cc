@@ -28,19 +28,19 @@ namespace psi {
 
 boost::shared_ptr<worldcomm> WorldComm;
 
-boost::shared_ptr<worldcomm> initialize_communicator(const int &argc, char **argv) {
-    return boost::shared_ptr<worldcomm>(initialize_specific_communicator<worldcomm>(argc, argv));
+boost::shared_ptr<worldcomm> initialize_communicator(const int &argc, char **argv, Process::Environment& process_environment_in) {
+    return boost::shared_ptr<worldcomm>(initialize_specific_communicator<worldcomm>(argc, argv, process_environment_in));
 }
 
-void init_openmp() {
+void init_openmp(Process::Environment& process_environment_in) {
 #ifdef _OPENMP
     // Disable nested threads in OpenMP
     omp_set_nested(0);
 #endif
 
     // If no OMP thread variable is set, set nthreads to default to 1
-    if (Process::environment("OMP_NUM_THREADS") == "")
-        Process::environment.set_n_threads(1);
+    if (process_environment_in("OMP_NUM_THREADS") == "")
+        process_environment_in.set_n_threads(1);
 }
 
 }

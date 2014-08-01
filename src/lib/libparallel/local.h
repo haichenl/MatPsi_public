@@ -39,12 +39,12 @@ private:
 
 public:
 
-    LocalCommWrapper(const int &argc, char **argv)
+    LocalCommWrapper(const int &argc, char **argv, Process::Environment& process_environment_in)
     {
-        init_openmp();
+        init_openmp(process_environment_in);
         me_ = 0;
         nproc_ = 1;
-        nthread_ = Process::environment.get_n_threads();
+        nthread_ = process_environment_in.get_n_threads();
         communicator_ = "LOCAL";
     }
 

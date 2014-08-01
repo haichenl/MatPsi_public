@@ -834,6 +834,7 @@ esac
 
 # Check for OpenMP, the test reports for C++ only, because we called AC_LANG([C++]) near the top
 AX_OPENMP([
+    COTH="$COTH $OPENMP_CXXFLAGS"
     CXXOTH="$CXXOTH $OPENMP_CXXFLAGS"
     LDFLAGS="$LDFLAGS $OPENMP_CXXFLAGS"
 ])
