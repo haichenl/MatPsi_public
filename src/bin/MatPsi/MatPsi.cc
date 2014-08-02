@@ -434,15 +434,16 @@ void MatPsi::RHF_reset() {
 
 void MatPsi::RHF_EnableMOM(int mom_start) {
     process_environment_.options.set_global_int("MOM_START", mom_start);
-    RHF_reset();
+    //~ RHF_reset(); // do not need since we now reset rhf_ at the beginning of RHF(); still in doubt when should we do so 
 }
 
 void MatPsi::RHF_EnableDamping(double damping_percentage) {
     process_environment_.options.set_global_double("DAMPING_PERCENTAGE", damping_percentage);
-    RHF_reset();
+    //~ RHF_reset(); // do not need since we now reset rhf_ at the beginning of RHF(); still in doubt when should we do so 
 }
 
 double MatPsi::RHF() {
+    RHF_reset();
     try {
         double Ehf = rhf_->compute_energy();
         jk_ = rhf_->jk();
@@ -455,6 +456,7 @@ double MatPsi::RHF() {
 }
 
 double MatPsi::RHF(SharedMatrix EnvMat) {
+    RHF_reset();
     try {
         double Ehf = rhf_->compute_energy(EnvMat);
         jk_ = rhf_->jk();
@@ -464,7 +466,6 @@ double MatPsi::RHF(SharedMatrix EnvMat) {
     catch (...) {
         throw PSIEXCEPTION("RHF(env): Hartree-Fock probably not converged.");
     }
-    
 }
 
 double MatPsi::RHF_EHF() { 
