@@ -62,7 +62,7 @@ void PSIOManager::set_specific_retention(int fileno, bool retain)
         specific_retains_.insert(fileno);
     else 
         specific_retains_.erase(fileno);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 
 bool PSIOManager::get_specific_retention(int fileno)
@@ -84,7 +84,7 @@ void PSIOManager::write_scratch_file(const std::string & full_path, const std::s
         throw PSIEXCEPTION("Unable to write to " + full_path);
     fprintf(fh, "%s",text.c_str());
     fclose(fh);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 
 void PSIOManager::open_file(const std::string& full_path, int fileno)
@@ -92,7 +92,7 @@ void PSIOManager::open_file(const std::string& full_path, int fileno)
     files_[full_path] = true;
     if (specific_retains_.count(fileno) != 0)
         retained_files_.insert(full_path);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 void PSIOManager::close_file(const std::string& full_path, int fileno, bool keep)
 {
@@ -100,13 +100,13 @@ void PSIOManager::close_file(const std::string& full_path, int fileno, bool keep
         files_[full_path] = false;
     else
         files_.erase(full_path);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 void PSIOManager::move_file(const std::string& old_full_path, const std::string& new_full_path)
 {
     files_[new_full_path] = files_[old_full_path];
     files_.erase(old_full_path);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 void PSIOManager::print(FILE* out)
 {
@@ -194,7 +194,7 @@ void PSIOManager::build_from_disk()
 }
 void PSIOManager::crashclean()
 {
-    build_from_disk();
+    //~ build_from_disk();
     psiclean();
 }
 void PSIOManager::mark_file_for_retention(const std::string& file, bool retain)
@@ -203,7 +203,7 @@ void PSIOManager::mark_file_for_retention(const std::string& file, bool retain)
         retained_files_.insert(file);
     else
         retained_files_.erase(file);
-    mirror_to_disk();
+    //~ mirror_to_disk();
 }
 void PSIOManager::psiclean()
 {
@@ -220,7 +220,7 @@ void PSIOManager::psiclean()
     files_.clear();
     files_ = temp;
     //if (WorldComm->me() == 0)
-        unlink("psi.clean");
+        //~ unlink("psi.clean");
 }
 
 }

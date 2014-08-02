@@ -23,7 +23,7 @@ classdef MatPsi < handle
                     throw(MException('MatPsi:MatPsi','MatPsi cannot find basis set files.'));
                 end
             end
-			this.objectHandle = MatPsi_mex('new', varargin{:}, this.path);
+            this.objectHandle = MatPsi_mex('new', varargin{:}, this.path);
         end
         
         %% Copy Constructor
@@ -39,101 +39,117 @@ classdef MatPsi < handle
         end
         
         %% Constructor related properties
-        % molecule_string, 1 string 
+        % string = matpsi.molecule_string(); 
+        % The molecule description string used in constructor 
         function varargout = molecule_string(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('molecule_string', this.objectHandle, varargin{:});
         end
         
-        % basis_name, 1 string 
+        % string = matpsi.basis_name(); 
+        % The basis set name used in constructor  
         function varargout = basis_name(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('basis_name', this.objectHandle, varargin{:});
         end
-
-        % ignore this 
-        function varargout = testmol(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('testmol', this.objectHandle, varargin{:});
-        end
         
         %% Molecule operations 
-        % fix_mol 
+        % matpsi.fix_mol(); 
+        % Fix the molecule at its current frame 
         function varargout = fix_mol(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('fix_mol', this.objectHandle, varargin{:});
         end
         
-        % free_mol 
+        % matpsi.free_mol(); 
+        % Free the molecule so that the program can move/reorient the molecule 
         function varargout = free_mol(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('free_mol', this.objectHandle, varargin{:});
         end
         
         %% Molecule properties 
-        % natom, 1 double 
+        % integer = matpsi.natom(); 
+        % Number of atoms in the molecule 
         function varargout = natom(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('natom', this.objectHandle, varargin{:});
         end
         
-        % nelec, 1 double 
+        % integer = matpsi.nelec(); 
+        % Number of electrons in the molecule 
         function varargout = nelec(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('nelec', this.objectHandle, varargin{:});
         end
         
-        % geom, (natom, 3) matrix 
+        % matrix(natom, 3) = matpsi.geom(); 
+        % The molecule's geometry in Cartesian coordinates 
         function varargout = geom(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('geom', this.objectHandle, varargin{:});
         end
         
-        % set_geom, (natom, 3) matrix 
+        % matpsi.set_geom( matrix(natom, 3) ); 
+        % Set the molecule's geometry to the given Cartesian coordinates; 
+        % if matpsi.fix_mol() has not been executed the geometry will only be "relative" 
         function varargout = set_geom(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('set_geom', this.objectHandle, varargin{:});
         end
         
-        % Zlist, (natom, 1) matrix 
+        % vector(natom) = matpsi.Zlist(); 
+        % Return a vector containing every atom's proton number 
         function varargout = Zlist(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('Zlist', this.objectHandle, varargin{:});
         end
         
-        % Enuc, 1 double 
+        % double = matpsi.Enuc(); 
+        % Return the molecule's nuclear Coulomb repulsion energy in Hartree 
         function varargout = Enuc(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('Enuc', this.objectHandle, varargin{:});
         end
         
+        
         %% Basis set properties 
-        % nbasis, 1 double 
+        % integer = matpsi.nbasis(); 
+        % Number of basis functions 
         function varargout = nbasis(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('nbasis', this.objectHandle, varargin{:});
         end
         
-        % func2center, (nbasis, 1) matrix 
+        % vector(nbasis) = matpsi.func2center(); 
+        % A mapping from every basis function to the number of atom it is centered on 
         function varargout = func2center(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('func2center', this.objectHandle, varargin{:});
         end
         
-        % func2am, (nbasis, 1) matrix 
+        % vector(nbasis) = matpsi.func2am; 
+        % A mapping from every basis function to its angular momentum quantum number 
         function varargout = func2am(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('func2am', this.objectHandle, varargin{:});
         end
         
+        
         %% One-electron integrals 
-        % overlap, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.overlap(); 
+        % Overlap matrix 
         function varargout = overlap(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('overlap', this.objectHandle, varargin{:});
         end
         
-        % kinetic, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.kinetic(); 
+        % Kinetic energy matrix; one part of the core Hamiltonian H1 
         function varargout = kinetic(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('kinetic', this.objectHandle, varargin{:});
         end
         
-        % potential, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.potential(); 
+        % Potential energy matrix; the other part of H1 
         function varargout = potential(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('potential', this.objectHandle, varargin{:});
         end
         
-        % atom-separated potential, (nbasis, nbasis, natom) 3-d matrix 
+        % 3-D_array(nbasis, nbasis, natom) = matpsi.potential_sep(); 
+        % Single-atom potential energy matrices; use mat(:, :, iatom) to extract one
         function varargout = potential_sep(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('potential_sep', this.objectHandle, varargin{:});
         end
         
-        % environment potential for a list containing a lot of point charges, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.potential_Zxyz(); 
+        % Coulomb potential for a list of point charges 
         function varargout = potential_Zxyz(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('potential_Zxyz', this.objectHandle, varargin{:});
         end
@@ -144,119 +160,168 @@ classdef MatPsi < handle
         end
         
         %% Two-electron integrals 
-        % tei_ijkl, 1 double 
+        % double = matpsi.tei_ijkl(i ,j ,k ,l); 
+        % Two-electron integral (ij|kl) 
         function varargout = tei_ijkl(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('tei_ijkl', this.objectHandle, varargin{:});
         end
         
-        % tei_uniqN, 1 double  
+        % integer = matpsi.tei_uniqN(): 
+        % The number of unique (without spatial symmetry) two-electron integrals 
         function varargout = tei_uniqN(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('tei_uniqN', this.objectHandle, varargin{:});
         end
         
-        % tei_alluniq, (nuniq, 1) vector 
+        % vector(nuniq) = matpsi.tei_alluniq(); 
+        % A vector of all unique two-electron integrals 
         function varargout = tei_alluniq(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('tei_alluniq', this.objectHandle, varargin{:});
         end
         
-        % tei_allfull, (nbasis, nbasis, nbasis, nbasis) array 
+        % 4-D_array(nbasis, nbasis, nbasis, nbasis) = matpsi.tei_allfull(); 
+        % All (with redundancy) two-electron integrals in a 4-D array 
         function varargout = tei_allfull(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('tei_allfull', this.objectHandle, varargin{:});
         end
         
-        % tei_alluniqJK, (nuniq, 1) vector 
+        % [vector(nuniq), vector(nuniq)] = matpsi.tei_alluniqJK(); 
+        % Two vectors containing all unique two-electron integrals; 
+        % 1st is the "regular" one for computing Coulomb matrix J 
+        % 2nd is specifically arranged for computing exchange matrix K 
         function varargout = tei_alluniqJK(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('tei_alluniqJK', this.objectHandle, varargin{:});
         end
         
-        %% SCF related 
-        % UseDirectJK 
+        %% JK related 
+        % matpsi.UseDirectJK(); 
+        % Enable DirectJK object that computes J and K with direct algoritm 
         function varargout = UseDirectJK(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('UseDirectJK', this.objectHandle, varargin{:});
         end
         
-        % Density2J, (nbasis, nbasis) matrix 
+        % matpsi.UsePKJK(); 
+        % Enable PKJK object that computes J and K with PK algoritm 
+        % Psi4's default JK method, uses disk space to store integrals 
+        function varargout = UsePKJK(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('UsePKJK', this.objectHandle, varargin{:});
+        end
+        
+        % matrix(nbasis, nbasis) = matpsi.Density2J( matrix(nbasis, nbasis) ); 
+        % Compute J from density matrix 
         function varargout = Density2J(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('Density2J', this.objectHandle, varargin{:});
         end
         
-        % OccMO2J, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.Density2K( matrix(nbasis, nbasis) ); 
+        % Compute K from density matrix 
+        function varargout = Density2K(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('Density2K', this.objectHandle, varargin{:});
+        end
+        
+        % matrix(nbasis, nbasis) = matpsi.OccMO2J( matrix(nbasis, nocc) ); 
+        % Compute J from occupied molecular orbital matrix 
         function varargout = OccMO2J(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('OccMO2J', this.objectHandle, varargin{:});
         end
         
-        % OccMO2K, (nbasis, nbasis) matrix 
+        % matrix(nbasis, nbasis) = matpsi.OccMO2K( matrix(nbasis, nocc) ); 
+        % Compute K from occupied molecular orbital matrix 
         function varargout = OccMO2K(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('OccMO2K', this.objectHandle, varargin{:});
         end
         
-        % OccMO2G, (nbasis, nbasis) matrix 
-        function varargout = OccMO2G(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('OccMO2G', this.objectHandle, varargin{:});
-        end
-        
-        % RHF, 1 double 
+        %% SCF related 
+        % double = matpsi.RHF(); 
+        % Run a Hartree-Fock calculation and returns the final total energy
         function varargout = RHF(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF', this.objectHandle, varargin{:});
         end
         
-        % RHFenv, 1 double 
+        % double = matpsi.RHFenv( matrix(nbasis, nbasis) ); 
+        % Run a Hartree-Fock with the given external potential field 
         function varargout = RHFenv(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHFenv', this.objectHandle, varargin{:});
         end
         
-        % RHF_finalize, nothing  
-        function varargout = RHF_finalize(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('RHF_finalize', this.objectHandle, varargin{:});
-        end 
+        % matpsi.RHF_reset(); 
+        % Reset the RHF object 
+        function varargout = RHF_reset(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_reset', this.objectHandle, varargin{:});
+        end
         
-        % RHF_EHF, 1 double 
+        % matpsi.RHF_EnableMOM(integer); 
+        % Start MOM from the given number of iteration, default 20 
+        % may help converge 
+        function varargout = RHF_EnableMOM(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_EnableMOM', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.RHF_DisableMOM(); 
+        % Disable MOM 
+        function varargout = RHF_DisableMOM(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_DisableMOM', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.RHF_EnableDamping(double); 
+        % Damp each Hartree-Fock iteration with the given rate, default 20.0 
+        % may help converge; minimum 0.0, maximum 100.0 
+        function varargout = RHF_EnableDamping(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_EnableDamping', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.RHF_DisableDamping(); 
+        % Disable damping 
+        function varargout = RHF_DisableDamping(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_DisableDamping', this.objectHandle, varargin{:});
+        end
+        
+        %~ The below RHF_X functions must be executed after matpsi.RHF(); 
+        % double = matpsi.RHF_EHF(); 
+        % Hartree-Fock energy 
         function varargout = RHF_EHF(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_EHF', this.objectHandle, varargin{:});
         end
         
-        % RHF_C, (nbasis, nbasis) matrix  
+        % matrix(nbasis, nbasis) = matpsi.RHF_C(); 
+        % Molecular orbital coefficients, ascending sorted by their eigenvalues 
         function varargout = RHF_C(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_C', this.objectHandle, varargin{:});
         end
         
-        % RHF_EMO, (nbasis, 1) vector  
+        % vector(nbasis) = matpsi.RHF_EMO(); 
+        % Molecular orbital energies, ascending sorted by their eigenvalues 
         function varargout = RHF_EMO(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_EMO', this.objectHandle, varargin{:});
         end
         
-        % RHF_D, (nbasis, nbasis) matrix  
+        % vector(nbasis) = matpsi.RHF_D(); 
+        % Final density matrix 
         function varargout = RHF_D(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_D', this.objectHandle, varargin{:});
         end
         
-        % RHF_H, (nbasis, nbasis) matrix  
+        % vector(nbasis) = matpsi.RHF_H(); 
+        % Core 1-electron Hamiltonian H1 
         function varargout = RHF_H(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_H', this.objectHandle, varargin{:});
         end
         
-        % RHF_J, (nbasis, nbasis) matrix  
+        % vector(nbasis) = matpsi.RHF_J();
+        % Coulomb matrix J 
         function varargout = RHF_J(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_J', this.objectHandle, varargin{:});
         end
         
-        % RHF_K, (nbasis, nbasis) matrix  
+        % vector(nbasis) = matpsi.RHF_K(); 
+        % Exchange matrix K 
         function varargout = RHF_K(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_K', this.objectHandle, varargin{:});
         end
         
-        % RHF_F, (nbasis, nbasis) matrix  
+        % vector(nbasis) = matpsi.RHF_F(); 
+        % Total Fock matrix F 
         function varargout = RHF_F(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF_F', this.objectHandle, varargin{:});
-        end
-        
-        % debugging
-        function varargout = printstatus(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('printstatus', this.objectHandle, varargin{:});
-        end
-        
-        function varargout = printdefault(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('printdefault', this.objectHandle, varargin{:});
         end
 
     end

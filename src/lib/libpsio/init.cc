@@ -36,6 +36,8 @@
 
 #include <unistd.h>
 
+#include <boost/filesystem.hpp>
+
 namespace psi {
 
 /* Definition of global data */
@@ -94,11 +96,14 @@ PSIO::PSIO()
    3) default name is psi_file_prefix
    4) 1 volume
    */
+    boost::filesystem::path tempdir = boost::filesystem::temp_directory_path();
+    std::string tempdir_str = tempdir.native();
+    tempdir_str += "/";
     for (i=1; i<=PSIO_MAXVOL; ++i) {
         char kwd[20];
         sprintf(kwd, "VOLUME%u", i);
         filecfg_kwd("DEFAULT", kwd, PSIF_CHKPT, "./");
-        filecfg_kwd("DEFAULT", kwd, -1, "/tmp/");
+        filecfg_kwd("DEFAULT", kwd, -1, tempdir_str.c_str());
     }
     filecfg_kwd("DEFAULT", "NAME", -1, psi_file_prefix);
     filecfg_kwd("DEFAULT", "NVOLUME", -1, "1");

@@ -1,16 +1,7 @@
 // Please directly include this file in MatPsi_mex.cpp to make compilation easier... 
 
-std::string tempname() {
-    // an ugly trick to get a temp file name.. subject to change 
-    char* trickbuffer = tempnam("/tmp/", "tmp");
-    std::string tempname_ = std::string(trickbuffer + 5); 
-    delete trickbuffer;
-    return tempname_;
-}
-
 // Constructor
 MatPsi::MatPsi(std::string molstring, std::string basisname, std::string path) {
-    fakepid_ = tempname();
     path_ = path + "/share/";
     common_init(molstring, basisname);
 }
@@ -25,14 +16,28 @@ void MatPsi::common_init(std::string molstring, std::string basisname, int ncore
     read_options("", process_environment_.options, true);
     process_environment_.options.set_read_globals(false);
     process_environment_.set("PSIDATADIR", path_);
-    //~ process_environment_.options.set_current_module("MatPsi");
     process_environment_.options.set_global_int("MAXITER", 100);
     
     Wavefunction::initialize_singletons();
     
     // initialize psio 
+    
+    boost::filesystem::path uniqname = boost::filesystem::unique_path();
+    matpsi_id = uniqname.native();
+    boost::filesystem::path tempdir = boost::filesystem::temp_directory_path();
+    matpsi_tempdir_str = tempdir.native();
+    matpsi_tempdir_str += "/matpsi.temp.";
+    matpsi_tempdir_str += matpsi_id;
+    boost::filesystem::create_directories(matpsi_tempdir_str);
     psio_ = boost::shared_ptr<PSIO>(new PSIO);
-    psio_->set_pid(fakepid_);
+    psio_->set_pid(matpsi_id);
+    for (int i=1; i<=PSIO_MAXVOL; ++i) {
+        char kwd[20];
+        sprintf(kwd, "VOLUME%u", i);
+        psio_->filecfg_kwd("DEFAULT", kwd, PSIF_CHKPT, matpsi_tempdir_str.c_str());
+        psio_->filecfg_kwd("DEFAULT", kwd, -1, matpsi_tempdir_str.c_str());
+    }
+    psio_->_psio_manager_->set_default_path(matpsi_tempdir_str);
     
     // create molecule object and set its basis set name 
     molstring_ = molstring;
@@ -46,9 +51,10 @@ void MatPsi::common_init(std::string molstring, std::string basisname, int ncore
     process_environment_.set_n_threads(ncores); // these values are shared among all instances, so better be constants 
     process_environment_.set_memory(memory);
     
-    // create basis object and one & two electron integral factories 
-	create_basis();
+    // create basis object and one & two electron integral factories & rhf 
+    create_basis();
     create_integral_factories();
+    RHF_reset();
     
     // create matrix factory object 
     int nbf[] = { basis_->nbf() };
@@ -73,20 +79,14 @@ void MatPsi::create_integral_factories() {
     eri_ = boost::shared_ptr<TwoBodyAOInt>(intfac_->eri());
 }
 
-void MatPsi::UseDirectJK(double cutoff) {
-    // create directJK object
-    directjk_ = boost::shared_ptr<DirectJK>(new DirectJK(process_environment_, basis_));
-    directjk_->set_cutoff(cutoff);
-    directjk_->initialize();
-    directjk_->remove_symmetry();
-}
-
 // destructor 
 MatPsi::~MatPsi() {
     if(rhf_ != NULL)
-        RHF_finalize();
-    if(directjk_ != NULL)
-        directjk_->finalize();
+        rhf_->extern_finalize();
+    if(jk_ != NULL)
+        jk_->finalize();
+    psio_->_psio_manager_->psiclean();
+    boost::filesystem::remove_all(matpsi_tempdir_str);
 }
 
 void MatPsi::fix_mol() {
@@ -105,6 +105,7 @@ void MatPsi::free_mol() {
     molecule_->set_geometry(*(oldgeom.get()));
     create_basis();
     create_integral_factories();
+    RHF_reset();
 }
 
 void MatPsi::set_geom(SharedMatrix newGeom) {
@@ -130,7 +131,7 @@ void MatPsi::set_geom(SharedMatrix newGeom) {
     if(nonbreak) {
         create_basis();
         create_integral_factories();
-        rhf_.reset();
+        RHF_reset();
     }
 }
 
@@ -207,9 +208,9 @@ std::vector<SharedMatrix> MatPsi::dipole() {
     return ao_dipole;
 }
 
-boost::shared_array<SharedMatrix> MatPsi::potential_sep() {
+std::vector<SharedMatrix> MatPsi::potential_sep() {
     int natom_ = molecule_->natom();
-    boost::shared_array<SharedMatrix> viMatArray(new SharedMatrix [natom_]);
+    std::vector<SharedMatrix> viMatVec;
     boost::shared_ptr<OneBodyAOInt> viOBI(intfac_->ao_potential());
     boost::shared_ptr<PotentialInt> viPtI = boost::static_pointer_cast<PotentialInt>(viOBI);
     SharedMatrix Zxyz = viPtI->charge_field();
@@ -218,11 +219,11 @@ boost::shared_array<SharedMatrix> MatPsi::potential_sep() {
         SharedVector Zxyz_rowi_vec = Zxyz->get_row(0, i);
         Zxyz_rowi->set_row(0, 0, Zxyz_rowi_vec);
         viPtI->set_charge_field(Zxyz_rowi);
-        viMatArray[i] = matfac_->create_shared_matrix("potential_sep");
-        viOBI->compute(viMatArray[i]);
-        viMatArray[i]->hermitivitize();
+        viMatVec.push_back(matfac_->create_shared_matrix("potential_sep"));
+        viOBI->compute(viMatVec[i]);
+        viMatVec[i]->hermitivitize();
     }
-    return viMatArray;
+    return viMatVec;
 }
 
 SharedMatrix MatPsi::potential_Zxyz(SharedMatrix Zxyz_list) {
@@ -337,118 +338,133 @@ void MatPsi::tei_alluniqJK(double* matptJ, double* matptK) {
     }
 }
 
-void MatPsi::init_directjk(double cutoff) {
-    directjk_->set_cutoff(cutoff);
-    directjk_->initialize();
-    directjk_->remove_symmetry();
+void MatPsi::UseDirectJK() {
+    // create directJK object
+    DirectJK* jk = new DirectJK(process_environment_, basis_);
+    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+    if (process_environment_.options["PRINT"].has_changed())
+        jk->set_print(process_environment_.options.get_int("PRINT"));
+    if (process_environment_.options["DEBUG"].has_changed())
+        jk->set_debug(process_environment_.options.get_int("DEBUG"));
+    if (process_environment_.options["BENCH"].has_changed())
+        jk->set_bench(process_environment_.options.get_int("BENCH"));
+    if (process_environment_.options["DF_INTS_NUM_THREADS"].has_changed())
+        jk->set_df_ints_num_threads(process_environment_.options.get_int("DF_INTS_NUM_THREADS"));
+    jk_ = boost::shared_ptr<JK>(jk);
+    jk_->initialize();
+    jk_->remove_symmetry();
+}
+
+void MatPsi::UsePKJK() {
+    // create PKJK object
+    PKJK* jk = new PKJK(process_environment_, basis_, psio_);
+
+    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+    if (process_environment_.options["PRINT"].has_changed())
+        jk->set_print(process_environment_.options.get_int("PRINT"));
+    if (process_environment_.options["DEBUG"].has_changed())
+        jk->set_debug(process_environment_.options.get_int("DEBUG"));
+    jk_ = boost::shared_ptr<JK>(jk);
+    printf("reach1\n");
+    jk_->initialize();
+    jk_->remove_symmetry();
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
-    if(directjk_ == NULL) {
-        throw PSIEXCEPTION("Density2J: DirectJK object has not been enabled.");
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("Density2J: JK object has not been enabled.");
     }
+    jk_->C_left().clear();
+    jk_->D().clear();
+    jk_->D().push_back(Density);
     
-    std::vector<SharedMatrix>& D = directjk_->D();
-    std::vector<SharedMatrix>& C_left = directjk_->C_left();
-    C_left.clear();
-    D.clear();
-    D.push_back(Density);
-    
-    directjk_->compute_from_D();
-    SharedMatrix Jnew = directjk_->J()[0];
+    jk_->compute_from_D();
+    SharedMatrix Jnew = jk_->J()[0];
     Jnew->hermitivitize();
-    //~ directjk_->finalize();
     return Jnew;
 }
 
-SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
-    if(directjk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2J: DirectJK object has not been enabled.");
+SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("Density2K: JK object has not been enabled.");
     }
-    std::vector<SharedMatrix>& C_left = directjk_->C_left();
-    C_left.clear();
-    C_left.push_back(OccMO);
-    directjk_->compute();
-    SharedMatrix Jnew = directjk_->J()[0];
+    
+    jk_->C_left().clear();
+    jk_->D().clear();
+    jk_->D().push_back(Density);
+    
+    jk_->compute_from_D();
+    SharedMatrix Knew = jk_->K()[0];
+    Knew->hermitivitize();
+    return Knew;
+}
+
+SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("OccMO2J: JK object has not been enabled.");
+    }
+    jk_->C_left().clear();
+    jk_->C_left().push_back(OccMO);
+    jk_->compute();
+    SharedMatrix Jnew = jk_->J()[0];
     Jnew->hermitivitize();
-    //~ directjk_->finalize();
     return Jnew;
 }
 
 SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
-    if(directjk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2K: DirectJK object has not been enabled.");
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("OccMO2K: JK object has not been enabled.");
     }
-    std::vector<SharedMatrix>& C_left = directjk_->C_left();
-    C_left.clear();
-    C_left.push_back(OccMO);
-    directjk_->compute();
-    SharedMatrix Knew = directjk_->K()[0];
+    jk_->C_left().clear();
+    jk_->C_left().push_back(OccMO);
+    jk_->compute();
+    SharedMatrix Knew = jk_->K()[0];
     Knew->hermitivitize();
-    //~ directjk_->finalize();
     return Knew;
 }
 
-SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
-    if(directjk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2G: DirectJK object has not been enabled.");
-    }
-    std::vector<SharedMatrix>& C_left = directjk_->C_left();
-    C_left.clear();
-    C_left.push_back(OccMO);
-    directjk_->compute();
-    SharedMatrix Gnew = directjk_->J()[0];
-    Gnew->scale(2);
-    Gnew->subtract(directjk_->K()[0]); // 2 J - K 
-    Gnew->hermitivitize();
-    //~ directjk_->finalize();
-    return Gnew;
+void MatPsi::RHF_reset() {
+    if(rhf_ != NULL)
+        rhf_->extern_finalize();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
+}
+
+void MatPsi::RHF_EnableMOM(int mom_start) {
+    process_environment_.options.set_global_int("MOM_START", mom_start);
+    RHF_reset();
+}
+
+void MatPsi::RHF_EnableDamping(double damping_percentage) {
+    process_environment_.options.set_global_double("DAMPING_PERCENTAGE", damping_percentage);
+    RHF_reset();
 }
 
 double MatPsi::RHF() {
-    boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
-    molecule_->set_point_group(c1group); // for safety 
-    
-    //~ Process::environment.options.set_global_int("MOM_START", 20);
-    //~ Process::environment.options.set_global_double("DAMPING_PERCENTAGE", 20.0);
-    
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
-    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy();
+        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
-        RHF_finalize();
         return Ehf;
     }
     catch (...) {
-        RHF_finalize();
-        //~ rhf_.reset();
-        throw PSIEXCEPTION("RHF: Hartree-Fock possibly not converged.");
+        throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
     }
 }
 
 double MatPsi::RHF(SharedMatrix EnvMat) {
-    boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
-    molecule_->set_point_group(c1group); // for safety 
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
-    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy(EnvMat);
+        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
-        RHF_finalize();
         return Ehf;
     }
     catch (...) {
-        RHF_finalize();
-        //~ rhf_.reset();
-        throw PSIEXCEPTION("RHF(env): Hartree-Fock possibly not converged.");
+        throw PSIEXCEPTION("RHF(env): Hartree-Fock probably not converged.");
     }
     
-}
-
-void MatPsi::RHF_finalize() {
-    rhf_->extern_finalize();
-    psio_->_psio_manager_->psiclean();
 }
 
 double MatPsi::RHF_EHF() { 

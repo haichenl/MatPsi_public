@@ -9,14 +9,18 @@
 #include <libpsio/psio.hpp>
 #include <libscf_solver/rhf.h>
 #include <read_options.cc>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace psi;
 using namespace boost;
 
 namespace psi {
-    //FILE* outfile = fopen("/dev/null", "w");
+#ifdef PSIDEBUG
     FILE* outfile = stdout;
+#else
+    FILE* outfile = fopen("/dev/null", "w");
+#endif
     char* psi_file_prefix = "matpsi";
     std::string outfile_name = "";
     extern int read_options(const std::string &name, Options & options, bool suppress_printing = false);
@@ -24,12 +28,12 @@ namespace psi {
 
 class MatPsi {
 protected:
-    //~ Options options_; // for now, just use an independent Options object; 
-                      // in the future may be we should use independent Enviroment object as well 
+
     Process::Environment process_environment_;
     boost::shared_ptr<worldcomm> worldcomm_;
     
-    std::string fakepid_; // serves as a fake pid 
+    std::string matpsi_id;
+    std::string matpsi_tempdir_str;
     boost::shared_ptr<PSIO> psio_;
     
     std::string path_;
@@ -38,10 +42,10 @@ protected:
     
     boost::shared_ptr<Molecule> molecule_;
     boost::shared_ptr<BasisSet> basis_;
-	boost::shared_ptr<IntegralFactory> intfac_;
+    boost::shared_ptr<IntegralFactory> intfac_;
     boost::shared_ptr<TwoBodyAOInt> eri_;
-	boost::shared_ptr<MatrixFactory> matfac_;
-    boost::shared_ptr<DirectJK> directjk_;
+    boost::shared_ptr<MatrixFactory> matfac_;
+    boost::shared_ptr<JK> jk_;
     boost::shared_ptr<scf::RHF> rhf_;
     
     // common initializer for constructors 
@@ -50,24 +54,15 @@ protected:
     // create basis object 
     void create_basis();
     
-    // create one & two electron integral factories and directjk object 
+    // create one & two electron integral factories and jk object 
     void create_integral_factories();
-    
-    // initialize the directjk object 
-    void init_directjk(double cutoff = 1.0E-12);
     
 public:
     // constructor; takes in 2 strings and parse them 
     MatPsi(std::string molstring, std::string basisname, std::string path);
-	
+    
     // destructor 
-	~MatPsi();
-    
-    // global molecule is shared among all instances, this method is for debugging 
-    void testmol() {Process::environment.molecule()->print();}
-    
-    // enable DirectJK object 
-    void UseDirectJK(double cutoff = 1.0E-12);
+    ~MatPsi();
     
     // the string describing the molecule 
     std::string molecule_string() { return molstring_; }
@@ -75,14 +70,16 @@ public:
     // basis set name string 
     std::string basis_name() { return basisname_; }
     
-    // Molecule operations 
+    
+    //*** Molecule operations 
     // fix the molecule
     void fix_mol();
     
-    // free the molecule
+    // free the molecule 
     void free_mol();
     
-    // Molecule properties 
+    
+    //*** Molecule properties 
     // number of atoms 
     int natom() { return molecule_->natom(); }
     
@@ -101,7 +98,8 @@ public:
     // number of electrons 
     int nelec();
     
-    // Basis set properties 
+    
+    //*** Basis set properties 
     // number of basis functions 
     int nbasis() { return basis_->nbf(); }
     
@@ -111,9 +109,10 @@ public:
     // map basis number to its angular momentum 
     SharedVector func2am();
     
-	// One-electron integrals 
+    
+    //*** One-electron integrals 
     // compute the overlap matrix S 
-	SharedMatrix overlap();
+    SharedMatrix overlap();
     
     // compute the kinetic energy matrix KE 
     SharedMatrix kinetic();
@@ -125,12 +124,14 @@ public:
     std::vector<SharedMatrix> dipole();
     
     // compute the atom-separated potential energy matrix ENI 
-    boost::shared_array<SharedMatrix> potential_sep();
+    //~ boost::shared_array<SharedMatrix> potential_sep();
+    std::vector<SharedMatrix> potential_sep();
     
     // compute from a given point charge list the environment potential energy matrix ENVI
     SharedMatrix potential_Zxyz(SharedMatrix Zxyz_list);
     
-    // Two-electron integrals 
+    
+    //*** Two-electron integrals 
     // compute the 4-indexed two-electron integral H2(i, j, k, l) 
     double tei_ijkl(int i, int j, int k, int l);
     
@@ -146,27 +147,40 @@ public:
     // compute all unique two-electron integrals and pre-arrange them for the forming of J and K 
     void tei_alluniqJK(double* matptJ, double* matptK);
     
-    // SCF related 
     
+    //*** JK related
+    // enables different types of JK  
+    void UseDirectJK();
+    void UsePKJK();
+    
+    // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from density matrix, consider no geometrical symmetry 
     SharedMatrix Density2J(SharedMatrix Density);
     
-    // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from occupied molecular orbital coefficient matrix, direct algorithm, consider no geometrical symmetry 
+    // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from density matrix, consider no geometrical symmetry 
+    SharedMatrix Density2K(SharedMatrix Density);
+    
+    // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2J(SharedMatrix OccMO);
     
-    // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from occupied molecular orbital coefficient matrix, direct algorithm, consider no geometrical symmetry 
+    // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2K(SharedMatrix OccMO);
     
-    // for restricted Hartree Fock, compute 2-electron G matrix from occupied molecular orbital coefficient matrix, direct algorithm, consider no geometrical symmetry 
-    SharedMatrix OccMO2G(SharedMatrix OccMO);
     
-    // restricted Hartree-Fock; quick but uses our filesystem and causes a lot of risky issues 
+    //*** SCF related
+    // create/reset RHF object 
+    void RHF_reset();
+    
+    // restricted Hartree-Fock 
     double RHF();
     
-    // restricted Hartree-Fock with environment potential; quick but uses our filesystem and causes a lot of risky issues 
+    // restricted Hartree-Fock with environment potential 
     double RHF(SharedMatrix EnvMat);
     
-    // release memory and clean temporary files for Hartree-Fock 
-    void RHF_finalize();
+    // enable MOM in restricted Hartree-Fock to solve convergence issue 
+    void RHF_EnableMOM(int mom_start);
+    
+    // enable Damping in restricted Hartree-Fock to solve convergence issue 
+    void RHF_EnableDamping(double damping_percentage);
     
     // restricted Hartree-Fock energy 
     double RHF_EHF();
@@ -192,8 +206,8 @@ public:
     // restricted Hartree-Fock Fock matrix 
     SharedMatrix RHF_F();
     
-    void switch_worldcomm() {
-        WorldComm = worldcomm_;
-    }
+    
+    //*** used at the beginning of mex file to let a global pointer pointing to a MatPsi class member property 
+    void switch_worldcomm() { WorldComm = worldcomm_; }
     
 };

@@ -8,49 +8,54 @@ using namespace psi;
 using namespace boost;
 
 SharedMatrix InputMatrix(const mxArray*& Mat_m) {
-	int nrow = mxGetM(Mat_m);
-	int ncol = mxGetN(Mat_m);
+    int nrow = mxGetM(Mat_m);
+    int ncol = mxGetN(Mat_m);
     SharedMatrix Mat_c(new Matrix(nrow, ncol));
-	double* Mat_m_pt = mxGetPr(Mat_m);
-	double** Mat_c_pt = Mat_c->pointer();
-	for(int i = 0; i < ncol; i++)
+    double* Mat_m_pt = mxGetPr(Mat_m);
+    double** Mat_c_pt = Mat_c->pointer();
+    for(int i = 0; i < ncol; i++)
         for(int j = 0; j < nrow; j++)
             Mat_c_pt[j][i] = *Mat_m_pt++; // Matlab loops over a column first, but C++ loops over a row first 
     return Mat_c;
 }
 
+double InputScalar(const mxArray*& Mat_m) {
+    double* Mat_m_pt = mxGetPr(Mat_m);
+    return *Mat_m_pt;
+}
+
 void OutputMatrix(mxArray*& Mat_m, SharedMatrix Mat_c) {
-	int nrow = Mat_c->nrow();
-	int ncol = Mat_c->ncol();
-	Mat_m = mxCreateDoubleMatrix( nrow, ncol, mxREAL);
-	double* Mat_m_pt = mxGetPr(Mat_m);
-	double** Mat_c_pt = Mat_c->pointer();
-	for(int i = 0; i < ncol; i++)
+    int nrow = Mat_c->nrow();
+    int ncol = Mat_c->ncol();
+    Mat_m = mxCreateDoubleMatrix( nrow, ncol, mxREAL);
+    double* Mat_m_pt = mxGetPr(Mat_m);
+    double** Mat_c_pt = Mat_c->pointer();
+    for(int i = 0; i < ncol; i++)
         for(int j = 0; j < nrow; j++)
             *Mat_m_pt++ = Mat_c_pt[j][i];
 }
 
 void OutputVector(mxArray*& Mat_m, SharedVector Vec_c) {
-	int dim = Vec_c->dim();
-	Mat_m = mxCreateDoubleMatrix( 1, dim, mxREAL);
-	double* Mat_m_pt = mxGetPr(Mat_m);
-	double* Vec_c_pt = Vec_c->pointer();
-	for(int i = 0; i < dim; i++) {
-		*Mat_m_pt++ = *Vec_c_pt++;
-	}
+    int dim = Vec_c->dim();
+    Mat_m = mxCreateDoubleMatrix( 1, dim, mxREAL);
+    double* Mat_m_pt = mxGetPr(Mat_m);
+    double* Vec_c_pt = Vec_c->pointer();
+    for(int i = 0; i < dim; i++) {
+        *Mat_m_pt++ = *Vec_c_pt++;
+    }
 }
 
 void OutputScalar(mxArray*& Mat_m, double scalar) {
-	Mat_m = mxCreateDoubleMatrix( 1, 1, mxREAL);
-	double* Mat_m_pt = mxGetPr(Mat_m);
+    Mat_m = mxCreateDoubleMatrix( 1, 1, mxREAL);
+    double* Mat_m_pt = mxGetPr(Mat_m);
     *Mat_m_pt = scalar;
 }
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {	
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Get the command string
     char cmd[64];
-	if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
-		mexErrMsgTxt("First input should be a command string less than 64 characters long.");
+    if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
+        mexErrMsgTxt("First input should be a command string less than 64 characters long.");
     
     // Constructor
     if (!strcmp("new", cmd)) {
@@ -59,14 +64,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             mexErrMsgTxt("MatPsi Constructor: One output expected.");
         if (nrhs!=4 || !mxIsChar(prhs[1]) || !mxIsChar(prhs[2]))
             mexErrMsgTxt("MatPsi Constructor: MatPsi(mol_string, basis_name) input expected.");
-		// Return a handle to a new C++ instance
-		plhs[0] = convertPtr2Mat<MatPsi>(new MatPsi((std::string)mxArrayToString(prhs[1]) , (std::string)mxArrayToString(prhs[2]), (std::string)mxArrayToString(prhs[3])));
+        // Return a handle to a new C++ instance
+        plhs[0] = convertPtr2Mat<MatPsi>(new MatPsi((std::string)mxArrayToString(prhs[1]) , (std::string)mxArrayToString(prhs[2]), (std::string)mxArrayToString(prhs[3])));
         return;
     }
     
     // Check there is a second input, which should be the class instance handle
     if (nrhs < 2)
-		mexErrMsgTxt("Second input should be a class instance handle.");
+        mexErrMsgTxt("Second input should be a class instance handle.");
     
     // Delete
     if (!strcmp("delete", cmd)) {
@@ -81,59 +86,56 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Get the class instance pointer from the second input
     MatPsi* MatPsi_obj = convertMat2Ptr<MatPsi>(prhs[1]);
     MatPsi_obj->switch_worldcomm();
-    // Call the various class methods 
     
-    // testmol
-    if (!strcmp("testmol", cmd)) {
-        MatPsi_obj->testmol();
-        return;
-    }
-	
+    //*** Call the various class methods 
+    
     // molecule_string 
     if (!strcmp("molecule_string", cmd)) {
         plhs[0] = mxCreateString((MatPsi_obj->molecule_string()).c_str());
         return;
     }
     
-    // basis_name  
+    // basis_name 
     if (!strcmp("basis_name", cmd)) {
         plhs[0] = mxCreateString((MatPsi_obj->basis_name()).c_str());
         return;
     }
     
-    // Molecule operations 
-    // fix_mol
+    
+    //*** Molecule operations 
+    // fix_mol 
     if (!strcmp("fix_mol", cmd)) {
         MatPsi_obj->fix_mol();
         return;
     }
     
-    // free_mol
+    // free_mol 
     if (!strcmp("free_mol", cmd)) {
         MatPsi_obj->free_mol();
         return;
     }
     
-    // Molecule properties
-    // natom
+    
+    //*** Molecule properties 
+    // natom 
     if (!strcmp("natom", cmd)) {
         OutputScalar(plhs[0], (double)MatPsi_obj->natom());
         return;
     }
     
-    // nelec
+    // nelec 
     if (!strcmp("nelec", cmd)) {
         OutputScalar(plhs[0], (double)MatPsi_obj->nelec());
         return;
     }
     
-    // geom(natom, 3)
+    // geom 
     if (!strcmp("geom", cmd)) {
         OutputMatrix(plhs[0], MatPsi_obj->geom());
         return;
     }
     
-    // set_geom(natom, 3)
+    // set_geom 
     if (!strcmp("set_geom", cmd)) {
         // Check parameters
         if (nrhs!=3)
@@ -141,13 +143,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if (mxGetM(prhs[2]) != MatPsi_obj->natom() || mxGetN(prhs[2]) != 3)
             mexErrMsgTxt("set_geom: Input geometry matrix dimension does not agree.");
         // Call the method
-		MatPsi_obj->set_geom(InputMatrix(prhs[2]));
+        MatPsi_obj->set_geom(InputMatrix(prhs[2]));
         return;
     }
     
-    // Zlist(natom, 1) 
+    // Zlist 
     if (!strcmp("Zlist", cmd)) {
-		OutputVector(plhs[0], MatPsi_obj->Zlist());
+        OutputVector(plhs[0], MatPsi_obj->Zlist());
         return;
     }
     
@@ -157,7 +159,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
-    // Basis set properties 
+    
+    //*** Basis set properties 
     // nbasis
     if (!strcmp("nbasis", cmd)) {
         OutputScalar(plhs[0], (double)MatPsi_obj->nbasis());
@@ -178,29 +181,31 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         OutputVector(plhs[0], MatPsi_obj->func2am());
         return;
     }
-	
-    // One-electron integrals 
-	// overlap(nbasis, nbasis)
+    
+    
+    //*** One-electron integrals 
+    // overlap(nbasis, nbasis)
     if (!strcmp("overlap", cmd)) {
-		OutputMatrix(plhs[0], MatPsi_obj->overlap());
+        OutputMatrix(plhs[0], MatPsi_obj->overlap());
         return;
     }
     
-    // kinetic(nbasis, nbasis)
+    // kinetic 
     if (!strcmp("kinetic", cmd)) {
-		OutputMatrix(plhs[0], MatPsi_obj->kinetic());
+        OutputMatrix(plhs[0], MatPsi_obj->kinetic());
         return;
     }
     
-    // potential(nbasis, nbasis)
+    // potential 
     if (!strcmp("potential", cmd)) {
-		OutputMatrix(plhs[0], MatPsi_obj->potential());
+        OutputMatrix(plhs[0], MatPsi_obj->potential());
         return;
     }
     
-    // potential_sep(nbasis, nbasis, natom)
+    // potential_sep 
     if (!strcmp("potential_sep", cmd)) {
-        boost::shared_array<SharedMatrix> viMatArray = MatPsi_obj->potential_sep();
+        //~ boost::shared_array<SharedMatrix> viMatArray = MatPsi_obj->potential_sep();
+        std::vector<SharedMatrix> viMatArray = MatPsi_obj->potential_sep();
         int ncol = viMatArray[0]->ncol();
         int nrow = viMatArray[0]->nrow();
         int natom = MatPsi_obj->natom();
@@ -216,7 +221,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
-    // potential_Zxyz(nbasis, nbasis)
+    // potential_Zxyz 
     if (!strcmp("potential_Zxyz", cmd)) {
         // Check parameters
         if (nrhs!=3)
@@ -224,20 +229,35 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if (mxGetN(prhs[2]) != 4)
             mexErrMsgTxt("potential_Zxyz: Zxyz list matrix dimension does not agree.");
         // Call the method
-		OutputMatrix(plhs[0], MatPsi_obj->potential_Zxyz(InputMatrix(prhs[2])));
+        OutputMatrix(plhs[0], MatPsi_obj->potential_Zxyz(InputMatrix(prhs[2])));
         return;
     }
     
-    // dipole 3 * (nbasis, nbasis) 
+    // dipole 
     if (!strcmp("dipole", cmd)) {
         std::vector<SharedMatrix> dipole = MatPsi_obj->dipole();
-		OutputMatrix(plhs[0], dipole[0]);
-        OutputMatrix(plhs[1], dipole[1]);
-        OutputMatrix(plhs[2], dipole[2]);
+        if(nlhs == 3) {
+            OutputMatrix(plhs[0], dipole[0]);
+            OutputMatrix(plhs[1], dipole[1]);
+            OutputMatrix(plhs[2], dipole[2]);
+            return;
+        }
+        int ncol = dipole[0]->ncol();
+        int nrow = dipole[0]->nrow();
+        mwSize dims[3] = {ncol, nrow, 3};
+        plhs[0] = mxCreateNumericArray(3, dims, mxDOUBLE_CLASS, mxREAL);
+        double* matlab_pt = mxGetPr(plhs[0]);
+        for(int idim = 0; idim < 3; idim++) {
+            double* tmp_pt = dipole[idim]->get_pointer();
+            for(int i = 0; i < ncol * nrow; i++) {
+                matlab_pt[idim*ncol*nrow + i] = tmp_pt[i];
+            }
+        }
         return;
     }
     
-    // Two-electron integrals 
+    
+    //*** Two-electron integrals 
     // tei_ijkl
     if (!strcmp("tei_ijkl", cmd)) {
         // Check parameters
@@ -287,53 +307,52 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
-    // SCF related 
-    // UseDirectJK
+    
+    //*** JK related 
+    // UseDirectJK 
     if (!strcmp("UseDirectJK", cmd)) {
         MatPsi_obj->UseDirectJK();
         return;
     }
     
-    // Density2J(nbasis, nbasis) 
+    // UsePKJK 
+    if (!strcmp("UsePKJK", cmd)) {
+        MatPsi_obj->UsePKJK();
+        return;
+    }
+    
+    // Density2J 
     if (!strcmp("Density2J", cmd)) {
         // Check parameters
         if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
             mexErrMsgTxt("Density2J(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
-		OutputMatrix(plhs[0], MatPsi_obj->Density2J(InputMatrix(prhs[2])));
+        OutputMatrix(plhs[0], MatPsi_obj->Density2J(InputMatrix(prhs[2])));
         return;
     }
     
-    // OccMO2J(nbasis, nbasis) 
+    // OccMO2J 
     if (!strcmp("OccMO2J", cmd)) {
         // Check parameters
         if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
             mexErrMsgTxt("OccMO2J(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
-		OutputMatrix(plhs[0], MatPsi_obj->OccMO2J(InputMatrix(prhs[2])));
+        OutputMatrix(plhs[0], MatPsi_obj->OccMO2J(InputMatrix(prhs[2])));
         return;
     }
     
-    // OccMO2K(nbasis, nbasis) 
+    // OccMO2K 
     if (!strcmp("OccMO2K", cmd)) {
         // Check parameters
         if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
             mexErrMsgTxt("OccMO2K(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
-		OutputMatrix(plhs[0], MatPsi_obj->OccMO2K(InputMatrix(prhs[2])));
+        OutputMatrix(plhs[0], MatPsi_obj->OccMO2K(InputMatrix(prhs[2])));
         return;
     }
     
-    // OccMO2G(nbasis, nbasis) 
-    if (!strcmp("OccMO2G", cmd)) {
-        // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
-            mexErrMsgTxt("OccMO2G(MOmat): nbasis by noccupy matrix input expected.");
-        // Call the method
-		OutputMatrix(plhs[0], MatPsi_obj->OccMO2G(InputMatrix(prhs[2])));
-        return;
-    }
     
+    //*** SCF related 
     // RHF
     if (!strcmp("RHF", cmd)) {
         OutputScalar(plhs[0], MatPsi_obj->RHF());
@@ -353,9 +372,42 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
-    // RHF_finalize
-    if (!strcmp("RHF_finalize", cmd)) {
-        MatPsi_obj->RHF_finalize();
+    // RHF_reset
+    if (!strcmp("RHF_reset", cmd)) {
+        MatPsi_obj->RHF_reset();
+        return;
+    }
+    
+    // RHF_EnableMOM
+    if (!strcmp("RHF_EnableMOM", cmd)) {
+        if ( (nrhs!=2 && nrhs!=3) || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
+            mexErrMsgTxt("RHF_EnableMOM(mom_start): Integer input expected.");
+        if (nrhs == 2)
+            MatPsi_obj->RHF_EnableMOM(20);
+        else
+            MatPsi_obj->RHF_EnableMOM((int)InputScalar(prhs[2]));
+        return;
+    }
+    
+    // RHF_DisableMOM 
+    if (!strcmp("RHF_DisableMOM", cmd)) {
+        MatPsi_obj->RHF_EnableMOM(0);
+        return;
+    }
+    
+    // RHF_EnableDamping 
+    if (!strcmp("RHF_EnableDamping", cmd)) {
+        if ( (nrhs!=2 && nrhs!=3) || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
+            mexErrMsgTxt("RHF_EnableDamping(damping_percentage): 1 double input expected.");
+        if (nrhs == 2)
+            MatPsi_obj->RHF_EnableDamping(20.0);
+        MatPsi_obj->RHF_EnableDamping(InputScalar(prhs[2]));
+        return;
+    }
+    
+    // RHF_DisableDamping 
+    if (!strcmp("RHF_DisableDamping", cmd)) {
+        MatPsi_obj->RHF_EnableDamping(0.0);
         return;
     }
     

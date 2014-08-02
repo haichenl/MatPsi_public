@@ -118,8 +118,8 @@ void RHF::finalize()
 
     Dold_.reset();
     G_.reset();
-    //~ J_.reset();
-    //~ K_.reset();
+    J_.reset();
+    K_.reset();
 
     HF::finalize();
 }

@@ -300,7 +300,8 @@ void HF::common_init()
     if(options_["PRINT"].has_changed())
         print_ = options_.get_int("PRINT");
 
-    if(options_["DAMPING_PERCENTAGE"].has_changed()){
+    //~ if(options_["DAMPING_PERCENTAGE"].has_changed()){
+    if(options_.get_double("DAMPING_PERCENTAGE") != 0.0){
         // The user has asked for damping to be turned on
         damping_enabled_ = true;
         damping_percentage_ = options_.get_double("DAMPING_PERCENTAGE") / 100.0;
@@ -1600,7 +1601,7 @@ double HF::compute_energy()
             scf_type_ = old_scf_type;
             options_.set_str("SCF","SCF_TYPE",old_scf_type);
             old_scf_type = "DF";
-            integrals();
+            //~ integrals();
         }
 
         // Call any postiteration callbacks
@@ -1913,7 +1914,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
             scf_type_ = old_scf_type;
             options_.set_str("SCF","SCF_TYPE",old_scf_type);
             old_scf_type = "DF";
-            integrals();
+            //~ integrals();
         }
 
         // Call any postiteration callbacks
