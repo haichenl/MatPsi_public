@@ -76,6 +76,8 @@ public:
     // basis set name string 
     std::string& basis_name() { return basisname_; }
     
+    void set_basis(const std::string& basisname);
+    
     void set_ncores(int ncores);
     
     void set_memory(std::string);

@@ -419,8 +419,8 @@ void HF::finalize()
 
     //Sphalf_.reset();
     X_.reset();
-    T_.reset();
-    V_.reset();
+    //~ T_.reset();
+    //~ V_.reset();
     diag_temp_.reset();
     diag_F_temp_.reset();
     diag_C_temp_.reset();
@@ -1701,7 +1701,7 @@ double HF::compute_energy()
         stability_analysis();
 
     // Clean memory off, handle diis closeout, etc
-    //~ finalize();
+    finalize();
 
 
     //fprintf(outfile,"\nComputation Completed\n");
@@ -2014,7 +2014,7 @@ double HF::compute_energy(SharedMatrix EnvMat)
         stability_analysis();
 
     // Clean memory off, handle diis closeout, etc
-    //~ finalize();
+    finalize();
 
 
     //fprintf(outfile,"\nComputation Completed\n");

@@ -80,19 +80,42 @@ void MatPsi::common_init() {
     create_basis();
     create_integral_factories();
     RHF_reset();
+    rhf_->extern_finalize(); // after this finalize() rhf_ seems to be stable and does not crash after RHF() or set_basis() 
     
     // create matrix factory object 
     int nbf[] = { basis_->nbf() };
     matfac_ = boost::shared_ptr<MatrixFactory>(new MatrixFactory);
     matfac_->init_with(1, nbf, nbf);
-      
+}
+
+void MatPsi::set_basis(const std::string& basisname) {
+    if(jk_ != NULL)
+        jk_->finalize();
+    psio_->_psio_manager_->psiclean();
+    jk_.reset();
+    
+    basisname_ = basisname;
+    molecule_->set_basis_all_atoms(basisname_);
+    
+    // create basis object and one & two electron integral factories & rhf 
+    create_basis();
+    create_integral_factories();
+    RHF_reset();
+    rhf_->extern_finalize();
+    
+    // create matrix factory object 
+    int nbf[] = { basis_->nbf() };
+    matfac_ = boost::shared_ptr<MatrixFactory>(new MatrixFactory);
+    matfac_->init_with(1, nbf, nbf);
 }
 
 void MatPsi::create_basis() {
     // create basis object 
+    boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
+    molecule_->set_point_group(c1group); 
     boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
     basis_ = BasisSet::construct(process_environment_, parser, molecule_, "BASIS");  
-    boost::shared_ptr<PointGroup> c1group(new PointGroup("C1"));
+    
     molecule_->set_point_group(c1group); // creating basis set object change molecule's point group, for some reasons 
 }
 
@@ -146,7 +169,6 @@ void MatPsi::free_mol() {
     molecule_->set_geometry(*(oldgeom.get()));
     create_basis();
     create_integral_factories();
-    RHF_reset();
 }
 
 void MatPsi::set_geom(SharedMatrix newGeom) {
@@ -172,7 +194,6 @@ void MatPsi::set_geom(SharedMatrix newGeom) {
     if(nonbreak) {
         create_basis();
         create_integral_factories();
-        RHF_reset();
     }
 }
 
@@ -380,7 +401,7 @@ void MatPsi::tei_alluniqJK(double* matptJ, double* matptK) {
 }
 
 void MatPsi::UseDirectJK() {
-    // create directJK object
+    // create DirectJK object
     DirectJK* jk = new DirectJK(process_environment_, basis_);
     if (process_environment_.options["INTS_TOLERANCE"].has_changed())
         jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
@@ -394,24 +415,22 @@ void MatPsi::UseDirectJK() {
         jk->set_df_ints_num_threads(process_environment_.options.get_int("DF_INTS_NUM_THREADS"));
     jk_ = boost::shared_ptr<JK>(jk);
     jk_->initialize();
-    jk_->remove_symmetry();
 }
 
 void MatPsi::UsePKJK() {
-    if(jk_ == NULL) {
-        // create PKJK object
-        PKJK* jk = new PKJK(process_environment_, basis_, psio_);
-    
-        if (process_environment_.options["INTS_TOLERANCE"].has_changed())
-            jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
-        if (process_environment_.options["PRINT"].has_changed())
-            jk->set_print(process_environment_.options.get_int("PRINT"));
-        if (process_environment_.options["DEBUG"].has_changed())
-            jk->set_debug(process_environment_.options.get_int("DEBUG"));
-        jk_ = boost::shared_ptr<JK>(jk);
-        jk_->initialize();
-    }
-    //~ jk_->remove_symmetry();
+    if(jk_ != NULL)
+        jk_->finalize();
+    // create PKJK object
+    PKJK* jk = new PKJK(process_environment_, basis_, psio_);
+
+    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+    if (process_environment_.options["PRINT"].has_changed())
+        jk->set_print(process_environment_.options.get_int("PRINT"));
+    if (process_environment_.options["DEBUG"].has_changed())
+        jk->set_debug(process_environment_.options.get_int("DEBUG"));
+    jk_ = boost::shared_ptr<JK>(jk);
+    jk_->initialize();
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
@@ -468,24 +487,23 @@ SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
 }
 
 void MatPsi::RHF_reset() {
-    if(rhf_ != NULL)
-        rhf_->extern_finalize();
+    //~ if(rhf_ != NULL)
+        //~ rhf_->extern_finalize(); // really tired of trying when we should do finalize, just be it, seems to work 
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
     process_environment_.set_wavefunction(rhf_);
 }
 
 void MatPsi::RHF_EnableMOM(int mom_start) {
     process_environment_.options.set_global_int("MOM_START", mom_start);
-    //~ RHF_reset(); // do not need since we now reset rhf_ at the beginning of RHF(); still in doubt when should we do so 
 }
 
 void MatPsi::RHF_EnableDamping(double damping_percentage) {
     process_environment_.options.set_global_double("DAMPING_PERCENTAGE", damping_percentage);
-    //~ RHF_reset(); // do not need since we now reset rhf_ at the beginning of RHF(); still in doubt when should we do so 
 }
 
 double MatPsi::RHF() {
-    RHF_reset();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy();
         jk_ = rhf_->jk();
@@ -498,7 +516,8 @@ double MatPsi::RHF() {
 }
 
 double MatPsi::RHF(SharedMatrix EnvMat) {
-    RHF_reset();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy(EnvMat);
         jk_ = rhf_->jk();

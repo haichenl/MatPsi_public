@@ -105,6 +105,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // set_basis
+    if (!strcmp("set_basis", cmd)) {
+        if ( nrhs!=3 || !mxIsChar(prhs[2]))
+            mexErrMsgTxt("set_basis(\"basis\"): String input expected.");
+            MatPsi_obj->set_basis((std::string)mxArrayToString(prhs[2]));
+        return;
+    }
+    
     // set_ncores 
     if (!strcmp("set_ncores", cmd)) {
         if (nrhs == 2) {

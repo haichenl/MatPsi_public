@@ -54,6 +54,12 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('basis_name', this.objectHandle, varargin{:});
         end
         
+        % matpsi.set_basis(integer); 
+        % Set basis set 
+        function varargout = set_basis(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('set_basis', this.objectHandle, varargin{:});
+        end
+        
         % matpsi.set_ncores(integer); 
         % Set the number of CPU cores this MatPsi instance can use 
         function varargout = set_ncores(this, varargin)
