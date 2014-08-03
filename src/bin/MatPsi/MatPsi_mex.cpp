@@ -331,6 +331,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // Density2K 
+    if (!strcmp("Density2K", cmd)) {
+        // Check parameters
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
+            mexErrMsgTxt("Density2K(MOmat): nbasis by noccupy matrix input expected.");
+        // Call the method
+        OutputMatrix(plhs[0], MatPsi_obj->Density2K(InputMatrix(prhs[2])));
+        return;
+    }
+    
     // OccMO2J 
     if (!strcmp("OccMO2J", cmd)) {
         // Check parameters
