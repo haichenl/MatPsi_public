@@ -62,10 +62,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // Check parameters
         if (nlhs != 1)
             mexErrMsgTxt("MatPsi Constructor: One output expected.");
-        if (nrhs!=4 || !mxIsChar(prhs[1]) || !mxIsChar(prhs[2]))
+        if ( (nrhs!=4 && nrhs!=6) || !mxIsChar(prhs[1]) || !mxIsChar(prhs[2]))
             mexErrMsgTxt("MatPsi Constructor: MatPsi(mol_string, basis_name) input expected.");
+        if (nrhs == 4){
+            plhs[0] = convertPtr2Mat<MatPsi>(new MatPsi((std::string)mxArrayToString(prhs[1]) , (std::string)mxArrayToString(prhs[2]), 1, "1000mb", (std::string)mxArrayToString(prhs[3]) + "/share/"));
+            return;
+        }
         // Return a handle to a new C++ instance
-        plhs[0] = convertPtr2Mat<MatPsi>(new MatPsi((std::string)mxArrayToString(prhs[1]) , (std::string)mxArrayToString(prhs[2]), (std::string)mxArrayToString(prhs[3])));
+        plhs[0] = convertPtr2Mat<MatPsi>(new MatPsi((std::string)mxArrayToString(prhs[1]) , (std::string)mxArrayToString(prhs[2]), (int)InputScalar(prhs[3]), (std::string)mxArrayToString(prhs[4]), (std::string)mxArrayToString(prhs[5]) + "/share/" ));
         return;
     }
     
@@ -98,6 +102,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // basis_name 
     if (!strcmp("basis_name", cmd)) {
         plhs[0] = mxCreateString((MatPsi_obj->basis_name()).c_str());
+        return;
+    }
+    
+    // set_ncores 
+    if (!strcmp("set_ncores", cmd)) {
+        if (nrhs == 2) {
+            MatPsi_obj->set_ncores(1);
+            return;
+        }
+        if (nrhs!=3 ||  mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
+            mexErrMsgTxt("set_ncores(ncores): Integer input expected.");
+        MatPsi_obj->set_ncores((int)InputScalar(prhs[2]));
+        return;
+    }
+    
+    // set_memory 
+    if (!strcmp("set_memory", cmd)) {
+        if (nrhs == 2) {
+            MatPsi_obj->set_memory("1000mb");
+            return;
+        }
+        if (nrhs!=3 || !mxIsChar(prhs[2]))
+            mexErrMsgTxt("set_memory(\"memory\"): String input expected.");
+        MatPsi_obj->set_memory((std::string)mxArrayToString(prhs[2]));
         return;
     }
     
@@ -138,10 +166,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // set_geom 
     if (!strcmp("set_geom", cmd)) {
         // Check parameters
-        if (nrhs!=3)
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->natom() || mxGetN(prhs[2]) != 3)
             mexErrMsgTxt("set_geom(newGeom): natom by 3 matrix input expected.");
-        if (mxGetM(prhs[2]) != MatPsi_obj->natom() || mxGetN(prhs[2]) != 3)
-            mexErrMsgTxt("set_geom: Input geometry matrix dimension does not agree.");
         // Call the method
         MatPsi_obj->set_geom(InputMatrix(prhs[2]));
         return;
@@ -390,12 +416,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     // RHF_EnableMOM
     if (!strcmp("RHF_EnableMOM", cmd)) {
-        if ( (nrhs!=2 && nrhs!=3) || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
-            mexErrMsgTxt("RHF_EnableMOM(mom_start): Integer input expected.");
-        if (nrhs == 2)
+        if (nrhs == 2) {
             MatPsi_obj->RHF_EnableMOM(20);
-        else
-            MatPsi_obj->RHF_EnableMOM((int)InputScalar(prhs[2]));
+            return;
+        }
+        if (nrhs!=3 || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
+            mexErrMsgTxt("RHF_EnableMOM(mom_start): Integer input expected.");
+        MatPsi_obj->RHF_EnableMOM((int)InputScalar(prhs[2]));
         return;
     }
     
@@ -407,10 +434,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     // RHF_EnableDamping 
     if (!strcmp("RHF_EnableDamping", cmd)) {
-        if ( (nrhs!=2 && nrhs!=3) || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
-            mexErrMsgTxt("RHF_EnableDamping(damping_percentage): 1 double input expected.");
-        if (nrhs == 2)
+        if (nrhs == 2) {
             MatPsi_obj->RHF_EnableDamping(20.0);
+            return;
+        }
+        if (nrhs!=3 || mxGetM(prhs[2])!=1 || mxGetN(prhs[2])!=1)
+            mexErrMsgTxt("RHF_EnableDamping(damping_percentage): 1 double input expected.");
         MatPsi_obj->RHF_EnableDamping(InputScalar(prhs[2]));
         return;
     }

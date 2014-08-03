@@ -39,8 +39,8 @@ void init_openmp(Process::Environment& process_environment_in) {
 #endif
 
     // If no OMP thread variable is set, set nthreads to default to 1
-    if (process_environment_in("OMP_NUM_THREADS") == "")
-        process_environment_in.set_n_threads(1);
+    //~ if (process_environment_in("OMP_NUM_THREADS") == "")
+        //~ process_environment_in.set_n_threads(1);
 }
 
 }

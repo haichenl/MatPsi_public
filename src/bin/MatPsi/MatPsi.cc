@@ -1,18 +1,50 @@
 // Please directly include this file in MatPsi_mex.cpp to make compilation easier... 
 
-// Constructor
-MatPsi::MatPsi(std::string molstring, std::string basisname, std::string path) {
-    path_ = path + "/share/";
-    common_init(molstring, basisname);
+unsigned long int parse_memory_str(const std::string& memory_str) {
+    std::string memory_str_ = memory_str;
+    boost::algorithm::to_lower(memory_str_);
+    boost::cmatch cm;
+    boost::regex_search(memory_str_.c_str(), cm, boost::regex("([+]?[0-9]*.?[0-9]+)"));
+    double memory = boost::lexical_cast<double>(std::string(cm[1].first, cm[1].second));
+    boost::regex_search(memory_str_.c_str(), cm, boost::regex("([a-z]?b)"));
+    std::string unit_str(cm[1].first, cm[1].second);
+    unsigned long int unit;
+    if(boost::iequals(unit_str, "b"))
+        unit = 1L;
+    else if(boost::iequals(unit_str, "kb"))
+        unit = 1000L;
+    else if(boost::iequals(unit_str, "mb"))
+        unit = 1000000L;
+    else
+        unit = 1000000000L;
+    if((unsigned long int)(memory*unit) < 100000000L) // less than 100 mb 
+        return 100000000L; // if less than 100mb then return 100 mb 
+    else
+        return (unsigned long int)(memory*unit);
 }
 
-void MatPsi::common_init(std::string molstring, std::string basisname, int ncores, unsigned long int memory) {
+// Constructor
+MatPsi::MatPsi(const std::string& molstring, const std::string& basisname, int ncores, const std::string& memory_str, const std::string& path)
+    : molstring_(molstring), basisname_(basisname), path_(path)
+{
+    ncores_ = ncores;
+    memory_ = parse_memory_str(memory_str);
+    cout<<ncores_<<endl<<omp_get_max_threads()<<endl;
+    common_init();
+}
+
+void MatPsi::common_init() {
     // some necessary initializations
     process_environment_.initialize();
+    
+    // set cores and memory 
+    process_environment_.set_n_threads(ncores_);
+    process_environment_.set_memory(memory_);
     worldcomm_ = initialize_communicator(0, NULL, process_environment_);
     switch_worldcomm();
-    process_environment_.options.set_read_globals(true);
     
+    // read in options 
+    process_environment_.options.set_read_globals(true);
     read_options("", process_environment_.options, true);
     process_environment_.options.set_read_globals(false);
     process_environment_.set("PSIDATADIR", path_);
@@ -40,16 +72,9 @@ void MatPsi::common_init(std::string molstring, std::string basisname, int ncore
     psio_->_psio_manager_->set_default_path(matpsi_tempdir_str);
     
     // create molecule object and set its basis set name 
-    molstring_ = molstring;
-    basisname_ = basisname;
-    molecule_ = psi::Molecule::create_molecule_from_string(process_environment_, molstring);
-    molecule_->set_basis_all_atoms(basisname);
-    
+    molecule_ = psi::Molecule::create_molecule_from_string(process_environment_, molstring_);
+    molecule_->set_basis_all_atoms(basisname_);
     process_environment_.set_molecule(molecule_);
-    
-    // set cores and memory 
-    process_environment_.set_n_threads(ncores); // these values are shared among all instances, so better be constants 
-    process_environment_.set_memory(memory);
     
     // create basis object and one & two electron integral factories & rhf 
     create_basis();
@@ -87,6 +112,22 @@ MatPsi::~MatPsi() {
         jk_->finalize();
     psio_->_psio_manager_->psiclean();
     boost::filesystem::remove_all(matpsi_tempdir_str);
+}
+
+void MatPsi::set_ncores(int ncores) {
+    // set cores and update worldcomm_ 
+    ncores_ = ncores;
+    process_environment_.set_n_threads(ncores_);
+    worldcomm_ = initialize_communicator(0, NULL, process_environment_);
+    switch_worldcomm();
+}
+
+void MatPsi::set_memory(std::string memory_str) {
+    // set memory and update worldcomm_ 
+    memory_ = parse_memory_str(memory_str);
+    process_environment_.set_memory(memory_);
+    worldcomm_ = initialize_communicator(0, NULL, process_environment_);
+    switch_worldcomm();
 }
 
 void MatPsi::fix_mol() {
@@ -357,19 +398,20 @@ void MatPsi::UseDirectJK() {
 }
 
 void MatPsi::UsePKJK() {
-    // create PKJK object
-    PKJK* jk = new PKJK(process_environment_, basis_, psio_);
-
-    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
-        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
-    if (process_environment_.options["PRINT"].has_changed())
-        jk->set_print(process_environment_.options.get_int("PRINT"));
-    if (process_environment_.options["DEBUG"].has_changed())
-        jk->set_debug(process_environment_.options.get_int("DEBUG"));
-    jk_ = boost::shared_ptr<JK>(jk);
-    printf("reach1\n");
-    jk_->initialize();
-    jk_->remove_symmetry();
+    if(jk_ == NULL) {
+        // create PKJK object
+        PKJK* jk = new PKJK(process_environment_, basis_, psio_);
+    
+        if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+            jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+        if (process_environment_.options["PRINT"].has_changed())
+            jk->set_print(process_environment_.options.get_int("PRINT"));
+        if (process_environment_.options["DEBUG"].has_changed())
+            jk->set_debug(process_environment_.options.get_int("DEBUG"));
+        jk_ = boost::shared_ptr<JK>(jk);
+        jk_->initialize();
+    }
+    //~ jk_->remove_symmetry();
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {

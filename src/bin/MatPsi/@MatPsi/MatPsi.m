@@ -23,6 +23,9 @@ classdef MatPsi < handle
                     throw(MException('MatPsi:MatPsi','MatPsi cannot find basis set files.'));
                 end
             end
+            if(nargin > 3 && isfloat(varargin{4}))
+                varargin{4} = num2str(varargin{4});
+            end
             this.objectHandle = MatPsi_mex('new', varargin{:}, this.path);
         end
         
@@ -49,6 +52,21 @@ classdef MatPsi < handle
         % The basis set name used in constructor  
         function varargout = basis_name(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('basis_name', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.set_ncores(integer); 
+        % Set the number of CPU cores this MatPsi instance can use 
+        function varargout = set_ncores(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('set_ncores', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.set_memory(string); 
+        % Set the amount of memory this MatPsi instance can use; default unit GB 
+        function varargout = set_memory(this, varargin)
+            if(isfloat(varargin{1}))
+                varargin{1} = num2str(varargin{1});
+            end
+            [varargout{1:nargout}] = MatPsi_mex('set_memory', this.objectHandle, varargin{:});
         end
         
         %% Molecule operations 

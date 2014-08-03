@@ -9,7 +9,10 @@
 #include <libpsio/psio.hpp>
 #include <libscf_solver/rhf.h>
 #include <read_options.cc>
+#include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace psi;
@@ -29,16 +32,19 @@ namespace psi {
 class MatPsi {
 protected:
 
+    int ncores_;
+    unsigned long int memory_;
+    
+    std::string molstring_;
+    std::string basisname_;
+    std::string path_;
+
     Process::Environment process_environment_;
     boost::shared_ptr<worldcomm> worldcomm_;
     
     std::string matpsi_id;
     std::string matpsi_tempdir_str;
     boost::shared_ptr<PSIO> psio_;
-    
-    std::string path_;
-    std::string molstring_;
-    std::string basisname_;
     
     boost::shared_ptr<Molecule> molecule_;
     boost::shared_ptr<BasisSet> basis_;
@@ -49,7 +55,7 @@ protected:
     boost::shared_ptr<scf::RHF> rhf_;
     
     // common initializer for constructors 
-    void common_init(std::string molstring, std::string basisname, int ncores = 4, unsigned long int memory = 1000000000L);
+    void common_init();
     
     // create basis object 
     void create_basis();
@@ -59,17 +65,20 @@ protected:
     
 public:
     // constructor; takes in 2 strings and parse them 
-    MatPsi(std::string molstring, std::string basisname, std::string path);
+    MatPsi(const std::string& molstring, const std::string& basisname, int ncores, const std::string& memory_str, const std::string& path);
     
     // destructor 
     ~MatPsi();
     
     // the string describing the molecule 
-    std::string molecule_string() { return molstring_; }
+    std::string& molecule_string() { return molstring_; }
     
     // basis set name string 
-    std::string basis_name() { return basisname_; }
+    std::string& basis_name() { return basisname_; }
     
+    void set_ncores(int ncores);
+    
+    void set_memory(std::string);
     
     //*** Molecule operations 
     // fix the molecule
