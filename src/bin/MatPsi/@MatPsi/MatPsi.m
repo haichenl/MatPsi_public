@@ -242,6 +242,12 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('Density2K', this.objectHandle, varargin{:});
         end
         
+        % matrix(nbasis, nbasis) = matpsi.Density2G( matrix(nbasis, nbasis) ); 
+        % Compute G from density matrix 
+        function varargout = Density2G(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('Density2G', this.objectHandle, varargin{:});
+        end
+        
         % matrix(nbasis, nbasis) = matpsi.OccMO2J( matrix(nbasis, nocc) ); 
         % Compute J from occupied molecular orbital matrix 
         function varargout = OccMO2J(this, varargin)
@@ -252,6 +258,12 @@ classdef MatPsi < handle
         % Compute K from occupied molecular orbital matrix 
         function varargout = OccMO2K(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('OccMO2K', this.objectHandle, varargin{:});
+        end
+        
+        % matrix(nbasis, nbasis) = matpsi.OccMO2G( matrix(nbasis, nocc) ); 
+        % Compute G from occupied molecular orbital matrix 
+        function varargout = OccMO2G(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('OccMO2G', this.objectHandle, varargin{:});
         end
         
         %% SCF related 

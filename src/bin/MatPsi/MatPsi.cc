@@ -461,6 +461,23 @@ SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
     return Knew;
 }
 
+SharedMatrix MatPsi::Density2G(SharedMatrix Density) {
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("Density2G: JK object has not been enabled.");
+    }
+    
+    jk_->C_left().clear();
+    jk_->D().clear();
+    jk_->D().push_back(Density);
+    
+    jk_->compute_from_D();
+    SharedMatrix Gnew = jk_->J()[0];
+    Gnew->scale(2.0);
+    Gnew->subtract(jk_->K()[0]);
+    Gnew->hermitivitize();
+    return Gnew;
+}
+
 SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
     if(jk_ == NULL) {
         throw PSIEXCEPTION("OccMO2J: JK object has not been enabled.");
@@ -483,6 +500,20 @@ SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
     SharedMatrix Knew = jk_->K()[0];
     Knew->hermitivitize();
     return Knew;
+}
+
+SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
+    if(jk_ == NULL) {
+        throw PSIEXCEPTION("OccMO2G: JK object has not been enabled.");
+    }
+    jk_->C_left().clear();
+    jk_->C_left().push_back(OccMO);
+    jk_->compute();
+    SharedMatrix Gnew = jk_->J()[0];
+    Gnew->scale(2.0);
+    Gnew->subtract(jk_->K()[0]);
+    Gnew->hermitivitize();
+    return Gnew;
 }
 
 void MatPsi::RHF_reset() {

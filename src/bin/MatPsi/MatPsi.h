@@ -170,11 +170,17 @@ public:
     // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from density matrix, consider no geometrical symmetry 
     SharedMatrix Density2K(SharedMatrix Density);
     
+    // for restricted Hartree Fock, compute 2-electron total interaction G matrix from density matrix, consider no geometrical symmetry 
+    SharedMatrix Density2G(SharedMatrix Density);
+    
     // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2J(SharedMatrix OccMO);
     
     // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2K(SharedMatrix OccMO);
+    
+    // for restricted Hartree Fock, compute 2-electron exchange interaction G matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
+    SharedMatrix OccMO2G(SharedMatrix OccMO);
     
     
     //*** SCF related

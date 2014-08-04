@@ -358,8 +358,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Density2J 
     if (!strcmp("Density2J", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
-            mexErrMsgTxt("Density2J(MOmat): nbasis by noccupy matrix input expected.");
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+            mexErrMsgTxt("Density2J(MOmat): nbasis by nbasis matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->Density2J(InputMatrix(prhs[2])));
         return;
@@ -368,10 +368,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Density2K 
     if (!strcmp("Density2K", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
-            mexErrMsgTxt("Density2K(MOmat): nbasis by noccupy matrix input expected.");
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+            mexErrMsgTxt("Density2K(MOmat): nbasis by nbasis matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->Density2K(InputMatrix(prhs[2])));
+        return;
+    }
+    
+    // Density2G 
+    if (!strcmp("Density2G", cmd)) {
+        // Check parameters
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+            mexErrMsgTxt("Density2G(MOmat): nbasis by nbasis matrix input expected.");
+        // Call the method
+        OutputMatrix(plhs[0], MatPsi_obj->Density2G(InputMatrix(prhs[2])));
         return;
     }
     
@@ -392,6 +402,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             mexErrMsgTxt("OccMO2K(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->OccMO2K(InputMatrix(prhs[2])));
+        return;
+    }
+    
+    // OccMO2G 
+    if (!strcmp("OccMO2G", cmd)) {
+        // Check parameters
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
+            mexErrMsgTxt("OccMO2G(MOmat): nbasis by noccupy matrix input expected.");
+        // Call the method
+        OutputMatrix(plhs[0], MatPsi_obj->OccMO2G(InputMatrix(prhs[2])));
         return;
     }
     
