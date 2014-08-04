@@ -541,6 +541,7 @@ double MatPsi::RHF() {
         return Ehf;
     }
     catch (...) {
+        jk_ = rhf_->jk();
         throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
     }
 }
@@ -556,6 +557,7 @@ double MatPsi::RHFenv(SharedMatrix EnvMat) {
         return Ehf;
     }
     catch (...) {
+        jk_ = rhf_->jk();
         throw PSIEXCEPTION("RHFenv(EnvMat): Hartree-Fock probably not converged.");
     }
 }
