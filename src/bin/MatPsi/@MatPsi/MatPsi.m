@@ -262,9 +262,21 @@ classdef MatPsi < handle
         end
         
         % double = matpsi.RHFenv( matrix(nbasis, nbasis) ); 
-        % Run a Hartree-Fock with the given external potential field 
+        % Run a Hartree-Fock with a given external potential field 
         function varargout = RHFenv(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHFenv', this.objectHandle, varargin{:});
+        end
+        
+        % double = matpsi.RHF_fromC( matrix(nbasis, nbasis) ); 
+        % Run a Hartree-Fock starting from a given molecular orbital matrix 
+        function varargout = RHF_fromC(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_fromC', this.objectHandle, varargin{:});
+        end
+        
+        % double = matpsi.RHFenv_fromC( matrix(nbasis, nbasis) ); 
+        % Run a Hartree-Fock with a given external potential field starting from a given molecular orbital matrix 
+        function varargout = RHFenv_fromC(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHFenv_fromC', this.objectHandle, varargin{:});
         end
         
         % matpsi.RHF_reset(); 

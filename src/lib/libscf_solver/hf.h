@@ -175,6 +175,9 @@ protected:
     int r_points_; // number of radial integration points
     int theta_points_; // number of colatitude integration points
     int phi_points_; // number of azimuthal integration points
+    
+    bool EnvMat_enabled_;
+    SharedMatrix EnvMat_;
 
 public:
     /// Nuclear contributions
@@ -341,6 +344,9 @@ protected:
 
     /** Saves all wavefunction information to the checkpoint file*/
     void dump_to_checkpoint();
+    
+    // Virtual fucntion used in RHF 
+    virtual void whether_to_use_StartingC() = 0;
 
 public:
     HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
@@ -352,7 +358,10 @@ public:
     virtual ~HF();
 
     virtual double compute_energy();
-    virtual double compute_energy(SharedMatrix EnvMat);
+    
+    virtual void set_EnvMat(SharedMatrix EnvMat_in);
+    
+    virtual void disable_EnvMat();
 };
 
 }} // Namespaces

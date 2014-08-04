@@ -56,7 +56,12 @@ protected:
     SharedMatrix G_;
     SharedMatrix J_;
     SharedMatrix K_;
-
+    
+    // Flag controlling whether we manually specify a starting molecular orbital matrix 
+    bool StartingC_enabled_;
+    
+    // Starting molecular orbital matrix 
+    SharedMatrix StartingC_;
 
     void form_C();
     void form_D();
@@ -86,6 +91,9 @@ protected:
     virtual void finalize();
 
     void save_density_and_energy();
+    
+    // Automatically judge whether we start from a manually specified starting molecular orbital 
+    void whether_to_use_StartingC();
 
 public:
     RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
@@ -101,6 +109,10 @@ public:
 
     virtual bool same_a_b_orbs() const { return true; }
     virtual bool same_a_b_dens() const { return true; }
+    
+    void set_StartingC(SharedMatrix StartingC_in);
+    
+    void disable_StartingC();
 };
 
 }}

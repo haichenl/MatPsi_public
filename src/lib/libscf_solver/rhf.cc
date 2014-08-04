@@ -98,7 +98,9 @@ void RHF::common_init()
     G_         = SharedMatrix(factory_->create_matrix("G"));
     J_         = SharedMatrix(factory_->create_matrix("J"));
     K_         = SharedMatrix(factory_->create_matrix("K"));
-
+    
+    StartingC_enabled_ = false;
+    StartingC_ = SharedMatrix(factory_->create_matrix("Starting molecular orbital"));
 }
 
 void RHF::finalize()
@@ -509,6 +511,26 @@ void RHF::stability_analysis()
         fprintf(outfile, "\tLowest triplet (RHF->UHF) stability eigenvalues:-\n");
         print_stability_analysis(triplet_eval_sym);
         psio_->close(PSIF_LIBTRANS_DPD, 1);
+    }
+}
+
+void RHF::set_StartingC(SharedMatrix StartingC_in) {
+    SharedMatrix example(factory_->create_matrix(""));
+    if(StartingC_in->nirrep()!= example->nirrep() || StartingC_in->colspi()!= example->colspi() || StartingC_in->rowspi()!=example->rowspi())
+        throw PSIEXCEPTION("RHF::set_startingC(MO): Input starting molecular orbital dimensions do not agree.");
+    // If dimensions agree then enable startingC_ 
+    StartingC_enabled_ = true;
+    StartingC_ = StartingC_in;
+}
+
+void RHF::disable_StartingC(){
+    StartingC_enabled_ = false;
+}
+
+void RHF::whether_to_use_StartingC() {
+    if(StartingC_enabled_) {
+        Ca_ = StartingC_;
+        form_D();
     }
 }
 

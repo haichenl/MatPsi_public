@@ -185,7 +185,13 @@ public:
     double RHF();
     
     // restricted Hartree-Fock with environment potential 
-    double RHF(SharedMatrix EnvMat);
+    double RHFenv(SharedMatrix EnvMat);
+    
+    // restricted Hartree-Fock starting from a given density matrix 
+    double RHF_fromC(SharedMatrix C_in);
+    
+    // restricted Hartree-Fock with environment potential starting from a given density matrix 
+    double RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in);
     
     // enable MOM in restricted Hartree-Fock to solve convergence issue 
     void RHF_EnableMOM(int mom_start);

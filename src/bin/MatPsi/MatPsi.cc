@@ -29,7 +29,6 @@ MatPsi::MatPsi(const std::string& molstring, const std::string& basisname, int n
 {
     ncores_ = ncores;
     memory_ = parse_memory_str(memory_str);
-    cout<<ncores_<<endl<<omp_get_max_threads()<<endl;
     common_init();
 }
 
@@ -515,17 +514,49 @@ double MatPsi::RHF() {
     }
 }
 
-double MatPsi::RHF(SharedMatrix EnvMat) {
+double MatPsi::RHFenv(SharedMatrix EnvMat) {
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
     process_environment_.set_wavefunction(rhf_);
+    rhf_->set_EnvMat(EnvMat);
     try {
-        double Ehf = rhf_->compute_energy(EnvMat);
+        double Ehf = rhf_->compute_energy();
         jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
-        throw PSIEXCEPTION("RHF(env): Hartree-Fock probably not converged.");
+        throw PSIEXCEPTION("RHFenv(EnvMat): Hartree-Fock probably not converged.");
+    }
+}
+
+double MatPsi::RHF_fromC(SharedMatrix C_in) {
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
+    rhf_->set_StartingC(C_in);
+    try {
+        double Ehf = rhf_->compute_energy();
+        jk_ = rhf_->jk();
+        rhf_->J()->scale(0.5);
+        return Ehf;
+    }
+    catch (...) {
+        throw PSIEXCEPTION("RHF_fromC(MO): Hartree-Fock probably not converged.");
+    }
+}
+
+double MatPsi::RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in) {
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    process_environment_.set_wavefunction(rhf_);
+    rhf_->set_EnvMat(EnvMat);
+    rhf_->set_StartingC(C_in);
+    try {
+        double Ehf = rhf_->compute_energy();
+        jk_ = rhf_->jk();
+        rhf_->J()->scale(0.5);
+        return Ehf;
+    }
+    catch (...) {
+        throw PSIEXCEPTION("RHFenv_fromC(EnvMat, MO): Hartree-Fock probably not converged.");
     }
 }
 

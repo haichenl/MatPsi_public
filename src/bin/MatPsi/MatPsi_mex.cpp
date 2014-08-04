@@ -403,26 +403,54 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
-    // RHFenv
+    // RHFenv 
     if (!strcmp("RHFenv", cmd)) {
         // Check parameters
         if (nrhs!=3)
             mexErrMsgTxt("RHFenv(EnvMat): nbasis by nbasis matrix input expected.");
         SharedMatrix EnvMat = InputMatrix(prhs[2]);
         if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbasis() || EnvMat->ncol() != MatPsi_obj->nbasis())
-            mexErrMsgTxt("RHFenv: Environment potential energy matrix dimensions do not agree.");
+            mexErrMsgTxt("RHFenv(EnvMat): Environment potential energy matrix dimensions do not agree.");
         // Call the method
-        OutputScalar(plhs[0], MatPsi_obj->RHF(EnvMat));
+        OutputScalar(plhs[0], MatPsi_obj->RHFenv(EnvMat));
         return;
     }
     
-    // RHF_reset
+    // RHF_fromC 
+    if (!strcmp("RHF_fromC", cmd)) {
+        // Check parameters
+        if (nrhs!=3)
+            mexErrMsgTxt("RHF_fromC(MO): nbasis by nbasis matrix input expected.");
+        SharedMatrix C_in = InputMatrix(prhs[2]);
+        if(C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbasis() || C_in->ncol() != MatPsi_obj->nbasis())
+            mexErrMsgTxt("RHF_fromC(MO): MO matrix dimensions do not agree.");
+        // Call the method
+        OutputScalar(plhs[0], MatPsi_obj->RHF_fromC(C_in));
+        return;
+    }
+    
+    // RHFenv_fromC 
+    if (!strcmp("RHFenv_fromC", cmd)) {
+        // Check parameters
+        if (nrhs!=4)
+            mexErrMsgTxt("RHFenv_fromC(EnvMat, MO): nbasis by nbasis matrix input expected.");
+        SharedMatrix EnvMat = InputMatrix(prhs[2]);
+        SharedMatrix C_in = InputMatrix(prhs[3]);
+        if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbasis() || EnvMat->ncol() != MatPsi_obj->nbasis()
+            || C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbasis() || C_in->ncol() != MatPsi_obj->nbasis())
+            mexErrMsgTxt("RHFenv_fromC(EnvMat, MO): MO matrix dimensions do not agree.");
+        // Call the method
+        OutputScalar(plhs[0], MatPsi_obj->RHFenv_fromC(EnvMat, C_in));
+        return;
+    }
+    
+    // RHF_reset 
     if (!strcmp("RHF_reset", cmd)) {
         MatPsi_obj->RHF_reset();
         return;
     }
     
-    // RHF_EnableMOM
+    // RHF_EnableMOM 
     if (!strcmp("RHF_EnableMOM", cmd)) {
         if (nrhs == 2) {
             MatPsi_obj->RHF_EnableMOM(20);
