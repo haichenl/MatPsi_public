@@ -287,7 +287,9 @@ EnvMat must be an nbasis by nbasis Hermitian(symmetric) matrix.
 
 ##TODO 
 
+remove python dependence
 
+incorejk
 
 ##Developer's Note 
 
