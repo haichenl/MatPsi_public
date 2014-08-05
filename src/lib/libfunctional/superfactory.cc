@@ -40,7 +40,7 @@ namespace psi {
 
 boost::shared_ptr<SuperFunctional> SuperFunctional::current(Options& options, int npoints, int deriv)
 {
-    throw PSIEXCEPTION("Python elimination causes a problem.");
+    throw PSIEXCEPTION("SuperFunctional::current: Python elimination causes a problem.");
     //~ if (npoints == -1) {
         //~ npoints = options.get_int("DFT_BLOCK_MAX_POINTS");
     //~ }

@@ -315,7 +315,7 @@ double Dispersion::compute_energy(boost::shared_ptr<Molecule> m)
         //~ else {
             //~ throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
         //~ }
-        throw PSIEXCEPTION("Python elimination causes a problem.\n");
+        throw PSIEXCEPTION("Dispersion::compute_energy: Python elimination causes a problem.\n");
         return E;
     }
     else if (Damping_type_ == Damping_TT) {
@@ -488,6 +488,7 @@ SharedMatrix Dispersion::compute_gradient(boost::shared_ptr<Molecule> m)
         //~ else {
             //~ throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
         //~ }
+        throw PSIEXCEPTION("Dispersion::compute_gradient: Python elimination causes a problem.\n");
     }
     else {
         for (int i = 0; i < m->natom(); i++) {

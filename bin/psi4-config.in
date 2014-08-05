@@ -9,9 +9,9 @@ configuration = {
     "CXXOPT"   : "@CXXOPT@",
     "CXXOTH"   : "@CXXOTH@",
     "CXXDBG"   : "@CXXDBG@",
-    "CXXINC"   : "@CPPFLAGS@ @PSICPPFLAGS@ @PYTHON_INCLUDE@",
+    "CXXINC"   : "@CPPFLAGS@ @PSICPPFLAGS@",
     "CXXFLAGS" : "@CXXDBG@ @CXXOPT@ @CXXDEF@ @CXXOTH@ @CXXINC@",
-    "LDFLAGS"  : "@LAPACK@ @BLAS@ @PYTHON_LDFLAGS@ -lpthread",
+    "LDFLAGS"  : "@LAPACK@ @BLAS@ -lpthread",
     "CPPFLAGS" : "@CPPFLAGS@",
     "PSICPPFLAGS" : "@PSICPPFLAGS@"
 }
