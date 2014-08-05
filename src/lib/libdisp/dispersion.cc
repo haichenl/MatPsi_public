@@ -42,15 +42,15 @@
 #include <sstream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/python.hpp>
-#include <boost/python/object.hpp>
+//~ #include <boost/python.hpp>
+//~ #include <boost/python/object.hpp>
 #include <liboptions/liboptions.h>
 
-#define PY_TRY(ptr, command)  \
-     if(!(ptr = command)){    \
-         PyErr_Print();       \
-         exit(1);             \
-     }
+//~ #define PY_TRY(ptr, command)  \
+     //~ if(!(ptr = command)){    \
+         //~ PyErr_Print();       \
+         //~ exit(1);             \
+     //~ }
 
 using namespace boost;
 using namespace std;
@@ -276,45 +276,46 @@ double Dispersion::compute_energy(boost::shared_ptr<Molecule> m)
     double E = 0.0;
 
     if ((name_ == "-D2GR") || (name_ == "-D3ZERO") || (name_ == "-D3BJ")) {
-        if (Py_IsInitialized()) {
-            try {
-                // Grab run_dftd3 off of the Python plane
-                PyObject *molutil;
-                PY_TRY(molutil, PyImport_ImportModule("molutil") );
-                PyObject *grimme;
-                PY_TRY(grimme, PyObject_GetAttrString(molutil, "run_dftd3"));
-                PyObject *pargs;
-                if (name_ == "-D2GR") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f} i)", NULL, NULL, "d2gr", 
-                        "s6", s6_, "alpha6", d_, 0));
-                } else if (name_ == "-D3ZERO") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3zero", 
-                        "s6", s6_, "sr6", sr6_, "s8", s8_, "alpha6", d_, 0));
-                } else if (name_ == "-D3BJ") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3bj", 
-                        "s6", s6_, "a1", a1_, "s8", s8_, "a2", a2_, 0));
-                }
-                PyObject *ret;
-                PY_TRY(ret, PyEval_CallObject(grimme, pargs));
-
-                // Extract the Dispersion Energy
-                E = boost::python::extract<double>(ret);
-    
-                // Decref Python env pointers
-                Py_DECREF(ret);
-                Py_DECREF(pargs);
-                Py_DECREF(grimme);
-                Py_DECREF(molutil);
-            }
-            catch (boost::python::error_already_set const& e)
-            {
-                PyErr_Print();
-                exit(1);
-            }
-        }
-        else {
-            throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
-        }
+        //~ if (Py_IsInitialized()) {
+            //~ try {
+                //~ // Grab run_dftd3 off of the Python plane
+                //~ PyObject *molutil;
+                //~ PY_TRY(molutil, PyImport_ImportModule("molutil") );
+                //~ PyObject *grimme;
+                //~ PY_TRY(grimme, PyObject_GetAttrString(molutil, "run_dftd3"));
+                //~ PyObject *pargs;
+                //~ if (name_ == "-D2GR") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f} i)", NULL, NULL, "d2gr", 
+                        //~ "s6", s6_, "alpha6", d_, 0));
+                //~ } else if (name_ == "-D3ZERO") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3zero", 
+                        //~ "s6", s6_, "sr6", sr6_, "s8", s8_, "alpha6", d_, 0));
+                //~ } else if (name_ == "-D3BJ") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3bj", 
+                        //~ "s6", s6_, "a1", a1_, "s8", s8_, "a2", a2_, 0));
+                //~ }
+                //~ PyObject *ret;
+                //~ PY_TRY(ret, PyEval_CallObject(grimme, pargs));
+//~ 
+                //~ // Extract the Dispersion Energy
+                //~ E = boost::python::extract<double>(ret);
+    //~ 
+                //~ // Decref Python env pointers
+                //~ Py_DECREF(ret);
+                //~ Py_DECREF(pargs);
+                //~ Py_DECREF(grimme);
+                //~ Py_DECREF(molutil);
+            //~ }
+            //~ catch (boost::python::error_already_set const& e)
+            //~ {
+                //~ PyErr_Print();
+                //~ exit(1);
+            //~ }
+        //~ }
+        //~ else {
+            //~ throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
+        //~ }
+        throw PSIEXCEPTION("Python elimination causes a problem.\n");
         return E;
     }
     else if (Damping_type_ == Damping_TT) {
@@ -448,45 +449,45 @@ SharedMatrix Dispersion::compute_gradient(boost::shared_ptr<Molecule> m)
     double** Gp = G->pointer();
 
     if ((name_ == "-D2GR") || (name_ == "-D3ZERO") || (name_ == "-D3BJ")) {
-        if (Py_IsInitialized()) {
-            try {
-                // Grab run_dftd3 off of the Python plane
-                PyObject *molutil;
-                PY_TRY(molutil, PyImport_ImportModule("molutil") );
-                PyObject *grimme;
-                PY_TRY(grimme, PyObject_GetAttrString(molutil, "run_dftd3"));
-                PyObject *pargs;
-                if (name_ == "-D2GR") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f} i)", NULL, NULL, "d2gr", 
-                        "s6", s6_, "alpha6", d_, 1));
-                } else if (name_ == "-D3ZERO") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3zero", 
-                        "s6", s6_, "sr6", sr6_, "s8", s8_, "alpha6", d_, 1));
-                } else if (name_ == "-D3BJ") {
-                    PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3bj", 
-                        "s6", s6_, "a1", a1_, "s8", s8_, "a2", a2_, 1));
-                }
-                PyObject *ret;
-                PY_TRY(ret, PyEval_CallObject(grimme, pargs));
-
-                // Extract the Dispersion Gradient
-                G = boost::python::extract<boost::shared_ptr<psi::Matrix> >(ret);
-
-                // Decref Python env pointers
-                Py_DECREF(ret);
-                Py_DECREF(pargs);
-                Py_DECREF(grimme);
-                Py_DECREF(molutil);
-            }
-            catch (boost::python::error_already_set const& e)
-            {
-                PyErr_Print();
-                exit(1);
-            }
-        }
-        else {
-            throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
-        }
+        //~ if (Py_IsInitialized()) {
+            //~ try {
+                //~ // Grab run_dftd3 off of the Python plane
+                //~ PyObject *molutil;
+                //~ PY_TRY(molutil, PyImport_ImportModule("molutil") );
+                //~ PyObject *grimme;
+                //~ PY_TRY(grimme, PyObject_GetAttrString(molutil, "run_dftd3"));
+                //~ PyObject *pargs;
+                //~ if (name_ == "-D2GR") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f} i)", NULL, NULL, "d2gr", 
+                        //~ "s6", s6_, "alpha6", d_, 1));
+                //~ } else if (name_ == "-D3ZERO") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3zero", 
+                        //~ "s6", s6_, "sr6", sr6_, "s8", s8_, "alpha6", d_, 1));
+                //~ } else if (name_ == "-D3BJ") {
+                    //~ PY_TRY(pargs, Py_BuildValue("(s s s {s:f,s:f,s:f,s:f} i)", NULL, NULL, "d3bj", 
+                        //~ "s6", s6_, "a1", a1_, "s8", s8_, "a2", a2_, 1));
+                //~ }
+                //~ PyObject *ret;
+                //~ PY_TRY(ret, PyEval_CallObject(grimme, pargs));
+//~ 
+                //~ // Extract the Dispersion Gradient
+                //~ G = boost::python::extract<boost::shared_ptr<psi::Matrix> >(ret);
+//~ 
+                //~ // Decref Python env pointers
+                //~ Py_DECREF(ret);
+                //~ Py_DECREF(pargs);
+                //~ Py_DECREF(grimme);
+                //~ Py_DECREF(molutil);
+            //~ }
+            //~ catch (boost::python::error_already_set const& e)
+            //~ {
+                //~ PyErr_Print();
+                //~ exit(1);
+            //~ }
+        //~ }
+        //~ else {
+            //~ throw PSIEXCEPTION("Unable to parse run_dftd3.\n");
+        //~ }
     }
     else {
         for (int i = 0; i < m->natom(); i++) {

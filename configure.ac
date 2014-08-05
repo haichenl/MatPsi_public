@@ -85,7 +85,7 @@ CXXDBG='-g' AC_SUBST(CXXDBG)
 CXXOPT='-O2' AC_SUBST(CXXOPT)
 CXXDEF='' AC_SUBST(CXXDEF)
 CXXOTH='-fpic' AC_SUBST(CXXOTH)
-CXXINC='$(CPPFLAGS) $(PSICPPFLAGS) $(PYTHON_INCLUDE)' AC_SUBST(CXXINC)
+CXXINC='$(CPPFLAGS) $(PSICPPFLAGS)' AC_SUBST(CXXINC)
 
 ########
 ## PSI-specific options
@@ -303,17 +303,6 @@ AC_SUBST(LIBDIRS)
 
 AC_CHECK_PROGS(PERL,perl,perl) AC_SUBST(PERL)
 
-# Check for python interpreter and libraries
-#  Version 2.6 is required because we import Python3 printing from future
-AC_PYTHON([2.6])
-AC_ARG_ENABLE([python-module],
-    [AC_HELP_STRING([--enable-python-module],
-      [Enable building PSI4 as a Python module. @<:@default=no@:>@]) ],
-    [
-      MAKE_PYTHON_MODULE=1
-      AC_DEFINE([MAKE_PYTHON_MODULE])
-      AC_SUBST([MAKE_PYTHON_MODULE])
-    ])
 
 AC_PROG_PDFLATEX
 AC_PROG_LATEX
@@ -614,10 +603,6 @@ AX_BOOST_BASE([1.46], [
     if test "x${ax_cv_boost_filesystem}" != "xyes"; then
         have_boost=0
     fi
-    AX_BOOST_PYTHON()
-    if test "x${ac_cv_boost_python}" != "xyes"; then
-        have_boost=0
-    fi
     AX_BOOST_REGEX()
     if test "x${ax_cv_boost_regex}" != "xyes"; then
         have_boost=0
@@ -656,7 +641,6 @@ if test "x${have_boost}" == "x0"; then
     BOOST_CPPFLAGS='-I$(top_objdir)/boost/$(BOOSTVER)'
     
     BOOST_FILESYSTEM_LIB='../../../boost/$(BOOSTVER)/stage/lib/libboost_filesystem.a'
-    BOOST_PYTHON_LIB='../../../boost/$(BOOSTVER)/stage/lib/libboost_python.a'
     BOOST_REGEX_LIB='../../../boost/$(BOOSTVER)/stage/lib/libboost_regex.a'
     BOOST_SERIALIZATION_LIB='../../../boost/$(BOOSTVER)/stage/lib/libboost_serialization.a'
     BOOST_SYSTEM_LIB='../../../boost/$(BOOSTVER)/stage/lib/libboost_system.a'
@@ -916,7 +900,7 @@ AC_MSG_RESULT([C++ extra flags: $CXXOTH])
 # Set up CFLAGS and FFLAGS.
 CFLAGS='$(CDBG) $(COPT) $(CDEF) $(COTH) $(CINC)' AC_SUBST(CFLAGS)
 CXXFLAGS='$(CXXDBG) $(CXXOPT) $(CXXDEF) $(CXXOTH) $(CXXINC)' AC_SUBST(CXXFLAGS)
-MEXFLAGS='CFLAGS="\$$CFLAGS $(CFLAGS)" CXXFLAGS="\$$CXXFLAGS $(CXXFLAGS)" LDFLAGS="\$$LDFLAGS $(LDFLAGS) $(PYTHON_LDFLAGS)" -cxx -largeArrayDims' AC_SUBST(MEXFLAGS)
+MEXFLAGS='CFLAGS="\$$CFLAGS $(CFLAGS)" CXXFLAGS="\$$CXXFLAGS $(CXXFLAGS)" LDFLAGS="\$$LDFLAGS $(LDFLAGS)" -cxx -largeArrayDims' AC_SUBST(MEXFLAGS)
 FFLAGS='$(FDBG) $(FOPT) $(FOTH) $(FSTATIC)' AC_SUBST(FFLAGS)
 
 ########

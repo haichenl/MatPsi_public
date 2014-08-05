@@ -29,9 +29,10 @@
 // Forward declarations
 namespace boost {
 template<class T> class shared_ptr;
-namespace python{
-class tuple;
-}}
+//~ namespace python{
+//~ class tuple;
+//~ }
+}
 
 namespace psi {
 

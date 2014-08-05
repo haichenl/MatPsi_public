@@ -21,6 +21,7 @@
  */
 
 #include "mints.h"
+#include <boost/cstdint.hpp>
 
 using namespace psi;
 using namespace boost;

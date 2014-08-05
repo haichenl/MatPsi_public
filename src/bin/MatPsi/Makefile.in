@@ -6,7 +6,7 @@ include ../MakeVars
 
 PSITARGET = $(top_objdir)/MatPsi
 
-LDLIBS += $(LAPACK) $(BLAS) $(BOOST_FILESYSTEM_LIB) $(BOOST_PYTHON_LIB) $(BOOST_REGEX_LIB) $(BOOST_SERIALIZATION_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) $(BOOST_LDFLAGS) -lpthread 
+LDLIBS += $(LAPACK) $(BLAS) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_SERIALIZATION_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) $(BOOST_LDFLAGS) -lpthread 
 CXXINC += -DINSTALLEDPSIDATADIR=\"$(pkgdatadir)\"
 
 # gfortranbegin contains main, so we can't link it in or we'll get a linker freakout

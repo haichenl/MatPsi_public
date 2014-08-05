@@ -29,7 +29,7 @@
 
 #include <physconst.h>
 #include <exception.h>
-#include <boost/python/tuple.hpp>
+//~ #include <boost/python/tuple.hpp>
 
 // Cancel out restrict keyword for timings
 #undef restrict

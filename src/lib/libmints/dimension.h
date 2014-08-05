@@ -80,9 +80,9 @@ public:
 
     void print() const;
 
-    // Only used for python
-    const int& get(int i) const { return blocks_[i]; }
-    void set(int i, int val) { blocks_[i] = val; }
+    //~ // Only used for python
+    //~ const int& get(int i) const { return blocks_[i]; }
+    //~ void set(int i, int val) { blocks_[i] = val; }
 };
 
 bool operator==(const Dimension& a, const Dimension& b);

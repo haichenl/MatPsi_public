@@ -31,6 +31,8 @@
 #include <libqt/qt.h>
 #include <psifiles.h>
 
+#include <math.h>
+
 using namespace psi;
 using namespace boost;
 

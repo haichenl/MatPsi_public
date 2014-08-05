@@ -51,7 +51,7 @@
 #include <libparallel/parallel.h>
 #include <libiwl/iwl.hpp>
 #include <libqt/qt.h>
-#include <liboptions/liboptions_python.h>
+//~ #include <liboptions/liboptions_python.h>
 #include <psifiles.h>
 #include <libfock/jk.h>
 
@@ -1489,7 +1489,7 @@ double HF::compute_energy()
         save_density_and_energy();
 
         // Call any preiteration callbacks
-        call_preiteration_callbacks();
+        //~ call_preiteration_callbacks();
 
         timer_on("Form G");
         form_G();
@@ -1618,7 +1618,7 @@ double HF::compute_energy()
         }
 
         // Call any postiteration callbacks
-        call_postiteration_callbacks();
+        //~ call_postiteration_callbacks();
 
     } while (!converged && iteration_ < maxiter_ );
 

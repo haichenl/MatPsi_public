@@ -31,8 +31,8 @@
 #include <boost/regex.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/xpressive/regex_actions.hpp>
-#include <boost/python.hpp>
-#include <boost/python/tuple.hpp>
+//~ #include <boost/python.hpp>
+//~ #include <boost/python/tuple.hpp>
 #include <boost/tuple/tuple.hpp>
 
 #include <exception.h>
@@ -3375,38 +3375,38 @@ bool Matrix::equal_but_for_row_order(const Matrix* rhs, double TOL)
     return true;
 }
 
-double Matrix::pyget(const boost::python::tuple &key)
-{
-    return get(boost::python::extract<int>(key[0]),
-               boost::python::extract<int>(key[1]),
-               boost::python::extract<int>(key[2]));
-}
+//~ double Matrix::pyget(const boost::python::tuple &key)
+//~ {
+    //~ return get(boost::python::extract<int>(key[0]),
+               //~ boost::python::extract<int>(key[1]),
+               //~ boost::python::extract<int>(key[2]));
+//~ }
 
-void Matrix::pyset(const boost::python::tuple &key, double value)
-{
-    return set(boost::python::extract<int>(key[0]),
-               boost::python::extract<int>(key[1]),
-               boost::python::extract<int>(key[2]),
-               value);
-}
+//~ void Matrix::pyset(const boost::python::tuple &key, double value)
+//~ {
+    //~ return set(boost::python::extract<int>(key[0]),
+               //~ boost::python::extract<int>(key[1]),
+               //~ boost::python::extract<int>(key[2]),
+               //~ value);
+//~ }
 
-void Matrix::set_by_python_list(const boost::python::list& data)
-{
-    size_t rows = boost::python::len(data);
-
-    // Make sure nrows < rows
-    if (nrow() > rows)
-        throw PSIEXCEPTION("Uh, moron!");
-
-    for (size_t i=0; i<rows; ++i) {
-        size_t cols = boost::python::len(data[i]);
-        if (ncol() > cols)
-            throw PSIEXCEPTION("Uh, moron!");
-        for (size_t j=0; j<cols; ++j) {
-            set(i, j, boost::python::extract<double>(data[i][j]));
-        }
-    }
-}
+//~ void Matrix::set_by_python_list(const boost::python::list& data)
+//~ {
+    //~ size_t rows = boost::python::len(data);
+//~ 
+    //~ // Make sure nrows < rows
+    //~ if (nrow() > rows)
+        //~ throw PSIEXCEPTION("Uh, moron!");
+//~ 
+    //~ for (size_t i=0; i<rows; ++i) {
+        //~ size_t cols = boost::python::len(data[i]);
+        //~ if (ncol() > cols)
+            //~ throw PSIEXCEPTION("Uh, moron!");
+        //~ for (size_t j=0; j<cols; ++j) {
+            //~ set(i, j, boost::python::extract<double>(data[i][j]));
+        //~ }
+    //~ }
+//~ }
 
 void Matrix::rotate_columns(int h, int i, int j, double theta)
 {

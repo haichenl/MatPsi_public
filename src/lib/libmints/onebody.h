@@ -26,7 +26,7 @@
 #include <vector>
 #include "typedefs.h"
 #include "vector3.h"
-#include <boost/python/list.hpp>
+//~ #include <boost/python/list.hpp>
 #include "exception.h"
 
 namespace psi {
@@ -96,14 +96,14 @@ public:
     /// Buffer where the integrals are placed.
     const double *buffer() const;
 
-    /// Get a python list version of the current buffer
-    const boost::python::list py_buffer() const {
-        boost::python::list ret_val;
-        //TODO: Just change over the pointer rather than copying, or at least do a memcopy
-        for(int i = 0; i < buffer_size_; ++i)
-            ret_val.append(buffer_[i]);
-        return ret_val;
-    }
+    //~ /// Get a python list version of the current buffer
+    //~ const boost::python::list py_buffer() const {
+        //~ boost::python::list ret_val;
+        //~ //TODO: Just change over the pointer rather than copying, or at least do a memcopy
+        //~ for(int i = 0; i < buffer_size_; ++i)
+            //~ ret_val.append(buffer_[i]);
+        //~ return ret_val;
+    //~ }
 
     /// Compute the integrals between basis function in the given shell pair.
     void compute_shell(int, int);

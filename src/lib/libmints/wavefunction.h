@@ -53,10 +53,10 @@ extern double fac[MAX_FAC];
 #   define INDEX4(i, j, k, l) ( INDEX2( INDEX2((i), (j)), INDEX2((k), (l)) ) )
 #endif
 
-#if !defined( PyObject_HEAD )
-    struct _object;
-    typedef _object PyObject;
-#endif
+//~ #if !defined( PyObject_HEAD )
+    //~ struct _object;
+    //~ typedef _object PyObject;
+//~ #endif
 
 namespace psi {
 
@@ -189,9 +189,9 @@ protected:
     /// Beta orbital energies
     boost::shared_ptr<Vector> epsilon_b_;
 
-    // Callback routines to Python
-    std::vector<void*> precallbacks_;
-    std::vector<void*> postcallbacks_;
+    //~ // Callback routines to Python
+    //~ std::vector<void*> precallbacks_;
+    //~ std::vector<void*> postcallbacks_;
 
     /// If a gradient is available it will be here:
     SharedMatrix gradient_;
@@ -437,15 +437,15 @@ public:
     /// Returns the Lagrangian in SO basis for the wavefunction
     SharedMatrix X() const;
 
-    /// Adds a pre iteration Python callback function
-    void add_preiteration_callback(PyObject*);
-    /// Adds a post iteration Python callback function
-    void add_postiteration_callback(PyObject*);
+    //~ /// Adds a pre iteration Python callback function
+    //~ void add_preiteration_callback(PyObject*);
+    //~ /// Adds a post iteration Python callback function
+    //~ void add_postiteration_callback(PyObject*);
 
-    /// Call pre iteration callbacks
-    void call_preiteration_callbacks();
-    /// Call post iteration callbacks
-    void call_postiteration_callbacks();
+    //~ /// Call pre iteration callbacks
+    //~ void call_preiteration_callbacks();
+    //~ /// Call post iteration callbacks
+    //~ void call_postiteration_callbacks();
 
     /// Returns the gradient
     SharedMatrix gradient() const;

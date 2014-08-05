@@ -28,8 +28,8 @@
 #include "dimension.h"
 
 #include <libparallel/parallel.h>
-#include <boost/python.hpp>
-#include <boost/python/tuple.hpp>
+//~ #include <boost/python.hpp>
+//~ #include <boost/python/tuple.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -209,35 +209,35 @@ void Vector::zero()
     std::fill(v_.begin(), v_.end(), 0.0);
 }
 
-double Vector::pyget(const boost::python::tuple &key)
-{
-    int h = 0, elem = 0;
-    h = python::extract<int>(key[0]);
-    elem = python::extract<int>(key[1]);
-
-    return get(h, elem);
-}
-
-void Vector::pyset(const boost::python::tuple &key, double value)
-{
-    int h = 0, elem = 0;
-    h = python::extract<int>(key[0]);
-    elem = python::extract<int>(key[1]);
-
-    set(h, elem, value);
-}
-
-double Vector::pyget(int key)
-{
-    int h = 0, elem = key;
-    return get(h, elem);
-}
-
-void Vector::pyset(int key, double value)
-{
-    int h = 0, elem = key;
-    set(h, elem, value);
-}
+//~ double Vector::pyget(const boost::python::tuple &key)
+//~ {
+    //~ int h = 0, elem = 0;
+    //~ h = python::extract<int>(key[0]);
+    //~ elem = python::extract<int>(key[1]);
+//~ 
+    //~ return get(h, elem);
+//~ }
+//~ 
+//~ void Vector::pyset(const boost::python::tuple &key, double value)
+//~ {
+    //~ int h = 0, elem = 0;
+    //~ h = python::extract<int>(key[0]);
+    //~ elem = python::extract<int>(key[1]);
+//~ 
+    //~ set(h, elem, value);
+//~ }
+//~ 
+//~ double Vector::pyget(int key)
+//~ {
+    //~ int h = 0, elem = key;
+    //~ return get(h, elem);
+//~ }
+//~ 
+//~ void Vector::pyset(int key, double value)
+//~ {
+    //~ int h = 0, elem = key;
+    //~ set(h, elem, value);
+//~ }
 
 void Vector::print(FILE* out, const char* extra) const
 {

@@ -36,10 +36,11 @@ namespace boost {
 template<class T> class shared_ptr;
 // Forward declarations for boost.python used in the extract_subsets
 
-namespace python{
-class tuple;
-class list;
-}}
+//~ namespace python{
+//~ class tuple;
+//~ class list;
+//~ }
+}
 
 namespace psi {
 
@@ -445,14 +446,14 @@ public:
      */
     void set_column(int h, int m, SharedVector vec);
 
-    /**
-     * Python wrapper for get
-     */
-    double pyget(const boost::python::tuple& key);
-    /**
-     * Python wrapper for set
-     */
-    void pyset(const boost::python::tuple& key, double value);
+    //~ /**
+     //~ * Python wrapper for get
+     //~ */
+    //~ double pyget(const boost::python::tuple& key);
+    //~ /**
+     //~ * Python wrapper for set
+     //~ */
+    //~ void pyset(const boost::python::tuple& key, double value);
 
     /**
      * Returns the double** pointer to the h-th irrep block matrix
@@ -1074,11 +1075,11 @@ public:
     bool equal_but_for_row_order(const Matrix* rhs, double TOL=1.0e-10);
     /// @}
 
-    /**
-     * Takes a Python object (assumes that it is a "matrix" array) and
-     * sets the matrix to that.
-     */
-    void set_by_python_list(const boost::python::list& data);
+    //~ /**
+     //~ * Takes a Python object (assumes that it is a "matrix" array) and
+     //~ * sets the matrix to that.
+     //~ */
+    //~ void set_by_python_list(const boost::python::list& data);
 
     /**
      * Rotates columns i and j in irrep h, by an angle theta

@@ -111,7 +111,7 @@ public:
     virtual SharedMatrix compute_hessian(boost::shared_ptr<Molecule> m);
 
     virtual void print(FILE* out = outfile, int level = 1) const;
-    void py_print() const { print(outfile, 1); }
+    //~ void py_print() const { print(outfile, 1); }
 };
 
 }

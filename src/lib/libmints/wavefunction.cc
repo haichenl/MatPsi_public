@@ -40,8 +40,8 @@
 
 #include <psi4-dec.h>
 
-#include <boost/python.hpp>
-#include <boost/python/call.hpp>
+//~ #include <boost/python.hpp>
+//~ #include <boost/python/call.hpp>
 
 #include <algorithm>
 #include <boost/tuple/tuple.hpp>
@@ -327,34 +327,34 @@ void Wavefunction::set_reference_wavefunction(const boost::shared_ptr<Wavefuncti
     reference_wavefunction_ = wfn;
 }
 
-void Wavefunction::add_preiteration_callback(PyObject *pyobject)
-{
-    if (pyobject != Py_None)
-        precallbacks_.push_back(pyobject);
-}
+//~ void Wavefunction::add_preiteration_callback(PyObject *pyobject)
+//~ {
+    //~ if (pyobject != Py_None)
+        //~ precallbacks_.push_back(pyobject);
+//~ }
+//~ 
+//~ void Wavefunction::add_postiteration_callback(PyObject *pyobject)
+//~ {
+    //~ if (pyobject != Py_None)
+        //~ postcallbacks_.push_back(pyobject);
+//~ }
 
-void Wavefunction::add_postiteration_callback(PyObject *pyobject)
-{
-    if (pyobject != Py_None)
-        postcallbacks_.push_back(pyobject);
-}
-
-void Wavefunction::call_preiteration_callbacks()
-{
-    std::vector<void*>::const_iterator iter;
-    for (iter = precallbacks_.begin(); iter != precallbacks_.end(); ++iter) {
-        if ((PyObject*)*iter != Py_None)
-            boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
-    }
-}
-void Wavefunction::call_postiteration_callbacks()
-{
-    std::vector<void*>::const_iterator iter;
-    for (iter = postcallbacks_.begin(); iter != postcallbacks_.end(); ++iter) {
-        if ((PyObject*)*iter != Py_None)
-            boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
-    }
-}
+//~ void Wavefunction::call_preiteration_callbacks()
+//~ {
+    //~ std::vector<void*>::const_iterator iter;
+    //~ for (iter = precallbacks_.begin(); iter != precallbacks_.end(); ++iter) {
+        //~ if ((PyObject*)*iter != Py_None)
+            //~ boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
+    //~ }
+//~ }
+//~ void Wavefunction::call_postiteration_callbacks()
+//~ {
+    //~ std::vector<void*>::const_iterator iter;
+    //~ for (iter = postcallbacks_.begin(); iter != postcallbacks_.end(); ++iter) {
+        //~ if ((PyObject*)*iter != Py_None)
+            //~ boost::python::call<void>((PyObject*)*iter, process_environment_.wavefunction());
+    //~ }
+//~ }
 
 SharedMatrix Wavefunction::Ca() const {
     if (!Ca_) {

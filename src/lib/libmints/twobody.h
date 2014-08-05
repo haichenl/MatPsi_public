@@ -24,7 +24,7 @@
 #define _psi_src_lib_libmints_twobody_h
 
 #include <boost/shared_ptr.hpp>
-#include <boost/python/list.hpp>
+//~ #include <boost/python/list.hpp>
 #include <exception.h>
 //~ #include "pybuffer.h"
 
@@ -73,9 +73,9 @@ protected:
     bool force_cartesian_;
     //! The order of the derivative integral buffers, after permuting shells
     unsigned char buffer_offsets_[4];
-    /// The PyBuffer object used for sharing the target_ buffer without copying data
+    //~ /// The PyBuffer object used for sharing the target_ buffer without copying data
     //~ PyBuffer<double> target_pybuffer_;
-    /// Whether or not to use the PyBuffer
+    //~ /// Whether or not to use the PyBuffer
     //~ bool enable_pybuffer_;
 
     void permute_target(double *s, double *t, int sh1, int sh2, int sh3, int sh4, bool p12, bool p34, bool p13p24);
@@ -118,13 +118,13 @@ public:
     /// Buffer where the integrals are placed
     const double *buffer() const { return target_; }
 
-    /// Get a python list version of the current buffer
-    const boost::python::list py_buffer() const {
-        boost::python::list ret_val;
-        for(int i = 0; i < curr_buff_size_; ++i)
-            ret_val.append(target_[i]);
-        return ret_val;
-    }
+    //~ /// Get a python list version of the current buffer
+    //~ const boost::python::list py_buffer() const {
+        //~ boost::python::list ret_val;
+        //~ for(int i = 0; i < curr_buff_size_; ++i)
+            //~ ret_val.append(target_[i]);
+        //~ return ret_val;
+    //~ }
 
     //~ const PyBuffer<double>* py_buffer_object() const {
         //~ if(!enable_pybuffer_) {

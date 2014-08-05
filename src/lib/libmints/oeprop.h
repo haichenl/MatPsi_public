@@ -281,10 +281,10 @@ public:
     /// Destructor
     virtual ~OEProp();
 
-    /// Python issue
-    void oepy_add(const std::string& task) { add(task); }
-    void oepy_compute() { compute(); }
-    void oepy_set_title(const std::string& title) { set_title(title); }
+    //~ /// Python issue
+    //~ void oepy_add(const std::string& task) { add(task); }
+    //~ void oepy_compute() { compute(); }
+    //~ void oepy_set_title(const std::string& title) { set_title(title); }
 
     /// Compute and print/save the properties
     void compute();
@@ -402,9 +402,9 @@ public:
     /// Destructor
     virtual ~GridProp();
 
-    /// Python issue
-    void gridpy_add(const std::string& task) { add(task); }
-    void gridpy_compute() { compute(); }
+    //~ /// Python issue
+    //~ void gridpy_add(const std::string& task) { add(task); }
+    //~ void gridpy_compute() { compute(); }
 
     /// Set the output filename
     void set_filename(const std::string& file) { filename_ = file; }

@@ -31,12 +31,12 @@
 #include <libutil/ref.h> // Needed for Ref counting, string splitting, and conversions
 
 // Forward boost python object
-#include <boost/python/object_fwd.hpp>
+//~ #include <boost/python/object_fwd.hpp>
 
 namespace boost{
-    namespace python{
-        class list;
-    }
+    //~ namespace python{
+        //~ class list;
+    //~ }
 }
 
 namespace psi {
@@ -105,7 +105,7 @@ public:
     virtual std::string to_string() const;
     virtual int to_integer() const;
     virtual double to_double() const;
-    virtual boost::python::list to_list() const;
+    //~ virtual boost::python::list to_list() const;
 
     virtual void assign(DataType*);
     virtual void assign(bool);
@@ -248,7 +248,7 @@ public:
     std::string to_string() const;
     int to_integer() const;
     double to_double() const;
-    boost::python::list to_list() const;
+    //~ boost::python::list to_list() const;
 
     bool is_array() const;
     unsigned int size() const;
@@ -310,7 +310,7 @@ public:
     virtual unsigned int size() const;
 
     virtual std::string to_string() const;
-    virtual boost::python::list to_list() const;
+    //~ virtual boost::python::list to_list() const;
 
     virtual void reset();
 };
@@ -390,14 +390,14 @@ public:
     void set_int(const std::string &module, const std::string &key, int i);
     void set_double(const std::string & module, const std::string &key, double d);
     void set_str(const std::string & module, const std::string &key, std::string s);
-    void set_python(const std::string &module, const std::string& key, const boost::python::object &p);
+    //~ void set_python(const std::string &module, const std::string& key, const boost::python::object &p);
     void set_array(const std::string &module, const std::string& key);
 
     void set_global_bool(const std::string &key, bool b);
     void set_global_int(const std::string &key, int i);
     void set_global_double(const std::string &key, double d);
     void set_global_str(const std::string &key, const std::string &s);
-    void set_global_python(const std::string& key, const boost::python::object &p);
+    //~ void set_global_python(const std::string& key, const boost::python::object &p);
     void set_global_array(const std::string& key);
 
     DataType* set_global_array_entry(const std::string& key, DataType* entry, DataType* loc);

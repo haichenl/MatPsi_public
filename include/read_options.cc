@@ -25,7 +25,7 @@
 */
 
 #include <liboptions/liboptions.h>
-#include <liboptions/liboptions_python.h>
+//~ #include <liboptions/liboptions_python.h>
 #include <libparallel/parallel.h>
 #include <physconst.h>
 #include <psifiles.h>
@@ -1024,8 +1024,8 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     options.add_double("PERTURB_MAGNITUDE", 0.0);
     /*- The operator used to perturb the Hamiltonian, if requested -*/
     options.add_str("PERTURB_WITH", "DIPOLE_X", "DIPOLE_X DIPOLE_Y DIPOLE_Z EMBPOT SPHERE DX");
-    /*- An ExternalPotential (built by Python or NULL/None) -*/
-    options.add("EXTERN", new PythonDataType());
+    //~ /*- An ExternalPotential (built by Python or NULL/None) -*/
+    //~ options.add("EXTERN", new PythonDataType());
 
     /*- Radius (bohr) of a hard-sphere external potential -*/
     options.add_double("RADIUS", 10.0); // bohr
@@ -1096,8 +1096,8 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     /*- The DFT combined functional name, e.g. B3LYP, or GEN to use a python reference to a
         custom functional specified by DFT_CUSTOM_FUNCTIONAL. -*/
     options.add_str("DFT_FUNCTIONAL", "");
-    /*- A custom DFT functional object (built by Python or NULL/None) -*/
-    options.add("DFT_CUSTOM_FUNCTIONAL", new PythonDataType());
+    //~ /*- A custom DFT functional object (built by Python or NULL/None) -*/
+    //~ options.add("DFT_CUSTOM_FUNCTIONAL", new PythonDataType());
     /*- The DFT Range-separation parameter -*/
     options.add_double("DFT_OMEGA", 0.0);
     /*- The DFT Exact-exchange parameter -*/
@@ -2748,14 +2748,14 @@ int read_options(const std::string &name, Options & options, bool suppress_print
       /*- tolerance for Cholesky decomposition of the ERI tensor -*/
       options.add_double("CHOLESKY_TOLERANCE",1.0e-4);
 
-      /*- Is this a CEPA job? This parameter is used internally
-      by the pythond driver.  Changing its value won't have any
-      effect on the procedure. !expert -*/
-      options.add_bool("RUN_CEPA",false);
-      /*- Which coupled-pair method is called?  This parameter is
-      used internally by the python driver.  Changing its value
-      won't have any effect on the procedure. !expert -*/
-      options.add_str("CEPA_LEVEL","CEPA(0)");
+      //~ /*- Is this a CEPA job? This parameter is used internally
+      //~ by the pythond driver.  Changing its value won't have any
+      //~ effect on the procedure. !expert -*/
+      //~ options.add_bool("RUN_CEPA",false);
+      //~ /*- Which coupled-pair method is called?  This parameter is
+      //~ used internally by the python driver.  Changing its value
+      //~ won't have any effect on the procedure. !expert -*/
+      //~ options.add_str("CEPA_LEVEL","CEPA(0)");
       /*- Compute the dipole moment? Note that dipole moments
       are only available in the FNOCC module for the ACPF,
       AQCC, CISD, and CEPA(0) methods. -*/
