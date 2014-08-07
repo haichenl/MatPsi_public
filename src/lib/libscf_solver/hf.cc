@@ -1704,7 +1704,7 @@ double HF::compute_energy()
             fprintf(outfile, "  Failed to converged.\n");
             fprintf(outfile, "    NOTE: MO Coefficients will not be saved to Checkpoint.\n");
         }
-        E_ = compute_E();
+        //~ E_ = compute_E();
         if(psio_->open_check(PSIF_CHKPT))
             psio_->close(PSIF_CHKPT, 1);
 
