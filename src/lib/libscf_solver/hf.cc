@@ -69,19 +69,21 @@ using namespace psi;
 
 namespace psi { namespace scf {
 
-HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
+HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
     : Wavefunction(process_environment_in, options, psio, chkpt),
       nuclear_dipole_contribution_(3),
       nuclear_quadrupole_contribution_(6)
 {
+    jk_ = jk_in;
     common_init();
 }
 
-HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio)
+HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio)
     : Wavefunction(process_environment_in, options, psio),
       nuclear_dipole_contribution_(3),
       nuclear_quadrupole_contribution_(6)
 {
+    jk_ = jk_in;
     common_init();
 }
 
@@ -357,28 +359,28 @@ void HF::integrals()
     if (print_ && WorldComm->me() == 0)
         fprintf(outfile, "  ==> Integral Setup <==\n\n");
 
-    // Build the JK from options, symmetric type
-    try {
-        jk_ = JK::build_JK(process_environment_, psio_);
-    }
-    catch(const BasisSetNotFound& e) {
-        if (options_.get_str("SCF_TYPE") == "DF" || options_.get_int("DF_SCF_GUESS") == 1) {
-            fprintf(outfile, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            fprintf(outfile, "%s\n", e.what());
-            fprintf(outfile, "   Turning off DF and switching to PK method.\n");
-            fprintf(outfile, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            options_.set_str("SCF", "SCF_TYPE", "PK");
-            options_.set_bool("SCF", "DF_SCF_GUESS", false);
-            jk_ = JK::build_JK(process_environment_, psio_);
-        }
-        else
-            throw; // rethrow the error
-    }
+    //~ // Build the JK from options, symmetric type
+    //~ try {
+        //~ jk_ = JK::build_JK(process_environment_, psio_);
+    //~ }
+    //~ catch(const BasisSetNotFound& e) {
+        //~ if (options_.get_str("SCF_TYPE") == "DF" || options_.get_int("DF_SCF_GUESS") == 1) {
+            //~ fprintf(outfile, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            //~ fprintf(outfile, "%s\n", e.what());
+            //~ fprintf(outfile, "   Turning off DF and switching to PK method.\n");
+            //~ fprintf(outfile, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            //~ options_.set_str("SCF", "SCF_TYPE", "PK");
+            //~ options_.set_bool("SCF", "DF_SCF_GUESS", false);
+            //~ jk_ = JK::build_JK(process_environment_, psio_);
+        //~ }
+        //~ else
+            //~ throw; // rethrow the error
+    //~ }
 
-    // Tell the JK to print
-    jk_->set_print(print_);
-    // Give the JK 75% of the memory
-    jk_->set_memory((ULI)(options_.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
+    //~ // Tell the JK to print
+    //~ jk_->set_print(print_);
+    //~ // Give the JK 75% of the memory
+    //~ jk_->set_memory((ULI)(options_.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
 
     // DFT sometimes needs custom stuff
     if ((options_.get_str("REFERENCE") == "UKS" || options_.get_str("REFERENCE") == "RKS")) {
@@ -395,10 +397,10 @@ void HF::integrals()
         jk_->set_omega(functional->x_omega());
     }
 
-    // Initialize
-    jk_->initialize(); 
-    // Print the header
-    jk_->print_header();
+    //~ // Initialize
+    //~ jk_->initialize(); 
+    //~ // Print the header
+    //~ jk_->print_header();
 }
 
 void HF::finalize()

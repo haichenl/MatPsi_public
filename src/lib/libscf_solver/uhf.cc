@@ -47,12 +47,14 @@ using namespace boost;
 
 namespace psi { namespace scf {
 
-UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) : HF(process_environment_in, options, psio, chkpt)
+UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
+    : HF(process_environment_in, options, jk_in, psio, chkpt)
 {
     common_init();
 }
 
-UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio) : HF(process_environment_in, options, psio)
+UHF::UHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio)
+    : HF(process_environment_in, options, jk_in, psio)
 {
     common_init();
 }

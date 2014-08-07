@@ -349,8 +349,8 @@ protected:
     virtual void whether_to_use_StartingC() = 0;
 
 public:
-    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
+    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio);
     
     SharedMatrix sotoao() { return SO2AO_;} // wavefunction already has aotoso() 
     double EHF() { return E_; }

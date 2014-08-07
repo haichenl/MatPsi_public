@@ -100,8 +100,8 @@ protected:
 
     void common_init();
 public:
-    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
+    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    RKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio);
     virtual ~RKS();
 };
 
@@ -126,8 +126,8 @@ protected:
 
     void common_init();
 public:
-    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
-    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<PSIO> psio);
+    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
+    UKS(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio);
     virtual ~UKS();
 };
 

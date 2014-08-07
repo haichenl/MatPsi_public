@@ -78,13 +78,13 @@ void KS::common_init()
     potential_->print_header();
 
 }
-RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
-    RHF(process_environment_in, options, psio, chkpt), KS(process_environment_in, options,psio)
+RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
+    RHF(process_environment_in, options, jk_in, psio, chkpt), KS(process_environment_in, options,psio)
 {
     common_init();
 }
-RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
-    RHF(process_environment_in, options, psio), KS(process_environment_in, options,psio)
+RKS::RKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio) :
+    RHF(process_environment_in, options, jk_in, psio), KS(process_environment_in, options,psio)
 {
     common_init();
 }
@@ -239,13 +239,13 @@ void RKS::stability_analysis()
     throw PSIEXCEPTION("DFT stabilty analysis has not been implemented yet.  Sorry :(");
 }
 
-UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
-    UHF(process_environment_in, options, psio, chkpt), KS(process_environment_in, options,psio)
+UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt) :
+    UHF(process_environment_in, options, jk_in, psio, chkpt), KS(process_environment_in, options,psio)
 {
     common_init();
 }
-UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
-    UHF(process_environment_in, options, psio), KS(process_environment_in, options,psio)
+UKS::UKS(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio) :
+    UHF(process_environment_in, options, jk_in, psio), KS(process_environment_in, options,psio)
 {
     common_init();
 }

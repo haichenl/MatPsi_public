@@ -413,6 +413,7 @@ void MatPsi::UseDirectJK() {
     if (process_environment_.options["DF_INTS_NUM_THREADS"].has_changed())
         jk->set_df_ints_num_threads(process_environment_.options.get_int("DF_INTS_NUM_THREADS"));
     jk_ = boost::shared_ptr<JK>(jk);
+    jk_->set_memory((ULI)(process_environment_.options.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
     jk_->initialize();
 }
 
@@ -429,6 +430,7 @@ void MatPsi::UsePKJK() {
     if (process_environment_.options["DEBUG"].has_changed())
         jk->set_debug(process_environment_.options.get_int("DEBUG"));
     jk_ = boost::shared_ptr<JK>(jk);
+    jk_->set_memory((ULI)(process_environment_.options.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
     jk_->initialize();
 }
 
@@ -519,7 +521,7 @@ SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
 void MatPsi::RHF_reset() {
     //~ if(rhf_ != NULL)
         //~ rhf_->extern_finalize(); // really tired of trying when we should do finalize, just be it, seems to work 
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
 }
 
@@ -532,7 +534,9 @@ void MatPsi::RHF_EnableDamping(double damping_percentage) {
 }
 
 double MatPsi::RHF() {
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    if(jk_ == NULL)
+        UsePKJK();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy();
@@ -547,7 +551,9 @@ double MatPsi::RHF() {
 }
 
 double MatPsi::RHFenv(SharedMatrix EnvMat) {
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    if(jk_ == NULL)
+        UsePKJK();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_EnvMat(EnvMat);
     try {
@@ -563,7 +569,9 @@ double MatPsi::RHFenv(SharedMatrix EnvMat) {
 }
 
 double MatPsi::RHF_fromC(SharedMatrix C_in) {
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    if(jk_ == NULL)
+        UsePKJK();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_StartingC(C_in);
     try {
@@ -578,7 +586,9 @@ double MatPsi::RHF_fromC(SharedMatrix C_in) {
 }
 
 double MatPsi::RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in) {
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, psio_));
+    if(jk_ == NULL)
+        UsePKJK();
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_EnvMat(EnvMat);
     rhf_->set_StartingC(C_in);
