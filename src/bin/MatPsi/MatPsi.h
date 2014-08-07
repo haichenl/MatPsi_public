@@ -184,6 +184,9 @@ public:
     
     
     //*** SCF related
+    // RHF engine for MSQC 
+    double RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in);
+    
     // create/reset RHF object 
     void RHF_reset();
     

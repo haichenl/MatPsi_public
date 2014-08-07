@@ -105,6 +105,10 @@ void HF::common_init()
 
     H_.reset(factory_->create_matrix("One-electron Hamiltonion"));
     X_.reset(factory_->create_matrix("X"));
+    
+    // initialize given_H_ 
+    given_H_enabled_ = false;
+    given_H_.reset(factory_->create_matrix("User given one-electron Hamiltonion"));
 
     nmo_ = 0;
     nso_ = 0;
@@ -1455,6 +1459,10 @@ double HF::compute_energy()
         // Adding environment in 
         if(EnvMat_enabled_)
             H_->add(EnvMat_);
+        
+        // If we use a given H 
+        if(given_H_enabled_)
+            H_ = given_H_;
             
         timer_off("Form H");
 
@@ -1696,7 +1704,7 @@ double HF::compute_energy()
             fprintf(outfile, "  Failed to converged.\n");
             fprintf(outfile, "    NOTE: MO Coefficients will not be saved to Checkpoint.\n");
         }
-        E_ = 0.0;
+        E_ = compute_E();
         if(psio_->open_check(PSIF_CHKPT))
             psio_->close(PSIF_CHKPT, 1);
 
@@ -1735,6 +1743,19 @@ void HF::set_EnvMat(SharedMatrix EnvMat_in) {
 
 void HF::disable_EnvMat() {
     EnvMat_enabled_ = false;
+}
+
+void HF::set_given_H(SharedMatrix given_H_in) {
+    SharedMatrix example(factory_->create_matrix(""));
+    if(given_H_in->nirrep()!= example->nirrep() || given_H_in->colspi()!= example->colspi() || given_H_in->rowspi()!=example->rowspi())
+        throw PSIEXCEPTION("HF::set_given_H(given_H_in): Input one-electron Hamiltonian dimensions do not agree.");
+    // If dimensions agree then enable given_H_ 
+    given_H_enabled_ = true;
+    given_H_ = given_H_in;
+}
+
+void HF::disable_given_H() {
+    given_H_enabled_ = false;
 }
 
 void HF::print_energies()

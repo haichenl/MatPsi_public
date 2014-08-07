@@ -99,6 +99,13 @@ void RHF::common_init()
     J_         = SharedMatrix(factory_->create_matrix("J"));
     K_         = SharedMatrix(factory_->create_matrix("K"));
     
+    // initialize modifiers to all ones 
+    JKmodifiers_enabled_ = false;
+    Jmodifier_ = SharedMatrix(factory_->create_matrix("J modifier"));
+    Jmodifier_->set(1.0);
+    Kmodifier_ = SharedMatrix(factory_->create_matrix("K modifier"));
+    Kmodifier_->set(1.0);
+    
     StartingC_enabled_ = false;
     StartingC_ = SharedMatrix(factory_->create_matrix("Starting molecular orbital"));
 }
@@ -158,6 +165,21 @@ void RHF::form_G()
     J_ = J[0];
     J_->scale(2.0);
     K_ = K[0];
+    
+    // judge if we modify J_ and K_ 
+    if(JKmodifiers_enabled_) {
+        // modify J and K 
+        double* J_pt = J_->get_pointer();
+        double* Jmodifier_pt = Jmodifier_->get_pointer();
+        double* K_pt = K_->get_pointer();
+        double* Kmodifier_pt = Kmodifier_->get_pointer();
+        for(int h = 0; h < J_->nirrep(); h++) {
+            for(int i = 0; i < J_->nrow() * J_->ncol(); i++) {
+                *J_pt++ *= *Jmodifier_pt++;
+                *K_pt++ *= *Kmodifier_pt++;
+            }
+        }
+    }
 
     G_->copy(J_);
     G_->subtract(K_);
@@ -533,5 +555,21 @@ void RHF::whether_to_use_StartingC() {
         form_D();
     }
 }
+
+void RHF::set_JKmodifiers(SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in) {
+    SharedMatrix example(factory_->create_matrix(""));
+    if(Jmodifier_in->nirrep()!= example->nirrep() || Jmodifier_in->colspi()!= example->colspi() || Jmodifier_in->rowspi()!=example->rowspi()
+        || Kmodifier_in->nirrep()!= example->nirrep() || Kmodifier_in->colspi()!= example->colspi() || Kmodifier_in->rowspi()!=example->rowspi())
+        throw PSIEXCEPTION("RHF::set_JKmodifiers(Jmod, Kmod): Input starting molecular orbital dimensions do not agree.");
+    // If dimensions agree then enable JKmodifiers 
+    JKmodifiers_enabled_ = true;
+    Jmodifier_ = Jmodifier_in;
+    Kmodifier_ = Kmodifier_in;
+}
+
+void RHF::disable_JKmodifiers(){
+    JKmodifiers_enabled_ = false;
+}
+
 
 }}

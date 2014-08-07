@@ -57,11 +57,14 @@ protected:
     SharedMatrix J_;
     SharedMatrix K_;
     
-    // Flag controlling whether we manually specify a starting molecular orbital matrix 
+    // control whether we manually specify a starting molecular orbital matrix 
     bool StartingC_enabled_;
-    
-    // Starting molecular orbital matrix 
     SharedMatrix StartingC_;
+    
+    // control whether we modify J_ and K_ 
+    bool JKmodifiers_enabled_;
+    SharedMatrix Jmodifier_;
+    SharedMatrix Kmodifier_;
 
     void form_C();
     void form_D();
@@ -110,9 +113,13 @@ public:
     virtual bool same_a_b_orbs() const { return true; }
     virtual bool same_a_b_dens() const { return true; }
     
+    // Control whether we manually specify a starting molecular orbital matrix 
     void set_StartingC(SharedMatrix StartingC_in);
-    
     void disable_StartingC();
+    
+    // Control whether we modify J_ and K_ 
+    void set_JKmodifiers(SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in);
+    void disable_JKmodifiers();
 };
 
 }}

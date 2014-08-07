@@ -540,12 +540,11 @@ double MatPsi::RHF() {
     process_environment_.set_wavefunction(rhf_);
     try {
         double Ehf = rhf_->compute_energy();
-        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
-        jk_ = rhf_->jk();
+        rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
     }
 }
@@ -558,12 +557,11 @@ double MatPsi::RHFenv(SharedMatrix EnvMat) {
     rhf_->set_EnvMat(EnvMat);
     try {
         double Ehf = rhf_->compute_energy();
-        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
-        jk_ = rhf_->jk();
+        rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHFenv(EnvMat): Hartree-Fock probably not converged.");
     }
 }
@@ -576,11 +574,11 @@ double MatPsi::RHF_fromC(SharedMatrix C_in) {
     rhf_->set_StartingC(C_in);
     try {
         double Ehf = rhf_->compute_energy();
-        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
+        rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHF_fromC(MO): Hartree-Fock probably not converged.");
     }
 }
@@ -594,13 +592,29 @@ double MatPsi::RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in) {
     rhf_->set_StartingC(C_in);
     try {
         double Ehf = rhf_->compute_energy();
-        jk_ = rhf_->jk();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
+        rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHFenv_fromC(EnvMat, MO): Hartree-Fock probably not converged.");
     }
+}
+
+double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in) {
+    if(jk_ == NULL)
+        UsePKJK();
+    process_environment_.options.set_global_bool("DIE_IF_NOT_CONVERGED", false);
+    // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
+    process_environment_.set_wavefunction(rhf_);
+    rhf_->set_given_H(given_H_in);
+    rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
+    double Ehf = rhf_->compute_energy();
+    rhf_->J()->scale(0.5);
+    
+    process_environment_.options.set_global_bool("DIE_IF_NOT_CONVERGED", true);
+    return Ehf;
 }
 
 double MatPsi::RHF_EHF() { 

@@ -267,8 +267,14 @@ classdef MatPsi < handle
         end
         
         %% SCF related 
+        % double = matpsi.RHF_msqc( matrix(nbasis, nbasis), matrix(nbasis, nbasis), matrix(nbasis, nbasis) ); 
+        % Hartree-Fock engine for MSQC 
+        function varargout = RHF_msqc(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_msqc', this.objectHandle, varargin{:});
+        end
+        
         % double = matpsi.RHF(); 
-        % Run a Hartree-Fock calculation and returns the final total energy
+        % Run a Hartree-Fock calculation and returns the final total energy 
         function varargout = RHF(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('RHF', this.objectHandle, varargin{:});
         end

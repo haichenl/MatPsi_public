@@ -176,8 +176,13 @@ protected:
     int theta_points_; // number of colatitude integration points
     int phi_points_; // number of azimuthal integration points
     
+    // control whether we use an environment in HF 
     bool EnvMat_enabled_;
     SharedMatrix EnvMat_;
+    
+    // control wheter we use a given core H 
+    bool given_H_enabled_;
+    SharedMatrix given_H_;
 
 public:
     /// Nuclear contributions
@@ -359,9 +364,13 @@ public:
 
     virtual double compute_energy();
     
+    // control whether we use an environment in HF 
     virtual void set_EnvMat(SharedMatrix EnvMat_in);
-    
     virtual void disable_EnvMat();
+    
+    // control wheter we use a given core H 
+    virtual void set_given_H(SharedMatrix H_in);
+    virtual void disable_given_H();
 };
 
 }} // Namespaces
