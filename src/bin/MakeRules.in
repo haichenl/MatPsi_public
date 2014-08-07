@@ -62,7 +62,7 @@ $(PSITARGET): $(LIBOBJ)
 clean:: oclean dclean targetclean
 
 oclean:
-	-rm -f *.o
+	-rm -f *.mex*
 
 dclean:
 	-rm -f *.d

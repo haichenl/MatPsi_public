@@ -10,7 +10,13 @@ LDLIBS += $(LAPACK) $(BLAS) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_S
 CXXINC += -DINSTALLEDPSIDATADIR=\"$(pkgdatadir)\"
 
 # gfortranbegin contains main, so we can't link it in or we'll get a linker freakout
-FILTEREDLDLIBS = $(filter-out -lgfortranbegin,$(LDLIBS))
+FILTEREDLDLIBS = $(filter-out -lgfortranbegin -mkl,$(LDLIBS))
+
+ifeq ($(CXX),icpc)
+   CFLAGS+= -mkl
+   CXXFLAGS+= -mkl
+   LDFLAGS+= -mkl
+endif
 
 # NOTE: Keep PSI_parallel last in the PSI library list (but before boost). It contains the fprintf override.
 PSILIBS = \

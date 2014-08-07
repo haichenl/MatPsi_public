@@ -4,6 +4,10 @@ dont_compile_boost = @have_boost@
 BOOSTVER = @BOOSTVER@
 CC = @CC@
 
+ifeq ($(CC), icc)
+	CC = intel
+endif
+
 all: default
 default: boost.compiled
 
