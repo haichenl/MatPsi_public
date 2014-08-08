@@ -209,6 +209,12 @@ public:
     // enable Damping in restricted Hartree-Fock to solve convergence issue 
     void RHF_EnableDamping(double damping_percentage);
     
+    // enable DIIS 
+    void RHF_EnableDIIS();
+    
+    // disable DIIS in restricted Hartree-Fock to solve convergence issue 
+    void RHF_DisableDIIS();
+    
     // restricted Hartree-Fock energy 
     double RHF_EHF();
     

@@ -168,9 +168,16 @@ void MatPsi::free_mol() {
     molecule_->set_geometry(*(oldgeom.get()));
     create_basis();
     create_integral_factories();
+    RHF_reset();
+    rhf_->extern_finalize();
 }
 
 void MatPsi::set_geom(SharedMatrix newGeom) {
+    if(jk_ != NULL)
+        jk_->finalize();
+    psio_->_psio_manager_->psiclean();
+    jk_.reset();
+    
     // store the old geometry
     Matrix oldgeom = molecule_->geometry();
     molecule_->set_geometry(*(newGeom.get()));
@@ -193,6 +200,8 @@ void MatPsi::set_geom(SharedMatrix newGeom) {
     if(nonbreak) {
         create_basis();
         create_integral_factories();
+        RHF_reset();
+        rhf_->extern_finalize();
     }
 }
 
@@ -531,6 +540,16 @@ void MatPsi::RHF_EnableMOM(int mom_start) {
 
 void MatPsi::RHF_EnableDamping(double damping_percentage) {
     process_environment_.options.set_global_double("DAMPING_PERCENTAGE", damping_percentage);
+}
+
+void MatPsi::RHF_DisableDIIS() {
+    process_environment_.options.set_global_bool("DIIS", false);
+    process_environment_.options.set_global_int("MAXITER", 500);
+}
+
+void MatPsi::RHF_EnableDIIS() {
+    process_environment_.options.set_global_int("DIIS", true);
+    process_environment_.options.set_global_int("MAXITER", 100);
 }
 
 double MatPsi::RHF() {

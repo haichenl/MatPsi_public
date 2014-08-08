@@ -542,6 +542,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // RHF_EnableDIIS 
+    if (!strcmp("RHF_EnableDIIS", cmd)) {
+        MatPsi_obj->RHF_EnableDIIS();
+        return;
+    }
+    
+    // RHF_DisableDIIS 
+    if (!strcmp("RHF_DisableDIIS", cmd)) {
+        MatPsi_obj->RHF_DisableDIIS();
+        return;
+    }
+    
     // RHF_EHF 
     if (!strcmp("RHF_EHF", cmd)) {
         OutputScalar(plhs[0], MatPsi_obj->RHF_EHF());

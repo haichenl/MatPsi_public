@@ -335,6 +335,20 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('RHF_DisableDamping', this.objectHandle, varargin{:});
         end
         
+        % matpsi.RHF_EnableDIIS(); 
+        % Enable DIIS 
+        % may help converge 
+        function varargout = RHF_EnableDIIS(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_EnableDIIS', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.RHF_DisableDIIS(); 
+        % Enable DIIS 
+        % may help converge 
+        function varargout = RHF_DisableDIIS(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_DisableDIIS', this.objectHandle, varargin{:});
+        end
+        
         %~ The below RHF_X functions must be executed after matpsi.RHF(); 
         % double = matpsi.RHF_EHF(); 
         % Hartree-Fock energy 
