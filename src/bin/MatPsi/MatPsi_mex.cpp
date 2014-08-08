@@ -434,6 +434,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // RHF_msqc_fromC 
+    if (!strcmp("RHF_msqc_fromC", cmd)) {
+        // Check parameters
+        if (nrhs!=6)
+            mexErrMsgTxt("RHF_msqc_fromC(H, Jmod, Kmod, Cin): nbasis by nbasis matrix input expected.");
+        SharedMatrix given_H_in = InputMatrix(prhs[2]);
+        SharedMatrix Jmodifier_in = InputMatrix(prhs[3]);
+        SharedMatrix Kmodifier_in = InputMatrix(prhs[4]);
+        SharedMatrix C_in = InputMatrix(prhs[5]);
+        if(given_H_in->nirrep() != 1 || given_H_in->nrow() != MatPsi_obj->nbasis() || given_H_in->ncol() != MatPsi_obj->nbasis()
+            || Jmodifier_in->nirrep() != 1 || Jmodifier_in->nrow() != MatPsi_obj->nbasis() || Jmodifier_in->ncol() != MatPsi_obj->nbasis()
+            || Kmodifier_in->nirrep() != 1 || Kmodifier_in->nrow() != MatPsi_obj->nbasis() || Kmodifier_in->ncol() != MatPsi_obj->nbasis()
+            || C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbasis() || C_in->ncol() != MatPsi_obj->nbasis())
+            mexErrMsgTxt("RHF_msqc_fromC(H, Jmod, Kmod, Cin): MO matrix dimensions do not agree.");
+        // Call the method
+        OutputScalar(plhs[0], MatPsi_obj->RHF_msqc_fromC(given_H_in, Jmodifier_in, Kmodifier_in, C_in));
+        return;
+    }
+    
     // RHF
     if (!strcmp("RHF", cmd)) {
         OutputScalar(plhs[0], MatPsi_obj->RHF());

@@ -620,6 +620,26 @@ double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, Shar
     }
 }
 
+double MatPsi::RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in, SharedMatrix C_in) {
+    if(jk_ == NULL)
+        UsePKJK();
+    // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
+    process_environment_.set_wavefunction(rhf_);
+    rhf_->set_given_H(given_H_in);
+    rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
+    rhf_->set_StartingC(C_in);
+    try {
+        double Ehf = rhf_->compute_energy();
+        rhf_->J()->scale(0.5);
+        return Ehf;
+    }
+    catch (...) {
+        rhf_->J()->scale(0.5);
+        throw PSIEXCEPTION("RHF_msqc_fromC(H, Jmod, Kmod): Hartree-Fock probably not converged.");
+    }
+}
+
 double MatPsi::RHF_EHF() { 
     if(rhf_ == NULL) {
         throw PSIEXCEPTION("RHF_EHF: Hartree-Fock calculation has not been done.");
