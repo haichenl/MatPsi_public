@@ -610,7 +610,7 @@ double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, Shar
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
     try {
-        double Ehf = rhf_->compute_energy();
+        double Ehf = rhf_->compute_energy_minIO();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
@@ -630,13 +630,13 @@ double MatPsi::RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
     rhf_->set_StartingC(C_in);
     try {
-        double Ehf = rhf_->compute_energy();
+        double Ehf = rhf_->compute_energy_minIO();
         rhf_->J()->scale(0.5);
         return Ehf;
     }
     catch (...) {
         rhf_->J()->scale(0.5);
-        throw PSIEXCEPTION("RHF_msqc_fromC(H, Jmod, Kmod): Hartree-Fock probably not converged.");
+        throw PSIEXCEPTION("RHF_msqc_fromC(H, Jmod, Kmod, C_in): Hartree-Fock probably not converged.");
     }
 }
 

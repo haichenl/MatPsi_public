@@ -364,6 +364,8 @@ public:
 
     virtual double compute_energy();
     
+    virtual double compute_energy_minIO();
+    
     // control whether we use an environment in HF 
     virtual void set_EnvMat(SharedMatrix EnvMat_in);
     virtual void disable_EnvMat();
