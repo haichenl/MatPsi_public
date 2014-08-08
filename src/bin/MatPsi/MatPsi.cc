@@ -446,7 +446,7 @@ void MatPsi::UsePKJK() {
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("Density2J: JK object has not been enabled.");
+        UsePKJK();
     }
     jk_->set_do_K(false);
     jk_->C_left().clear();
@@ -462,7 +462,7 @@ SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
 
 SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("Density2K: JK object has not been enabled.");
+        UsePKJK();
     }
     jk_->set_do_J(false);
     jk_->C_left().clear();
@@ -478,7 +478,7 @@ SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
 
 SharedMatrix MatPsi::Density2G(SharedMatrix Density) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("Density2G: JK object has not been enabled.");
+        UsePKJK();
     }
     
     jk_->C_left().clear();
@@ -495,7 +495,7 @@ SharedMatrix MatPsi::Density2G(SharedMatrix Density) {
 
 SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2J: JK object has not been enabled.");
+        UsePKJK();
     }
     jk_->set_do_K(false);
     jk_->C_left().clear();
@@ -509,7 +509,7 @@ SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
 
 SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2K: JK object has not been enabled.");
+        UsePKJK();
     }
     jk_->set_do_J(false);
     jk_->C_left().clear();
@@ -523,7 +523,7 @@ SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
 
 SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
     if(jk_ == NULL) {
-        throw PSIEXCEPTION("OccMO2G: JK object has not been enabled.");
+        UsePKJK();
     }
     jk_->C_left().clear();
     jk_->C_left().push_back(OccMO);
