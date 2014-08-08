@@ -1559,6 +1559,7 @@ void PKJK::compute_JK()
     std::vector<double*> K_vectors;
     std::vector<double*> D_vectors;
 
+if(do_J_) {
     /*
      * The J terms
      */
@@ -1639,7 +1640,10 @@ void PKJK::compute_JK()
         delete [] D_vectors[N];
         delete [] J_vectors[N];
     }
+}
 
+
+if(do_K_) {
     /*
      * The K terms
      */
@@ -1719,7 +1723,9 @@ void PKJK::compute_JK()
         delete [] D_vectors[N];
         delete [] K_vectors[N];
     }
+}
 
+if(do_wK_) {
     /*
      * The wK terms
      */
@@ -1801,6 +1807,7 @@ void PKJK::compute_JK()
         delete [] D_vectors[N];
         delete [] wK_vectors[N];
     }
+}
 
 //    if(!file_was_open);
         psio_->close(pk_file_, 1);

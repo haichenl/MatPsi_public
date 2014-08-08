@@ -441,12 +441,14 @@ void MatPsi::UsePKJK() {
     jk_ = boost::shared_ptr<JK>(jk);
     jk_->set_memory((ULI)(process_environment_.options.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
     jk_->initialize();
+    Density2G(SharedMatrix(matfac_->create_matrix(""))); // have to do this here or it crashes due to our change to PKJK::compute_JK() 
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
     if(jk_ == NULL) {
         throw PSIEXCEPTION("Density2J: JK object has not been enabled.");
     }
+    jk_->set_do_K(false);
     jk_->C_left().clear();
     jk_->D().clear();
     jk_->D().push_back(Density);
@@ -454,6 +456,7 @@ SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
     jk_->compute_from_D();
     SharedMatrix Jnew = jk_->J()[0];
     Jnew->hermitivitize();
+    jk_->set_do_K(true);
     return Jnew;
 }
 
@@ -461,7 +464,7 @@ SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
     if(jk_ == NULL) {
         throw PSIEXCEPTION("Density2K: JK object has not been enabled.");
     }
-    
+    jk_->set_do_J(false);
     jk_->C_left().clear();
     jk_->D().clear();
     jk_->D().push_back(Density);
@@ -469,6 +472,7 @@ SharedMatrix MatPsi::Density2K(SharedMatrix Density) {
     jk_->compute_from_D();
     SharedMatrix Knew = jk_->K()[0];
     Knew->hermitivitize();
+    jk_->set_do_J(true);
     return Knew;
 }
 
@@ -493,11 +497,13 @@ SharedMatrix MatPsi::OccMO2J(SharedMatrix OccMO) {
     if(jk_ == NULL) {
         throw PSIEXCEPTION("OccMO2J: JK object has not been enabled.");
     }
+    jk_->set_do_K(false);
     jk_->C_left().clear();
     jk_->C_left().push_back(OccMO);
     jk_->compute();
     SharedMatrix Jnew = jk_->J()[0];
     Jnew->hermitivitize();
+    jk_->set_do_K(true);
     return Jnew;
 }
 
@@ -505,11 +511,13 @@ SharedMatrix MatPsi::OccMO2K(SharedMatrix OccMO) {
     if(jk_ == NULL) {
         throw PSIEXCEPTION("OccMO2K: JK object has not been enabled.");
     }
+    jk_->set_do_J(false);
     jk_->C_left().clear();
     jk_->C_left().push_back(OccMO);
     jk_->compute();
     SharedMatrix Knew = jk_->K()[0];
     Knew->hermitivitize();
+    jk_->set_do_J(true);
     return Knew;
 }
 
