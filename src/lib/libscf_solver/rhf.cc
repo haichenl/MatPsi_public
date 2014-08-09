@@ -200,7 +200,7 @@ void RHF::compute_orbital_gradient(bool save_fock)
             if (scf_type_ == "direct")
                 diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::InCore));
             else
-                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::OnDisk));
+                diis_manager_ = boost::shared_ptr<DIISManager>(new DIISManager(process_environment_, max_diis_vectors_, "HF DIIS vector", psio_, DIISManager::LargestError, DIISManager::InCore));
             diis_manager_->set_error_vector_size(1, DIISEntry::Matrix, gradient.get());
             diis_manager_->set_vector_size(1, DIISEntry::Matrix, Fa_.get());
             initialized_diis_manager_ = true;
