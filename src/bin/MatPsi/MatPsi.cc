@@ -650,39 +650,45 @@ double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, Shar
     if(jk_ == NULL)
         UsePKJK();
     // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
+    process_environment_.options.set_global_int("PRINT", 0);
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
+    double Ehf;
     try {
-        double Ehf = rhf_->compute_energy_minIO();
+        Ehf = rhf_->compute_energy_minIO();
         rhf_->J()->scale(0.5);
-        return Ehf;
     }
     catch (...) {
         rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHF_msqc(H, Jmod, Kmod): Hartree-Fock probably not converged.");
     }
+    process_environment_.options.set_global_int("PRINT", 1);
+    return Ehf;
 }
 
 double MatPsi::RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in, SharedMatrix C_in) {
     if(jk_ == NULL)
         UsePKJK();
     // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
+    process_environment_.options.set_global_int("PRINT", 0);
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
     rhf_->set_StartingC(C_in);
+    double Ehf;
     try {
-        double Ehf = rhf_->compute_energy_minIO();
+        Ehf = rhf_->compute_energy_minIO();
         rhf_->J()->scale(0.5);
-        return Ehf;
     }
     catch (...) {
         rhf_->J()->scale(0.5);
         throw PSIEXCEPTION("RHF_msqc_fromC(H, Jmod, Kmod, C_in): Hartree-Fock probably not converged.");
     }
+    process_environment_.options.set_global_int("PRINT", 1);
+    return Ehf;
 }
 
 double MatPsi::RHF_EHF() { 

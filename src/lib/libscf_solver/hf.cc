@@ -223,7 +223,7 @@ void HF::common_init()
         if(nelectron_%2){
             multiplicity_ = 2;
             molecule_->set_multiplicity(2);
-            if (WorldComm->me() == 0) {
+            if (print_ && WorldComm->me() == 0) {
             // There are an odd number of electrons
                 fprintf(outfile,"\tThere are an odd number of electrons - assuming doublet.\n"
                             "\tSpecify the multiplicity with the MULTP option in the\n"
@@ -232,7 +232,7 @@ void HF::common_init()
         }else{
             multiplicity_ = 1;
             // There are an even number of electrons
-            if (WorldComm->me() == 0) {
+            if (print_ && WorldComm->me() == 0) {
                 fprintf(outfile,"\tThere are an even number of electrons - assuming singlet.\n"
                             "\tSpecify the multiplicity with the MULTP option in the\n"
                             "\tinput if this is incorrect\n\n");
@@ -345,7 +345,8 @@ void HF::common_init()
     frac_enabled_ = (options_.get_int("FRAC_START") != 0);
     frac_performed_ = false;
 
-    print_header();
+    if(print_)
+        print_header();
     
     // for environment 
     EnvMat_enabled_ = false;
