@@ -356,6 +356,20 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('RHF_DisableDIIS', this.objectHandle, varargin{:});
         end
         
+        % matpsi.RHF_GuessSAD(); 
+        % Start from SAD guess density 
+        % may help converge 
+        function varargout = RHF_GuessSAD(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_GuessSAD', this.objectHandle, varargin{:});
+        end
+        
+        % matpsi.RHF_GuessCore(); 
+        % Start from core guess density 
+        % default 
+        function varargout = RHF_GuessCore(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('RHF_GuessCore', this.objectHandle, varargin{:});
+        end
+        
         %~ The below RHF_X functions must be executed after matpsi.RHF(); 
         % double = matpsi.RHF_EHF(); 
         % Hartree-Fock energy 

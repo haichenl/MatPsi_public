@@ -429,7 +429,7 @@ void HF::finalize()
     dump_to_checkpoint();
 
     //Sphalf_.reset();
-    X_.reset();
+    //~ X_.reset();
     //~ T_.reset();
     //~ V_.reset();
     diag_temp_.reset();
@@ -439,9 +439,7 @@ void HF::finalize()
     // Close the chkpt
     if(psio_->open_check(PSIF_CHKPT))
         psio_->close(PSIF_CHKPT, 1);
-        
-    // rude fix for that Andy's trick 2.0 
-    options_.set_str("SCF","SCF_TYPE","PK");
+    
 }
 
 void HF::find_occupation()
@@ -1736,10 +1734,10 @@ double HF::compute_energy()
     return E_;
 }
 
+
+// bacially a copy of compute_energy() but with many printing/disio things turned off 
 double HF::compute_energy_minIO()
 {
-    std::string reference = options_.get_str("REFERENCE");
-
     bool converged = false;
     MOM_performed_ = false;
     diis_performed_ = false;
@@ -1749,16 +1747,9 @@ double HF::compute_energy_minIO()
     else
         iteration_ = 0;
 
-    //~ if (print_ && (WorldComm->me() == 0))
-        //~ fprintf(outfile, "  ==> Pre-Iterations <==\n\n");
-//~ 
-    //~ if (print_)
-        //~ print_preiterations();
-
     // Andy trick 2.0
     std::string old_scf_type = options_.get_str("SCF_TYPE");
     if (options_.get_bool("DF_SCF_GUESS") && !(old_scf_type == "DF" || old_scf_type == "CD")) {
-         //~ fprintf(outfile, "  Starting with a DF guess...\n\n");
          if(!options_["DF_BASIS_SCF"].has_changed()) {
              // TODO: Match Dunning basis sets 
              molecule_->set_basis_all_atoms("CC-PVDZ-JKFIT", "DF_BASIS_SCF");
@@ -1768,118 +1759,52 @@ double HF::compute_energy_minIO()
     }
 
     if(attempt_number_ == 1){
-        //~ boost::shared_ptr<MintsHelper> mints (new MintsHelper(process_environment_, psio_, options_, 0));
-        //~ mints->one_electron_integrals();
-//~ 
-        //~ integrals();
-//~ 
-        //~ timer_on("Form H");
-        //~ form_H(); //Core Hamiltonian
-        //~ 
-        //~ // Adding environment in 
-        //~ if(EnvMat_enabled_)
-            //~ H_->add(EnvMat_);
-        //~ 
-        //~ // If we use a given H 
-        //~ if(given_H_enabled_)
         H_ = given_H_;
-            
-        //~ timer_off("Form H");
-
-        timer_on("Form S/X");
         form_Shalf(); //S and X Matrix
-        timer_off("Form S/X");
-
-        timer_on("Guess");
         guess(); // Guess
-        timer_off("Guess");
         
         // Automatically judge whether we start from a manually specified starting molecular orbital 
         whether_to_use_StartingC();
 
     }else{
-        // We're reading the orbitals from the previous set of iterations.
+        H_ = given_H_;
+        guess(); // Guess
         whether_to_use_StartingC();
         form_D();
         E_ = compute_initial_E();
     }
-
-    bool df = (options_.get_str("SCF_TYPE") == "DF");
-
-    //~ if (WorldComm->me() == 0) {
-        //~ fprintf(outfile, "  ==> Iterations <==\n\n");
-        //~ fprintf(outfile, "%s                        Total Energy        Delta E     RMS |[F,P]|\n\n", df ? "   " : "");
-    //~ }
-    //~ fflush(outfile);
-
+    attempt_number_ = 2;
     // SCF iterations
     do {
         iteration_++;
-
+        
         save_density_and_energy();
-
-        // Call any preiteration callbacks
-        //~ call_preiteration_callbacks();
-
-        timer_on("Form G");
+        
         form_G();
-        timer_off("Form G");
-
+        
         // Reset fractional SAD occupation
         if (iteration_ == 0 && options_.get_str("GUESS") == "SAD")
             reset_SAD_occupation();
-
-        timer_on("Form F");
+        
         form_F();
-        timer_off("Form F");
-
-        //~ if (print_>3) {
-            //~ Fa_->print(outfile);
-            //~ Fb_->print(outfile);
-        //~ }
-
-	//bool has_efp = options.get("HAS_EFP");
-
-	// XXX
-	//if (has_efp) {
-	//efp_get_multipole_count
-	// allocate arrays
-	//efp_get_multipoles
-	// compute 1e contributions
-	//}
-
+        
         E_ = compute_E();
-
-	// XXX
-	//if (has_efp) {
-	//double efp_energy;
-	//efp_scf_update(efp, &efp_energy);
-	//E_ += efp_energy;
-	//}
-
-        timer_on("DIIS");
+        
         bool add_to_diis_subspace = false;
         if (diis_enabled_ && iteration_ > 0 && iteration_ >= diis_start_ )
             add_to_diis_subspace = true;
-
+        
         compute_orbital_gradient(add_to_diis_subspace);
-
+        
         if (diis_enabled_ == true && iteration_ >= diis_start_ + min_diis_vectors_ - 1) {
             diis_performed_ = diis();
         } else {
             diis_performed_ = false;
         }
-        timer_off("DIIS");
-
-        //~ if (print_>4 && diis_performed_ && (WorldComm->me() == 0)) {
-            //~ fprintf(outfile,"  After DIIS:\n");
-            //~ Fa_->print(outfile);
-            //~ Fb_->print(outfile);
-        //~ }
-
+        
         // If we're too well converged, or damping wasn't enabled, do DIIS
         damping_performed_ = (damping_enabled_ && iteration_ > 1 && Drms_ > damping_convergence_);
-
+        
         std::string status = "";
         if(diis_performed_){
             if(status != "") status += "/";
@@ -1897,44 +1822,21 @@ double HF::compute_energy_minIO()
             if(status != "") status += "/";
             status += "FRAC";
         }
-
-
-
-        timer_on("Form C");
+        
         form_C();
-        timer_off("Form C");
-        timer_on("Form D");
         form_D();
-        timer_off("Form D");
-
-        process_environment_.globals["SCF ITERATION ENERGY"] = E_;
-
+        
         // After we've built the new D, damp the update if
         if(damping_performed_) damp_update();
-
-        //~ if (print_ > 3){
-            //~ Ca_->print(outfile);
-            //~ Cb_->print(outfile);
-            //~ Da_->print(outfile);
-            //~ Db_->print(outfile);
-        //~ }
-
+        
         converged = test_convergency();
-
-        df = (options_.get_str("SCF_TYPE") == "DF");
-
-        //~ if (WorldComm->me() == 0) {
-            //~ fprintf(outfile, "   @%s%s iter %3d: %20.14f   %12.5e   %-11.5e %s\n", df ? "DF-" : "",
-                              //~ reference.c_str(), iteration_, E_, E_ - Eold_, Drms_, status.c_str());
-            //~ fflush(outfile);
-        //~ }
-
+        
         // If a an excited MOM is requested but not started, don't stop yet
         if (MOM_excited_ && !MOM_started_) converged = false;
-
+        
         // If a fractional occupation is requested but not started, don't stop yet
         if (frac_enabled_ && !frac_performed_) converged = false;
-
+        
         // If a DF Guess environment, reset the JK object, and keep running
         if (converged && options_.get_bool("DF_SCF_GUESS") && !(old_scf_type == "DF" || old_scf_type == "CD")) {
             //~ fprintf(outfile, "\n  DF guess converged.\n\n"); // Be cool dude. 
@@ -1944,133 +1846,54 @@ double HF::compute_energy_minIO()
             scf_type_ = old_scf_type;
             options_.set_str("SCF","SCF_TYPE",old_scf_type);
             old_scf_type = "DF";
-            //~ integrals();
         }
-
-        // Call any postiteration callbacks
-        //~ call_postiteration_callbacks();
-
+        
     } while (!converged && iteration_ < maxiter_ );
-
-    //~ if (WorldComm->me() == 0)
-        //~ fprintf(outfile, "\n  ==> Post-Iterations <==\n\n");
-
+    
     check_phases();
     compute_spin_contamination();
     frac_renormalize();
-
+    
+    double return_E = E_;
     if (converged || !fail_on_maxiter_) {
         // Need to recompute the Fock matrices, as they are modified during the SCF interation
         // and might need to be dumped to checkpoint later
         form_F();
-
-        // Print the orbitals
-        //~ if(print_)
-            //~ print_orbitals();
-
-        //~ if (WorldComm->me() == 0 && converged) {
-            //~ fprintf(outfile, "  Energy converged.\n\n");
-        //~ }
-        //~ if (WorldComm->me() == 0 && !converged) {
-            //~ fprintf(outfile, "  Energy did not converge, but proceeding anyway.\n\n");
-        //~ }
-        //~ if (WorldComm->me() == 0) {
-            //~ fprintf(outfile, "  @%s%s Final Energy: %20.14f", df ? "DF-" : "", reference.c_str(), E_);
-            //~ if (perturb_h_) {
-                //~ fprintf(outfile, " with %f perturbation", lambda_);
-            //~ }
-            //~ fprintf(outfile, "\n\n");
-            //~ print_energies();
-        //~ }
-
-        // Properties
-        //~ if (print_) {
-            //~ boost::shared_ptr<OEProp> oe(new OEProp(process_environment_));
-            //~ oe->set_title("SCF");
-            //~ oe->add("DIPOLE");
-//~ 
-            //~ if (print_ >= 2) {
-                //~ oe->add("QUADRUPOLE");
-                //~ oe->add("MULLIKEN_CHARGES");
-            //~ }
-//~ 
-            //~ if (print_ >= 3) {
-                //~ oe->add("LOWDIN_CHARGES");
-                //~ oe->add("MAYER_INDICES");
-                //~ oe->add("WIBERG_LOWDIN_INDICES");
-            //~ }
-//~ 
-            //~ if (WorldComm->me() == 0)
-                //~ fprintf(outfile, "  ==> Properties <==\n\n");
-            //~ oe->compute();
-//~ 
-//~ //  Comments so that autodoc utility will find these PSI variables
-//~ //
-//~ //  Process::environment.globals["SCF DIPOLE X"] =
-//~ //  Process::environment.globals["SCF DIPOLE Y"] =
-//~ //  Process::environment.globals["SCF DIPOLE Z"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE XX"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE XY"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE XZ"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE YY"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE YZ"] =
-//~ //  Process::environment.globals["SCF QUADRUPOLE ZZ"] =
-//~ 
-        //~ }
-
         save_information();
     } else {
-        //~ if (WorldComm->me() == 0) {
-            //~ fprintf(outfile, "  Failed to converged.\n");
-            //~ fprintf(outfile, "    NOTE: MO Coefficients will not be saved to Checkpoint.\n");
-        //~ }
-        //~ E_ = compute_E();
-        if(psio_->open_check(PSIF_CHKPT))
-            psio_->close(PSIF_CHKPT, 1);
-
-        // Throw if we didn't converge?
-        die_if_not_converged(process_environment_);
+        return_E = 0.0;
     }
-
+    
     // Orbitals are always saved, in case an MO guess is requested later
     //~ save_orbitals();
     //~ if (options_.get_str("SAPT") != "FALSE") //not a bool because it has types
         //~ save_sapt_info();
-
-    //~ WorldComm->sync();
-
+    
     // Perform wavefunction stability analysis
     if(options_.get_str("STABILITY_ANALYSIS") != "NONE")
         stability_analysis();
-
+    
     // Clean memory off, handle diis closeout, etc
     // Clean up after DIIS
-    if(initialized_diis_manager_)
-        diis_manager_->delete_diis_file();
+    //~ if(initialized_diis_manager_)
+        //~ diis_manager_->delete_diis_file();
     diis_manager_.reset();
     initialized_diis_manager_ = false;
-
+    
     // Figure out how many frozen virtual and frozen core per irrep
     compute_fcpi();
     compute_fvpi();
     energy_ = E_;
-
+    
     //Sphalf_.reset();
-    X_.reset();
+    //~ X_.reset();
     //~ T_.reset();
     //~ V_.reset();
-    diag_temp_.reset();
-    diag_F_temp_.reset();
-    diag_C_temp_.reset();
+    //~ diag_temp_.reset();
+    //~ diag_F_temp_.reset();
+    //~ diag_C_temp_.reset();
 
-        
-    // rude fix for that Andy's trick 2.0 
-    options_.set_str("SCF","SCF_TYPE","PK");
-
-
-    //fprintf(outfile,"\nComputation Completed\n");
-    //~ fflush(outfile);
-    return E_;
+    return return_E;
 }
 
 void HF::set_EnvMat(SharedMatrix EnvMat_in) {

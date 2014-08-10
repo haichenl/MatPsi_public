@@ -125,8 +125,8 @@ void RHF::finalize()
         }
     }
 
-    Dold_.reset();
-    G_.reset();
+    //~ Dold_.reset();
+    //~ G_.reset();
     //~ J_.reset();
     //~ K_.reset();
 

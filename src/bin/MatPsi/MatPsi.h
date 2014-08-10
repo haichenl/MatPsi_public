@@ -26,7 +26,8 @@ namespace psi {
 #endif
     char* psi_file_prefix = "matpsi";
     std::string outfile_name = "";
-    extern int read_options(const std::string &name, Options & options, bool suppress_printing = false);
+    extern int read_options(const std::string &name, Options & options, 
+            bool suppress_printing = false);
 }
 
 class MatPsi {
@@ -60,188 +61,120 @@ protected:
     // create basis object 
     void create_basis();
     
-    // create one & two electron integral factories and jk object 
-    void create_integral_factories();
+    // create basis object and one & two electron integral factories 
+    void create_basis_and_integral_factories();
     
 public:
     // constructor; takes in 2 strings and parse them 
-    MatPsi(const std::string& molstring, const std::string& basisname, int ncores, const std::string& memory_str, const std::string& path);
+    MatPsi(const std::string& molstring, const std::string& basisname, 
+        int ncores, const std::string& memory_str, const std::string& path);
     
     // destructor 
-    ~MatPsi();
+    virtual ~MatPsi();
     
-    // the string describing the molecule 
-    std::string& molecule_string() { return molstring_; }
+    // Construcing properties 
+    std::string& molecule_string() { return molstring_; } // the string describing the molecule 
+    std::string& basis_name() { return basisname_; } // basis set name string 
     
-    // basis set name string 
-    std::string& basis_name() { return basisname_; }
-    
-    void set_basis(const std::string& basisname);
-    
+    // CPU and memory controll 
     void set_ncores(int ncores);
-    
     void set_memory(std::string);
     
-    //*** Molecule operations 
-    // fix the molecule
-    void fix_mol();
-    
-    // free the molecule 
-    void free_mol();
     
     
     //*** Molecule properties 
-    // number of atoms 
-    int natom() { return molecule_->natom(); }
+    int natom() { return molecule_->natom(); } // number of atoms 
+    int nelec(); // number of electrons 
+    SharedMatrix geom() { return molecule_->geometry().clone(); } // geometry 
+    void set_geom(SharedMatrix newGeom); // set a new geometry 
+    double Enuc() { return molecule_->nuclear_repulsion_energy(); } // nuclear repulsion energy 
+    SharedVector Zlist(); // protonic number list vector 
     
-    // geometry 
-    SharedMatrix geom() { return molecule_->geometry().clone(); }
-    
-    // set geometry 
-    void set_geom(SharedMatrix newGeom);
-    
-    // nuclear repulsion energy 
-    double Enuc() { return molecule_->nuclear_repulsion_energy(); }
-    
-    // Z list 
-    SharedVector Zlist();
-    
-    // number of electrons 
-    int nelec();
+    //*** Molecule operations 
+    void fix_mol();
+    void free_mol();
     
     
     //*** Basis set properties 
-    // number of basis functions 
-    int nbasis() { return basis_->nbf(); }
-    
-    // map basis number to the number of atom it is centred on 
-    SharedVector func2center();
-    
-    // map basis number to its angular momentum 
-    SharedVector func2am();
+    void set_basis(const std::string& basisname); // set a new basis set 
+    int nbasis() { return basis_->nbf(); } // number of basis functions 
+    SharedVector func2center(); // map basis function number to the number of atom it is centred on 
+    SharedVector func2am(); // map basis function number to its angular momentum 
     
     
-    //*** One-electron integrals 
-    // compute the overlap matrix S 
-    SharedMatrix overlap();
-    
-    // compute the kinetic energy matrix KE 
-    SharedMatrix kinetic();
-    
-    // compute the total potential energy matrix EN 
-    SharedMatrix potential();
-    
-    // compute the dipole integrals 
-    std::vector<SharedMatrix> dipole();
-    
-    // compute the atom-separated potential energy matrix ENI 
-    //~ boost::shared_array<SharedMatrix> potential_sep();
-    std::vector<SharedMatrix> potential_sep();
-    
-    // compute from a given point charge list the environment potential energy matrix ENVI
-    SharedMatrix potential_Zxyz(SharedMatrix Zxyz_list);
+    //*** One-Electron Integrals 
+    SharedMatrix overlap(); // overlap matrix S <i|j>
+    SharedMatrix kinetic(); // kinetic energy matrix KE 
+    SharedMatrix potential(); // total potential energy matrix EN <i|sum(1/R)|j>
+    std::vector<SharedMatrix> dipole(); // dipole matrices <i|x|j>, <i|y|j>, <i|z|j>
+    std::vector<SharedMatrix> potential_sep(); // atom-separated EN 
+    SharedMatrix potential_Zxyz(SharedMatrix Zxyz_list); // compute from a given point charge list 
+                                                         // the environment potential energy matrix ENVI 
     
     
-    //*** Two-electron integrals 
-    // compute the 4-indexed two-electron integral H2(i, j, k, l) 
-    double tei_ijkl(int i, int j, int k, int l);
-    
-    // number of unique two-electron integrals 
-    int tei_uniqN();
-    
-    // compute all unique two-electron integrals and put them in a vector; be careful as it costs a huge amount of memory 
-    void tei_alluniq(double* matpt);
-    
-    // compute all, full, nbasis by nbasis by nbasis by nbasis two-electron integrals and put them in a vector; be careful as it costs a super huge amount of memory 
-    void tei_allfull(double* matpt);
-    
-    // compute all unique two-electron integrals and pre-arrange them for the forming of J and K 
-    void tei_alluniqJK(double* matptJ, double* matptK);
+    //*** Two-Electron Integrals (TEIs) 
+    int tei_uniqN(); // number of unique TEIs 
+    double tei_ijkl(int i, int j, int k, int l); // (ij|kl), chemist's notation 
+    // ##HIGH MEMORY COST METHODS## 
+    void tei_alluniq(double* matpt); // all unique TEIs in a vector 
+    void tei_allfull(double* matpt); // all (repetitive) TEIs in a 4D-array 
+    void tei_alluniqJK(double* matptJ, double* matptK); // pre-arrange TEI vectors for forming J/K 
+    // ##HIGH MEMORY COST METHODS## 
     
     
     //*** JK related
-    // enables different types of JK 
+    // use different types of JK 
     void UseDirectJK();
     void UsePKJK();
     void UseICJK();
     
-    // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from density matrix, consider no geometrical symmetry 
+    // methods computing J/K/G 
     SharedMatrix Density2J(SharedMatrix Density);
-    
-    // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from density matrix, consider no geometrical symmetry 
-    SharedMatrix Density2K(SharedMatrix Density);
-    
-    // for restricted Hartree Fock, compute 2-electron total interaction G matrix from density matrix, consider no geometrical symmetry 
+    SharedMatrix Density2K(SharedMatrix Density); 
     SharedMatrix Density2G(SharedMatrix Density);
-    
-    // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2J(SharedMatrix OccMO);
-    
-    // for restricted Hartree Fock, compute 2-electron exchange interaction K matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2K(SharedMatrix OccMO);
-    
-    // for restricted Hartree Fock, compute 2-electron exchange interaction G matrix from occupied molecular orbital coefficient matrix, consider no geometrical symmetry 
     SharedMatrix OccMO2G(SharedMatrix OccMO);
     
     
     //*** SCF related
-    // RHF engine for MSQC 
-    double RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in);
-    double RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in, SharedMatrix C_in);
-    
     // create/reset RHF object 
     void RHF_reset();
     
-    // restricted Hartree-Fock 
-    double RHF();
+    // RHF engine for MSQC 
+    double RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, 
+        SharedMatrix Kmodifier_in);
+    double RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, 
+        SharedMatrix Kmodifier_in, SharedMatrix C_in);
     
-    // restricted Hartree-Fock with environment potential 
-    double RHFenv(SharedMatrix EnvMat);
-    
-    // restricted Hartree-Fock starting from a given density matrix 
-    double RHF_fromC(SharedMatrix C_in);
-    
-    // restricted Hartree-Fock with environment potential starting from a given density matrix 
+    // method of doing RHF calculations 
+    double RHF(); // "regular" restricted Hartree-Fock 
+    double RHFenv(SharedMatrix EnvMat);  // with an environment potential 
+    double RHF_fromC(SharedMatrix C_in); // starting from a given molecular orbital matrix 
     double RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in);
     
-    // enable MOM in restricted Hartree-Fock to solve convergence issue 
+    // methods controlling RHF algorithm 
     void RHF_EnableMOM(int mom_start);
-    
-    // enable Damping in restricted Hartree-Fock to solve convergence issue 
     void RHF_EnableDamping(double damping_percentage);
-    
-    // enable DIIS 
     void RHF_EnableDIIS();
-    
-    // disable DIIS in restricted Hartree-Fock to solve convergence issue 
     void RHF_DisableDIIS();
+    void RHF_GuessSAD();
+    void RHF_GuessCore();
     
-    // restricted Hartree-Fock energy 
-    double RHF_EHF();
-    
-    // restricted Hartree-Fock molecular orbitals 
-    SharedMatrix RHF_C();
-    
-    // restricted Hartree-Fock molecular orbital energies 
-    SharedVector RHF_EMO();
-    
-    // restricted Hartree-Fock density matrix 
-    SharedMatrix RHF_D();
-    
-    // restricted Hartree-Fock one-electron (core) Hamiltonian matrix 
-    SharedMatrix RHF_Ha();
-    
-    // restricted Hartree-Fock two-electron Coulomb matrix 
-    SharedMatrix RHF_J();
-    
-    // restricted Hartree-Fock two-electron exchange matrix 
-    SharedMatrix RHF_K();
-    
-    // restricted Hartree-Fock Fock matrix 
-    SharedMatrix RHF_F();
+    // methods extracting restricted Hartree-Fock results
+    double RHF_EHF();       // restricted Hartree-Fock energy 
+    SharedMatrix RHF_C();   // molecular orbital coefficients
+    SharedVector RHF_EMO(); // molecular orbital engenvalues 
+    SharedMatrix RHF_D();   // density matrix 
+    SharedMatrix RHF_Ha();  // core Hamiltonian 
+    SharedMatrix RHF_J();   // Coulomb interaction matrix J 
+    SharedMatrix RHF_K();   // exchange interaction matrix K
+    SharedMatrix RHF_F();   // entire Fock matrix 
     
     
-    //*** used at the beginning of mex file to let a global pointer pointing to a MatPsi class member property 
+    // ##EXPERT## 
+    //*** used at the beginning of mex file to let a global pointer point to a MatPsi class member property 
     void switch_worldcomm() { WorldComm = worldcomm_; }
+    // ##EXPERT## 
     
 };
