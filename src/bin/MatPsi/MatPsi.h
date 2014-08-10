@@ -160,9 +160,10 @@ public:
     
     
     //*** JK related
-    // enables different types of JK  
+    // enables different types of JK 
     void UseDirectJK();
     void UsePKJK();
+    void UseICJK();
     
     // for restricted Hartree Fock, compute 2-electron Coulomb interaction J matrix from density matrix, consider no geometrical symmetry 
     SharedMatrix Density2J(SharedMatrix Density);

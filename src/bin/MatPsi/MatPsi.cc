@@ -444,6 +444,24 @@ void MatPsi::UsePKJK() {
     Density2G(SharedMatrix(matfac_->create_matrix(""))); // have to do this here or it crashes due to our change to PKJK::compute_JK() 
 }
 
+void MatPsi::UseICJK() {
+    if(jk_ != NULL)
+        jk_->finalize();
+    // create PKJK object
+    ICJK* jk = new ICJK(process_environment_, basis_);
+
+    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+    if (process_environment_.options["PRINT"].has_changed())
+        jk->set_print(process_environment_.options.get_int("PRINT"));
+    if (process_environment_.options["DEBUG"].has_changed())
+        jk->set_debug(process_environment_.options.get_int("DEBUG"));
+    jk_ = boost::shared_ptr<JK>(jk);
+    jk_->set_memory(process_environment_.get_memory());
+    jk_->initialize();
+    Density2G(SharedMatrix(matfac_->create_matrix(""))); // have to do this here or it crashes 
+}
+
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
     if(jk_ == NULL) {
         UsePKJK();

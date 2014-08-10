@@ -355,6 +355,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // UseICJK 
+    if (!strcmp("UseICJK", cmd)) {
+        MatPsi_obj->UseICJK();
+        return;
+    }
+    
     // Density2J 
     if (!strcmp("Density2J", cmd)) {
         // Check parameters

@@ -353,11 +353,11 @@ public:
      */
     void compute();
     /**
-     * Compute D/J/K for the current C
+     * Compute J/K for the current D
      * Update values in your reference to
-     * C_left/C_right BEFORE calling this,
+     * D_left/D_right BEFORE calling this,
      * renew your references to the matrices
-     * in D/J/K AFTER calling this.
+     * in J/K AFTER calling this.
      */
     void compute_from_D();
     /**
@@ -994,6 +994,32 @@ public:
     * type on output file
     */
     virtual void print_header() const;
+};
+
+/**
+ * Class ICJK
+ *
+ * In-Core JK implementation 
+ */
+class ICJK : public JK {
+protected:
+    boost::shared_ptr<IntegralFactory> intfac_;
+    boost::shared_ptr<TwoBodyAOInt> eri_;
+    SharedMatrix reshaped_eri_j_;
+    SharedMatrix reshaped_eri_k_;
+    int bigN_;
+    
+    virtual bool C1() const { return false; }
+    virtual void preiterations();
+    virtual void compute_JK();
+    virtual void postiterations();
+    
+public:
+    ICJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary);
+    virtual ~ICJK();
+    
+    virtual void print_header() const;
+
 };
 
 #if 0

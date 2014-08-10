@@ -5078,6 +5078,136 @@ void FastDFJK::build_K(boost::shared_ptr<Matrix> Z,
     throw PSIEXCEPTION("K: Not implemented yet");
 }
 
+
+// begin in-core jk 
+
+inline int ij2I(int i, int j) {
+    if(i < j) {
+        int tmp = i;
+        i = j;
+        j = tmp;
+    }
+    return i * ( i + 1 ) / 2 + j;
+}
+
+ICJK::ICJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) : JK(process_environment_in, primary) {
+}
+
+ICJK::~ICJK() {
+}
+
+void ICJK::postiterations() {
+}
+
+void ICJK::print_header() const {
+}
+
+void ICJK::preiterations() {
+    intfac_ = boost::shared_ptr<IntegralFactory>(new IntegralFactory(primary_, primary_, primary_, primary_));
+    eri_ = boost::shared_ptr<TwoBodyAOInt>(intfac_->eri());
+    
+    // TODO: add memory amount judging 
+    // allocate in-core matrices 
+    bigN_ = primary_->nbf() * (primary_->nbf() + 1) / 2; // bigN_ is a property 
+    reshaped_eri_j_ = SharedMatrix(new Matrix(bigN_, bigN_));
+    reshaped_eri_k_ = SharedMatrix(new Matrix(bigN_, bigN_));
+    
+    double* jpt = reshaped_eri_j_->get_pointer();
+    double* kpt = reshaped_eri_k_->get_pointer();
+    AOShellCombinationsIterator shellIter = intfac_->shells_iterator();
+    const double *buffer = eri_->buffer();
+    for (shellIter.first(); shellIter.is_done() == false; shellIter.next()) {
+        // Compute quartet
+        eri_->compute_shell(shellIter);
+        // From the quartet get all the integrals
+        AOIntegralsIterator intIter = shellIter.integrals_iterator();
+        for (intIter.first(); intIter.is_done() == false; intIter.next()) {
+            int i = intIter.i();
+            int j = intIter.j();
+            int k = intIter.k();
+            int l = intIter.l();
+            jpt[ij2I(k, l) * bigN_ + ij2I(i, j)] = jpt[ij2I(i, j) * bigN_ + ij2I(k, l)] = buffer[intIter.index()];
+        }
+    }
+    for (shellIter.first(); shellIter.is_done() == false; shellIter.next()) {
+        // Compute quartet
+        // From the quartet get all the integrals
+        AOIntegralsIterator intIter = shellIter.integrals_iterator();
+        for (intIter.first(); intIter.is_done() == false; intIter.next()) {
+            int i = intIter.i();
+            int j = intIter.j();
+            int k = intIter.k();
+            int l = intIter.l();
+            kpt[ij2I(k, l) * bigN_ + ij2I(i, j)] = kpt[ij2I(i, j) * bigN_ + ij2I(k, l)] = jpt[ij2I(i, l) * bigN_ + ij2I(k, j)] + jpt[ij2I(i, k) * bigN_ + ij2I(j, l)];
+        }
+    }
+}
+
+void ICJK::compute_JK() {
+    int nbf = primary_->nbf();
+    SharedVector Dvec(new Vector(bigN_));
+    
+    if(do_J_ && J_.size()) {
+        SharedVector Jvec(new Vector(bigN_)); // used as a cache 
+        for (int N = 0; N < D_.size(); ++N) { 
+            // reshape D_[N] to a vector 
+            double* const D_pt = D_[N]->get_pointer();
+            double* Dvec_pt = Dvec->pointer();
+            double* const Dvec_starting_pt = Dvec_pt;
+            for( int i = 0; i < nbf; i++ ) {
+                for( int j = 0; j <= i; j++)
+                    *Dvec_pt++ = D_pt[i * nbf + j] * 2.0;
+                Dvec_starting_pt[i * (i+3) / 2] /= 2.0;
+            }
+            
+            // generate J vector 
+            Jvec->gemv(0, 1.0, reshaped_eri_j_.get(), Dvec.get(), 0.0);
+            
+            // reshape J vector into J_[N] 
+            double* Jvec_pt = Jvec->pointer();
+            double* const Jmat_pt = J_[N]->get_pointer();
+            for( int i = 0; i < nbf; i++ )
+                for( int j = 0; j <= i; j++)
+                    Jmat_pt[i * nbf + j] = Jmat_pt[j * nbf + i] = *Jvec_pt++;
+            
+        }
+    }
+    
+    if(do_K_ && K_.size()) {
+        SharedVector Kvec(new Vector(bigN_));
+        for (int N = 0; N < D_.size(); ++N) {
+            // reshape D_[N] to a vector 
+            double* const D_pt = D_[N]->get_pointer();
+            double* Dvec_pt = Dvec->pointer();
+            double* const Dvec_starting_pt = Dvec_pt;
+            for( int i = 0; i < nbf; i++ ) {
+                for( int j = 0; j <= i; j++)
+                    *Dvec_pt++ = D_pt[i * nbf + j];
+                Dvec_starting_pt[i * (i+3) / 2] /= 2.0;
+            }
+            
+            // generate K vector 
+            Kvec->gemv(0, 1.0, reshaped_eri_k_.get(), Dvec.get(), 0.0);
+            
+            // reshape K vector into K_[N] 
+            double* Kvec_pt = Kvec->pointer();
+            double* const Kmat_pt = K_[N]->get_pointer();
+            int nbf = primary_->nbf();
+            for( int i = 0; i < nbf; i++ )
+                for( int j = 0; j <= i; j++)
+                    Kmat_pt[i * nbf + j] = Kmat_pt[j * nbf + i] = *Kvec_pt++;
+            
+        }
+    }
+    
+    if(do_wK_ || wK_.size()) {
+        throw PSIEXCEPTION("ICJK::compute_JK(): wK not supported for ICJK now.");
+    }
+    
+}
+
+
+
 #if 0
 
 PSJK::PSJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
