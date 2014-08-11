@@ -327,6 +327,37 @@ void JK::compute_D()
 void JK::allocate_JK()
 {
     // Allocate J/K in the case that the algorithm uses USOs, so AO2USO will not allocate.
+    //~ bool same = true;
+    //~ if (J_.size() != D_.size()) {
+        //~ same = false;
+    //~ } else {
+        //~ for (int N = 0; N < D_.size(); N++) {
+            //~ if (D_[N]->symmetry() != J_[N]->symmetry())
+                //~ same = false;
+        //~ }
+    //~ }
+//~ 
+    //~ if (!same) {
+        //~ J_.clear();
+        //~ K_.clear();
+        //~ wK_.clear();
+        //~ for (int N = 0; N < D_.size() && do_J_; ++N) {
+            //~ std::stringstream s;
+            //~ s << "J " << N << " (SO)";
+            //~ J_.push_back(SharedMatrix(new Matrix(s.str(),D_[N]->nirrep(), D_[N]->rowspi(), D_[N]->rowspi(), D_[N]->symmetry())));
+        //~ }
+        //~ for (int N = 0; N < D_.size() && do_K_; ++N) {
+            //~ std::stringstream s;
+            //~ s << "K " << N << " (SO)";
+            //~ K_.push_back(SharedMatrix(new Matrix(s.str(),D_[N]->nirrep(), D_[N]->rowspi(), D_[N]->rowspi(), D_[N]->symmetry())));
+        //~ }
+        //~ for (int N = 0; N < D_.size() && do_wK_; ++N) {
+            //~ std::stringstream s;
+            //~ s << "wK " << N << " (SO)";
+            //~ wK_.push_back(SharedMatrix(new Matrix(s.str(),D_[N]->nirrep(), D_[N]->rowspi(), D_[N]->rowspi(), D_[N]->symmetry())));
+        //~ }
+    //~ }
+    
     bool same = true;
     if (J_.size() != D_.size()) {
         same = false;
@@ -336,21 +367,44 @@ void JK::allocate_JK()
                 same = false;
         }
     }
-
     if (!same) {
         J_.clear();
-        K_.clear();
-        wK_.clear();
         for (int N = 0; N < D_.size() && do_J_; ++N) {
             std::stringstream s;
             s << "J " << N << " (SO)";
             J_.push_back(SharedMatrix(new Matrix(s.str(),D_[N]->nirrep(), D_[N]->rowspi(), D_[N]->rowspi(), D_[N]->symmetry())));
         }
+    }
+    
+    same = true;
+    if (K_.size() != D_.size()) {
+        same = false;
+    } else {
+        for (int N = 0; N < D_.size(); N++) {
+            if (D_[N]->symmetry() != K_[N]->symmetry())
+                same = false;
+        }
+    }
+    if (!same) {
+        K_.clear();
         for (int N = 0; N < D_.size() && do_K_; ++N) {
             std::stringstream s;
             s << "K " << N << " (SO)";
             K_.push_back(SharedMatrix(new Matrix(s.str(),D_[N]->nirrep(), D_[N]->rowspi(), D_[N]->rowspi(), D_[N]->symmetry())));
         }
+    }
+    
+    same = true;
+    if (wK_.size() != D_.size()) {
+        same = false;
+    } else {
+        for (int N = 0; N < D_.size(); N++) {
+            if (D_[N]->symmetry() != wK_[N]->symmetry())
+                same = false;
+        }
+    }
+    if (!same) {
+        wK_.clear();
         for (int N = 0; N < D_.size() && do_wK_; ++N) {
             std::stringstream s;
             s << "wK " << N << " (SO)";

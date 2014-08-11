@@ -443,7 +443,6 @@ void MatPsi::UsePKJK() {
     jk_ = boost::shared_ptr<JK>(jk);
     jk_->set_memory((ULI)(process_environment_.options.get_double("SCF_MEM_SAFETY_FACTOR")*(process_environment_.get_memory() / 8L)));
     jk_->initialize();
-    Density2G(SharedMatrix(matfac_->create_matrix(""))); // have to do this here or it crashes due to our change to PKJK::compute_JK() 
 }
 
 void MatPsi::UseICJK() {
@@ -461,7 +460,6 @@ void MatPsi::UseICJK() {
     jk_ = boost::shared_ptr<JK>(jk);
     jk_->set_memory(process_environment_.get_memory());
     jk_->initialize();
-    Density2G(SharedMatrix(matfac_->create_matrix(""))); // have to do this here or it crashes 
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
