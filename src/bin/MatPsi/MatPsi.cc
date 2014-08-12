@@ -479,6 +479,12 @@ void MatPsi::UseMatlabJK() {
     jk_->initialize();
 }
 
+const std::string& MatPsi::JKtype() {
+    if(jk_ == NULL)
+        throw PSIEXCEPTION("JKtype: JK object has not been initialized.");
+    return jk_->JKtype();
+}
+
 void MatPsi::SetMatlabJK(boost::shared_array<double*> Jcell_ptr_in, boost::shared_array<double*> Kcell_ptr_in) {
     boost::static_pointer_cast<MatlabJK>(jk_)->set_JKcell_ptrs(Jcell_ptr_in, Kcell_ptr_in);
 }
@@ -616,15 +622,7 @@ double MatPsi::RHF() {
         UsePKJK();
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
-    //~ try {
-        double Ehf = rhf_->compute_energy();
-        rhf_->J()->scale(0.5);
-        return Ehf;
-    //~ }
-    //~ catch (...) {
-        //~ rhf_->J()->scale(0.5);
-        //~ throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
-    //~ }
+    return rhf_->compute_energy();
 }
 
 double MatPsi::RHFenv(SharedMatrix EnvMat) {
@@ -633,15 +631,7 @@ double MatPsi::RHFenv(SharedMatrix EnvMat) {
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_EnvMat(EnvMat);
-    try {
-        double Ehf = rhf_->compute_energy();
-        rhf_->J()->scale(0.5);
-        return Ehf;
-    }
-    catch (...) {
-        rhf_->J()->scale(0.5);
-        throw PSIEXCEPTION("RHFenv(EnvMat): Hartree-Fock probably not converged.");
-    }
+    return rhf_->compute_energy();
 }
 
 double MatPsi::RHF_fromC(SharedMatrix C_in) {
@@ -650,15 +640,7 @@ double MatPsi::RHF_fromC(SharedMatrix C_in) {
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_StartingC(C_in);
-    try {
-        double Ehf = rhf_->compute_energy();
-        rhf_->J()->scale(0.5);
-        return Ehf;
-    }
-    catch (...) {
-        rhf_->J()->scale(0.5);
-        throw PSIEXCEPTION("RHF_fromC(MO): Hartree-Fock probably not converged.");
-    }
+    return rhf_->compute_energy();
 }
 
 double MatPsi::RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in) {
@@ -668,28 +650,19 @@ double MatPsi::RHFenv_fromC(SharedMatrix EnvMat, SharedMatrix C_in) {
     process_environment_.set_wavefunction(rhf_);
     rhf_->set_EnvMat(EnvMat);
     rhf_->set_StartingC(C_in);
-    try {
-        double Ehf = rhf_->compute_energy();
-        rhf_->J()->scale(0.5);
-        return Ehf;
-    }
-    catch (...) {
-        rhf_->J()->scale(0.5);
-        throw PSIEXCEPTION("RHFenv_fromC(EnvMat, MO): Hartree-Fock probably not converged.");
-    }
+    return rhf_->compute_energy();
 }
 
 double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in) {
     if(jk_ == NULL)
-        UseICJK();
-    if(rhf_ == NULL)
+        throw PSIEXCEPTION("RHF_msqc: Please explictly initialize JK first.");
+    if(rhf_ == NULL || rhf_->jk() != jk_) // always use our jk_ 
         RHF_reset();
     // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
     rhf_->set_print(0);
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
-    double Ehf = rhf_->compute_energy_minIO();
-    return Ehf;
+    return rhf_->compute_energy_minIO();
 }
 
 double MatPsi::RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, SharedMatrix Kmodifier_in, SharedMatrix C_in) {
@@ -701,8 +674,7 @@ double MatPsi::RHF_msqc_fromC(SharedMatrix given_H_in, SharedMatrix Jmodifier_in
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
     rhf_->set_StartingC(C_in);
-    double Ehf = rhf_->compute_energy_minIO();
-    return Ehf;
+    return rhf_->compute_energy_minIO();
 }
 
 double MatPsi::RHF_EHF() { 

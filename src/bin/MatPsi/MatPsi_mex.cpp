@@ -367,6 +367,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // JKtype 
+    if (!strcmp("JKtype", cmd)) {
+        plhs[0] = mxCreateString((MatPsi_obj->JKtype()).c_str());
+        return;
+    }
+    
     // SetMatlabJK 
     if (!strcmp("SetMatlabJK", cmd)) {
         int nbasis = MatPsi_obj->nbasis();

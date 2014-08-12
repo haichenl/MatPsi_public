@@ -163,7 +163,7 @@ void RHF::form_G()
     const std::vector<SharedMatrix> & J = jk_->J();
     const std::vector<SharedMatrix> & K = jk_->K();
     J_ = J[0];
-    J_->scale(2.0);
+    //~ J_->scale(2.0); // move scaling down below 
     K_ = K[0];
     
     // judge if we modify J_ and K_ 
@@ -182,6 +182,8 @@ void RHF::form_G()
     }
 
     G_->copy(J_);
+    // now scale here so J_ won't get doubled 
+    G_->scale(2.0);
     G_->subtract(K_);
 }
 

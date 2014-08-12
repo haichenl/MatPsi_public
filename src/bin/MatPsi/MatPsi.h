@@ -132,6 +132,7 @@ public:
     void UseDirectJK();
     void UsePKJK();
     void UseICJK();
+    const std::string& JKtype();
     // ### EXPERT ### 
     void UseMatlabJK();
     void SetMatlabJK(boost::shared_array<double*> Jcell_ptr, boost::shared_array<double*> Kcell_ptr);

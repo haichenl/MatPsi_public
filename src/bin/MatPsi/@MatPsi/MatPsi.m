@@ -253,6 +253,12 @@ classdef MatPsi < handle
         end
         % ### EXPERT ###  
         
+        % matpsi.JKtype(); 
+        % See type of JK currently using 
+        function varargout = JKtype(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('JKtype', this.objectHandle, varargin{:});
+        end
+        
         % matrix(nbasis, nbasis) = matpsi.Density2J( matrix(nbasis, nbasis) ); 
         % Compute J from density matrix 
         function varargout = Density2J(this, varargin)

@@ -31,6 +31,7 @@ public:
 };
 
 MatlabJK::MatlabJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) : JK(process_environment_in, primary) {
+    JKtype_ = "MatlabJK";
 }
 
 MatlabJK::~MatlabJK() {

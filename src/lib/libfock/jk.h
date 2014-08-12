@@ -154,6 +154,8 @@ class JK {
 protected:
 
     Process::Environment& process_environment_;
+    
+    std::string JKtype_;
 
     // => Utility Variables <= //
 
@@ -433,10 +435,14 @@ public:
     */
     virtual void print_header() const = 0;
     
+    // do we need this one? 
     void remove_symmetry() {
         AO2USO_ = SharedMatrix(new Matrix("AO->SO matrix", primary_->nbf(), primary_->nbf()));
         AO2USO_->identity();
     }
+    
+    const std::string& JKtype() { return JKtype_; }
+    
 };
 
 // => APPLIED CLASSES <= //

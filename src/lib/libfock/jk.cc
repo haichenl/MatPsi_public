@@ -1261,6 +1261,7 @@ void DiskJK::postiterations()
 PKJK::PKJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary, boost::shared_ptr<PSIO> psio_in) :
     JK(process_environment_in, primary)
 {
+    JKtype_ = "PKJK";
     psio_ = psio_in;
     common_init();
 }
@@ -5145,6 +5146,7 @@ inline int ij2I(int i, int j) {
 }
 
 ICJK::ICJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) : JK(process_environment_in, primary) {
+    JKtype_ = "ICJK";
 }
 
 ICJK::~ICJK() {
