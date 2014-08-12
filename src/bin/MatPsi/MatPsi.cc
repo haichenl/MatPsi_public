@@ -448,7 +448,7 @@ void MatPsi::UsePKJK() {
 void MatPsi::UseICJK() {
     if(jk_ != NULL)
         jk_->finalize();
-    // create PKJK object
+    // create ICJK object
     ICJK* jk = new ICJK(process_environment_, basis_);
 
     if (process_environment_.options["INTS_TOLERANCE"].has_changed())
@@ -460,6 +460,31 @@ void MatPsi::UseICJK() {
     jk_ = boost::shared_ptr<JK>(jk);
     jk_->set_memory(process_environment_.get_memory());
     jk_->initialize();
+}
+
+void MatPsi::UseMatlabJK() {
+    if(jk_ != NULL)
+        jk_->finalize();
+    // create MatlabJK object
+    MatlabJK* jk = new MatlabJK(process_environment_, basis_);
+
+    if (process_environment_.options["INTS_TOLERANCE"].has_changed())
+        jk->set_cutoff(process_environment_.options.get_double("INTS_TOLERANCE"));
+    if (process_environment_.options["PRINT"].has_changed())
+        jk->set_print(process_environment_.options.get_int("PRINT"));
+    if (process_environment_.options["DEBUG"].has_changed())
+        jk->set_debug(process_environment_.options.get_int("DEBUG"));
+    jk_ = boost::shared_ptr<JK>(jk);
+    jk_->set_memory(process_environment_.get_memory());
+    jk_->initialize();
+}
+
+void MatPsi::SetMatlabJK(boost::shared_array<double*> Jcell_ptr_in, boost::shared_array<double*> Kcell_ptr_in) {
+    boost::static_pointer_cast<MatlabJK>(jk_)->set_JKcell_ptrs(Jcell_ptr_in, Kcell_ptr_in);
+}
+
+void MatPsi::DisableMatlabJK() {
+    boost::static_pointer_cast<MatlabJK>(jk_)->disable();
 }
 
 SharedMatrix MatPsi::Density2J(SharedMatrix Density) {
@@ -591,15 +616,15 @@ double MatPsi::RHF() {
         UsePKJK();
     rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
     process_environment_.set_wavefunction(rhf_);
-    try {
+    //~ try {
         double Ehf = rhf_->compute_energy();
         rhf_->J()->scale(0.5);
         return Ehf;
-    }
-    catch (...) {
-        rhf_->J()->scale(0.5);
-        throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
-    }
+    //~ }
+    //~ catch (...) {
+        //~ rhf_->J()->scale(0.5);
+        //~ throw PSIEXCEPTION("RHF: Hartree-Fock probably not converged.");
+    //~ }
 }
 
 double MatPsi::RHFenv(SharedMatrix EnvMat) {
@@ -660,7 +685,7 @@ double MatPsi::RHF_msqc(SharedMatrix given_H_in, SharedMatrix Jmodifier_in, Shar
     if(rhf_ == NULL)
         RHF_reset();
     // now we don't need to cancel given_H_ or JKmodifiers_ since we re-generate an rhf_ each time we call 
-    //~ rhf_->set_print(0);
+    rhf_->set_print(0);
     rhf_->set_given_H(given_H_in);
     rhf_->set_JKmodifiers(Jmodifier_in, Kmodifier_in);
     double Ehf = rhf_->compute_energy_minIO();

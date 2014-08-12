@@ -1455,7 +1455,7 @@ double HF::compute_energy()
 
         integrals();
 
-        timer_on("Form H");
+        //~ timer_on("Form H");
         form_H(); //Core Hamiltonian
         
         // Adding environment in 
@@ -1466,15 +1466,15 @@ double HF::compute_energy()
         if(given_H_enabled_)
             H_ = given_H_;
             
-        timer_off("Form H");
+        //~ timer_off("Form H");
 
-        timer_on("Form S/X");
+        //~ timer_on("Form S/X");
         form_Shalf(); //S and X Matrix
-        timer_off("Form S/X");
+        //~ timer_off("Form S/X");
 
-        timer_on("Guess");
+        //~ timer_on("Guess");
         guess(); // Guess
-        timer_off("Guess");
+        //~ timer_off("Guess");
         
         // Automatically judge whether we start from a manually specified starting molecular orbital 
         whether_to_use_StartingC();
@@ -1503,17 +1503,17 @@ double HF::compute_energy()
         // Call any preiteration callbacks
         //~ call_preiteration_callbacks();
 
-        timer_on("Form G");
+        //~ timer_on("Form G");
         form_G();
-        timer_off("Form G");
+        //~ timer_off("Form G");
 
         // Reset fractional SAD occupation
         if (iteration_ == 0 && options_.get_str("GUESS") == "SAD")
             reset_SAD_occupation();
 
-        timer_on("Form F");
+        //~ timer_on("Form F");
         form_F();
-        timer_off("Form F");
+        //~ timer_off("Form F");
 
         if (print_>3) {
             Fa_->print(outfile);
@@ -1539,7 +1539,7 @@ double HF::compute_energy()
 	//E_ += efp_energy;
 	//}
 
-        timer_on("DIIS");
+        //~ timer_on("DIIS");
         bool add_to_diis_subspace = false;
         if (diis_enabled_ && iteration_ > 0 && iteration_ >= diis_start_ )
             add_to_diis_subspace = true;
@@ -1551,7 +1551,7 @@ double HF::compute_energy()
         } else {
             diis_performed_ = false;
         }
-        timer_off("DIIS");
+        //~ timer_off("DIIS");
 
         if (print_>4 && diis_performed_ && (WorldComm->me() == 0)) {
             fprintf(outfile,"  After DIIS:\n");
@@ -1582,12 +1582,12 @@ double HF::compute_energy()
 
 
 
-        timer_on("Form C");
+        //~ timer_on("Form C");
         form_C();
-        timer_off("Form C");
-        timer_on("Form D");
+        //~ timer_off("Form C");
+        //~ timer_on("Form D");
         form_D();
-        timer_off("Form D");
+        //~ timer_off("Form D");
 
         process_environment_.globals["SCF ITERATION ENERGY"] = E_;
 

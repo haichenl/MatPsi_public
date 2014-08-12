@@ -237,6 +237,22 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('UseICJK', this.objectHandle, varargin{:});
         end
         
+        % matpsi.UseMatlabJK(); 
+        % Enable MatlabJK object that computes J and K in core 
+        % ### EXPERT ###  
+        function varargout = UseMatlabJK(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('UseMatlabJK', this.objectHandle, varargin{:});
+        end
+        
+        function varargout = SetMatlabJK(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('SetMatlabJK', this.objectHandle, varargin{:});
+        end
+        
+        function varargout = DisableMatlabJK(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('DisableMatlabJK', this.objectHandle, varargin{:});
+        end
+        % ### EXPERT ###  
+        
         % matrix(nbasis, nbasis) = matpsi.Density2J( matrix(nbasis, nbasis) ); 
         % Compute J from density matrix 
         function varargout = Density2J(this, varargin)

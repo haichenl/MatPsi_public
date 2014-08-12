@@ -361,6 +361,35 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // UseMatlabJK 
+    if (!strcmp("UseMatlabJK", cmd)) {
+        MatPsi_obj->UseMatlabJK();
+        return;
+    }
+    
+    // SetMatlabJK 
+    if (!strcmp("SetMatlabJK", cmd)) {
+        int nbasis = MatPsi_obj->nbasis();
+        if (nrhs!=4 || mxGetM(prhs[2]) != nbasis || mxGetN(prhs[2]) != nbasis || mxGetM(prhs[3]) != nbasis || mxGetN(prhs[3]) != nbasis)
+            mexErrMsgTxt("SetMatlabJK(Jcell, Kcell): 2 nbasis by nbasis cell arrays input expected.");
+        boost::shared_array<double*> Jcell_ptr_in(new double* [nbasis * nbasis]);
+        boost::shared_array<double*> Kcell_ptr_in(new double* [nbasis * nbasis]);
+        mxArray* Jcell = (mxArray*)prhs[2];
+        mxArray* Kcell = (mxArray*)prhs[3];
+        for( int i = 0; i < nbasis * nbasis; i++) {
+            Jcell_ptr_in[i] = mxGetPr(mxGetCell(Jcell, i));
+            Kcell_ptr_in[i] = mxGetPr(mxGetCell(Kcell, i));
+        }
+        MatPsi_obj->SetMatlabJK(Jcell_ptr_in, Kcell_ptr_in);
+        return;
+    }
+    
+    // DisableMatlabJK 
+    if (!strcmp("DisableMatlabJK", cmd)) {
+        MatPsi_obj->DisableMatlabJK();
+        return;
+    }
+    
     // Density2J 
     if (!strcmp("Density2J", cmd)) {
         // Check parameters

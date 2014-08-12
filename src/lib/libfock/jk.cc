@@ -602,25 +602,25 @@ void JK::compute()
         lr_symmetric_ = false;
     }
 
-    timer_on("JK: D");
+    //~ timer_on("JK: D");
     compute_D();
-    timer_off("JK: D");
+    //~ timer_off("JK: D");
     if (C1()) {
-        timer_on("JK: USO2AO");
+        //~ timer_on("JK: USO2AO");
         USO2AO();
-        timer_off("JK: USO2AO");
+        //~ timer_off("JK: USO2AO");
     } else {
         allocate_JK();
     }
 
-    timer_on("JK: JK");
+    //~ timer_on("JK: JK");
     compute_JK();
-    timer_off("JK: JK");
+    //~ timer_off("JK: JK");
 
     if (C1()) {
-        timer_on("JK: AO2USO");
+        //~ timer_on("JK: AO2USO");
         AO2USO();
-        timer_off("JK: AO2USO");
+        //~ timer_off("JK: AO2USO");
     }
 
     if (debug_ > 6) {
@@ -660,21 +660,21 @@ void JK::compute_from_D() // must be executed after pushing back to D_
     //~ compute_D();
     //~ timer_off("JK: D");
     if (C1()) {
-        timer_on("JK: USO2AO");
+        //~ timer_on("JK: USO2AO");
         USO2AO();
-        timer_off("JK: USO2AO");
+        //~ timer_off("JK: USO2AO");
     } else {
         allocate_JK();
     }
 
-    timer_on("JK: JK");
+    //~ timer_on("JK: JK");
     compute_JK();
-    timer_off("JK: JK");
+    //~ timer_off("JK: JK");
 
     if (C1()) {
-        timer_on("JK: AO2USO");
+        //~ timer_on("JK: AO2USO");
         AO2USO();
-        timer_off("JK: AO2USO");
+        //~ timer_off("JK: AO2USO");
     }
 
     if (debug_ > 6) {
@@ -5166,8 +5166,8 @@ void ICJK::preiterations() {
     reshaped_eri_j_ = SharedMatrix(new Matrix(bigN_, bigN_));
     reshaped_eri_k_ = SharedMatrix(new Matrix(bigN_, bigN_));
     
-    double* jpt = reshaped_eri_j_->get_pointer();
-    double* kpt = reshaped_eri_k_->get_pointer();
+    double* jptr = reshaped_eri_j_->get_pointer();
+    double* kptr = reshaped_eri_k_->get_pointer();
     AOShellCombinationsIterator shellIter = intfac_->shells_iterator();
     const double *buffer = eri_->buffer();
     for (shellIter.first(); shellIter.is_done() == false; shellIter.next()) {
@@ -5180,7 +5180,7 @@ void ICJK::preiterations() {
             int j = intIter.j();
             int k = intIter.k();
             int l = intIter.l();
-            jpt[ij2I(k, l) * bigN_ + ij2I(i, j)] = jpt[ij2I(i, j) * bigN_ + ij2I(k, l)] = buffer[intIter.index()];
+            jptr[ij2I(k, l) * bigN_ + ij2I(i, j)] = jptr[ij2I(i, j) * bigN_ + ij2I(k, l)] = buffer[intIter.index()];
         }
     }
     for (shellIter.first(); shellIter.is_done() == false; shellIter.next()) {
@@ -5192,7 +5192,7 @@ void ICJK::preiterations() {
             int j = intIter.j();
             int k = intIter.k();
             int l = intIter.l();
-            kpt[ij2I(k, l) * bigN_ + ij2I(i, j)] = kpt[ij2I(i, j) * bigN_ + ij2I(k, l)] = jpt[ij2I(i, l) * bigN_ + ij2I(k, j)] + jpt[ij2I(i, k) * bigN_ + ij2I(j, l)];
+            kptr[ij2I(k, l) * bigN_ + ij2I(i, j)] = kptr[ij2I(i, j) * bigN_ + ij2I(k, l)] = jptr[ij2I(i, l) * bigN_ + ij2I(k, j)] + jptr[ij2I(i, k) * bigN_ + ij2I(j, l)];
         }
     }
 }
@@ -5205,24 +5205,24 @@ void ICJK::compute_JK() {
         SharedVector Jvec(new Vector(bigN_)); // used as a cache 
         for (int N = 0; N < D_.size(); ++N) { 
             // reshape D_[N] to a vector 
-            double* const D_pt = D_[N]->get_pointer();
-            double* Dvec_pt = Dvec->pointer();
-            double* const Dvec_starting_pt = Dvec_pt;
+            double* const D_ptr = D_[N]->get_pointer();
+            double* Dvec_ptr = Dvec->pointer();
+            double* const Dvec_starting_ptr = Dvec_ptr;
             for( int i = 0; i < nbf; i++ ) {
                 for( int j = 0; j <= i; j++)
-                    *Dvec_pt++ = D_pt[i * nbf + j] * 2.0;
-                Dvec_starting_pt[i * (i+3) / 2] /= 2.0;
+                    *Dvec_ptr++ = D_ptr[i * nbf + j] * 2.0;
+                Dvec_starting_ptr[i * (i+3) / 2] /= 2.0;
             }
             
             // generate J vector 
             Jvec->gemv(0, 1.0, reshaped_eri_j_.get(), Dvec.get(), 0.0);
             
             // reshape J vector into J_[N] 
-            double* Jvec_pt = Jvec->pointer();
-            double* const Jmat_pt = J_[N]->get_pointer();
+            double* Jvec_ptr = Jvec->pointer();
+            double* const Jmat_ptr = J_[N]->get_pointer();
             for( int i = 0; i < nbf; i++ )
                 for( int j = 0; j <= i; j++)
-                    Jmat_pt[i * nbf + j] = Jmat_pt[j * nbf + i] = *Jvec_pt++;
+                    Jmat_ptr[i * nbf + j] = Jmat_ptr[j * nbf + i] = *Jvec_ptr++;
             
         }
     }
@@ -5231,25 +5231,25 @@ void ICJK::compute_JK() {
         SharedVector Kvec(new Vector(bigN_));
         for (int N = 0; N < D_.size(); ++N) {
             // reshape D_[N] to a vector 
-            double* const D_pt = D_[N]->get_pointer();
-            double* Dvec_pt = Dvec->pointer();
-            double* const Dvec_starting_pt = Dvec_pt;
+            double* const D_ptr = D_[N]->get_pointer();
+            double* Dvec_ptr = Dvec->pointer();
+            double* const Dvec_starting_ptr = Dvec_ptr;
             for( int i = 0; i < nbf; i++ ) {
                 for( int j = 0; j <= i; j++)
-                    *Dvec_pt++ = D_pt[i * nbf + j];
-                Dvec_starting_pt[i * (i+3) / 2] /= 2.0;
+                    *Dvec_ptr++ = D_ptr[i * nbf + j];
+                Dvec_starting_ptr[i * (i+3) / 2] /= 2.0;
             }
             
             // generate K vector 
             Kvec->gemv(0, 1.0, reshaped_eri_k_.get(), Dvec.get(), 0.0);
             
             // reshape K vector into K_[N] 
-            double* Kvec_pt = Kvec->pointer();
-            double* const Kmat_pt = K_[N]->get_pointer();
+            double* Kvec_ptr = Kvec->pointer();
+            double* const Kmat_ptr = K_[N]->get_pointer();
             int nbf = primary_->nbf();
             for( int i = 0; i < nbf; i++ )
                 for( int j = 0; j <= i; j++)
-                    Kmat_pt[i * nbf + j] = Kmat_pt[j * nbf + i] = *Kvec_pt++;
+                    Kmat_ptr[i * nbf + j] = Kmat_ptr[j * nbf + i] = *Kvec_ptr++;
             
         }
     }

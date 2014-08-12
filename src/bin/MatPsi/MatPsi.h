@@ -14,6 +14,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "matlabjk.hpp"
+
+// debugging 
+#include <inttypes.h>
+
 using namespace std;
 using namespace psi;
 using namespace boost;
@@ -115,11 +120,11 @@ public:
     //*** Two-Electron Integrals (TEIs) 
     int tei_uniqN(); // number of unique TEIs 
     double tei_ijkl(int i, int j, int k, int l); // (ij|kl), chemist's notation 
-    // ##HIGH MEMORY COST METHODS## 
+    // ## HIGH MEMORY COST METHODS ## 
     void tei_alluniq(double* matpt); // all unique TEIs in a vector 
     void tei_allfull(double* matpt); // all (repetitive) TEIs in a 4D-array 
     void tei_alluniqJK(double* matptJ, double* matptK); // pre-arrange TEI vectors for forming J/K 
-    // ##HIGH MEMORY COST METHODS## 
+    // ## HIGH MEMORY COST METHODS ## 
     
     
     //*** JK related
@@ -127,6 +132,11 @@ public:
     void UseDirectJK();
     void UsePKJK();
     void UseICJK();
+    // ### EXPERT ### 
+    void UseMatlabJK();
+    void SetMatlabJK(boost::shared_array<double*> Jcell_ptr, boost::shared_array<double*> Kcell_ptr);
+    void DisableMatlabJK();
+    // ### EXPERT ### 
     
     // methods computing J/K/G 
     SharedMatrix Density2J(SharedMatrix Density);
