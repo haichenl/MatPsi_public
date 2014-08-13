@@ -383,8 +383,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mxArray* Jcell = (mxArray*)prhs[2];
         mxArray* Kcell = (mxArray*)prhs[3];
         for( int i = 0; i < nbasis * nbasis; i++) {
-            Jcell_ptr_in[i] = mxGetPr(mxGetCell(Jcell, i));
-            Kcell_ptr_in[i] = mxGetPr(mxGetCell(Kcell, i));
+            mxArray* Jelement = mxGetCell(Jcell, i);
+            mxArray* Kelement = mxGetCell(Kcell, i);
+            if (mxGetM(Jelement) != nbasis || mxGetN(Jelement) != nbasis || mxGetM(Kelement) != nbasis || mxGetN(Kelement) != nbasis)
+                mexErrMsgTxt("SetMatlabJK(Jcell, Kcell): Element not having nbasis by nbasis dimension detected.");
+            Jcell_ptr_in[i] = mxGetPr(Jelement);
+            Kcell_ptr_in[i] = mxGetPr(Kelement);
         }
         MatPsi_obj->SetMatlabJK(Jcell_ptr_in, Kcell_ptr_in);
         return;
