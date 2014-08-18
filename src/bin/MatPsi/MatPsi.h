@@ -2,38 +2,20 @@
 #include <libfock/jk.h>
 #include <psi4-dec.h>
 #include <libparallel/parallel.h>
-#include "mex.h"
-#include "class_handle.hpp"
 #include <boost/shared_array.hpp>
 #include <libpsio/psio.h>
 #include <libpsio/psio.hpp>
 #include <libscf_solver/rhf.h>
-#include <read_options.cc>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "matlabjk.hpp"
 
-// debugging 
-#include <inttypes.h>
 
 using namespace std;
 using namespace psi;
 using namespace boost;
-
-namespace psi {
-#ifdef PSIDEBUG
-    FILE* outfile = stdout;
-#else
-    FILE* outfile = fopen("/dev/null", "w");
-#endif
-    char* psi_file_prefix = "matpsi";
-    std::string outfile_name = "";
-    extern int read_options(const std::string &name, Options & options, 
-            bool suppress_printing = false);
-}
 
 class MatPsi {
 protected:

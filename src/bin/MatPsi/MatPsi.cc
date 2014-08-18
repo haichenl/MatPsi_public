@@ -1,4 +1,19 @@
-// Please directly include this file in MatPsi_mex.cpp to make compilation easier... 
+
+#include "MatPsi.h"
+#include "matlabjk.hpp"
+#include <read_options.cc>
+
+namespace psi {
+#ifdef PSIDEBUG
+    FILE* outfile = stdout;
+#else
+    FILE* outfile = fopen("/dev/null", "w");
+#endif
+    char* psi_file_prefix = "matpsi";
+    std::string outfile_name = "";
+    extern int read_options(const std::string &name, Options & options, 
+            bool suppress_printing = false);
+}
 
 unsigned long int parse_memory_str(const std::string& memory_str) {
     std::string memory_str_ = memory_str;
@@ -53,9 +68,9 @@ void MatPsi::common_init() {
     
     // initialize psio 
     boost::filesystem::path uniqname = boost::filesystem::unique_path();
-    matpsi_id = uniqname.native();
+    matpsi_id = uniqname.string();
     boost::filesystem::path tempdir = boost::filesystem::temp_directory_path();
-    matpsi_tempdir_str = tempdir.native();
+    matpsi_tempdir_str = tempdir.string();
     matpsi_tempdir_str += "/matpsi.temp.";
     matpsi_tempdir_str += matpsi_id;
     boost::filesystem::create_directories(matpsi_tempdir_str);
