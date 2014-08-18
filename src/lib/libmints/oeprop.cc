@@ -829,7 +829,7 @@ void OEProp::common_init()
         }
 
         for (int xyz = 0; xyz < 3; ++xyz) {
-            if(fabs(t[xyz] > 1.0E-8)){
+            if(fabs(t[xyz]) > 1.0E-8){
                 fprintf(outfile, "The origin chosen breaks symmetry; multipoles will be computed without symmetry.\n");
                 origin_preserves_symmetry_ = false;
             }

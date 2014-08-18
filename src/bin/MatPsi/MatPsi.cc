@@ -15,20 +15,21 @@ namespace psi {
             bool suppress_printing = false);
 }
 
+
 unsigned long int parse_memory_str(const std::string& memory_str) {
     std::string memory_str_ = memory_str;
     boost::algorithm::to_lower(memory_str_);
     boost::cmatch cm;
     boost::regex_search(memory_str_.c_str(), cm, boost::regex("([+]?[0-9]*.?[0-9]+)"));
     double memory = boost::lexical_cast<double>(std::string(cm[1].first, cm[1].second));
-    boost::regex_search(memory_str_.c_str(), cm, boost::regex("([a-z]?b)"));
+    boost::regex_search(memory_str_.c_str(), cm, boost::regex("([a-z])"));
     std::string unit_str(cm[1].first, cm[1].second);
     unsigned long int unit;
     if(boost::iequals(unit_str, "b"))
         unit = 1L;
-    else if(boost::iequals(unit_str, "kb"))
+    else if(boost::iequals(unit_str, "k"))
         unit = 1000L;
-    else if(boost::iequals(unit_str, "mb"))
+    else if(boost::iequals(unit_str, "m"))
         unit = 1000000L;
     else
         unit = 1000000000L;
@@ -190,10 +191,6 @@ void MatPsi::free_mol() {
 }
 
 void MatPsi::set_geom(SharedMatrix newGeom) {
-    if(jk_ != NULL)
-        jk_->finalize();
-    psio_->_psio_manager_->psiclean();
-    jk_.reset();
     
     // store the old geometry
     Matrix oldgeom = molecule_->geometry();
@@ -215,6 +212,10 @@ void MatPsi::set_geom(SharedMatrix newGeom) {
     
     // update other objects 
     if(nonbreak) {
+        if(jk_ != NULL)
+            jk_->finalize();
+        psio_->_psio_manager_->psiclean();
+        jk_.reset();
         create_basis_and_integral_factories();
         RHF_reset();
         rhf_->extern_finalize();

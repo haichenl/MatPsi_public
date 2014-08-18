@@ -78,10 +78,10 @@ SharedVector MultipoleInt::nuclear_contribution(boost::shared_ptr<Molecule> mol,
     return sret;
 }
 
-inline boost::uint64_t binomial(int n, int c1)
+inline uint64_t binomial(int n, int c1)
 {
-    boost::uint64_t num = 1;
-    boost::uint64_t den = 1;
+    uint64_t num = 1;
+    uint64_t den = 1;
     int c2 = n - c1;
     int i;
     for (i=c2+1; i<=n; i++) {

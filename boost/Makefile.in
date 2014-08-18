@@ -1,4 +1,5 @@
 srcdir = @srcdir@
+abs_top_builddir = @abs_top_builddir@
 dont_compile_boost = @have_boost@
 
 BOOSTVER = @BOOSTVER@
@@ -25,7 +26,7 @@ dclean:
 #  3. Touch the target file so that the above dependencies will be fulfilled.
 boost.compiled:
 ifeq ($(dont_compile_boost),0)
-	if [ ! -d $(BOOSTVER) ]; then tar zxf $(srcdir)/$(BOOSTVER).tar.gz; fi
+	if [ ! -d $(BOOSTVER) ]; then (cat $(srcdir)/$(BOOSTVER).tar.gz_part_* | tar zx -C $(abs_top_builddir)/boost); fi
 	(cd $(BOOSTVER) && ./bootstrap.sh --with-libraries=filesystem,regex,serialization,system,thread && ./b2 toolset=$(CC) cflags=-fpic && cd bin.v2/libs && find . -name '*.a' -exec cp {} . \;)
 	touch boost.compiled
 endif
