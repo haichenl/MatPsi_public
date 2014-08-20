@@ -426,7 +426,8 @@ void HF::finalize()
     compute_fvpi();
     energy_ = E_;
 
-    dump_to_checkpoint();
+    if(psio_->open_check(PSIF_CHKPT))
+        dump_to_checkpoint();
 
     //Sphalf_.reset();
     //~ X_.reset();

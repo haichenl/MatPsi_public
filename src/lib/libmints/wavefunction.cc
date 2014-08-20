@@ -59,7 +59,7 @@ double fac[MAX_FAC];
 Wavefunction::Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio) :
     process_environment_(process_environment_in), options_(options), psio_(psio)
 {
-    chkpt_ = boost::shared_ptr<Chkpt>(new Chkpt(psio.get(), PSIO_OPEN_OLD));
+    //~ chkpt_ = boost::shared_ptr<Chkpt>(new Chkpt(psio.get(), PSIO_OPEN_OLD));
     common_init();
 }
 

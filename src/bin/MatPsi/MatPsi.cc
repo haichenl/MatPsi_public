@@ -74,7 +74,7 @@ void MatPsi::common_init() {
     matpsi_tempdir_str = tempdir.string();
     matpsi_tempdir_str += "/matpsi.temp.";
     matpsi_tempdir_str += matpsi_id;
-    boost::filesystem::create_directories(matpsi_tempdir_str);
+    //~ boost::filesystem::create_directories(matpsi_tempdir_str);
     psio_ = boost::shared_ptr<PSIO>(new PSIO);
     psio_->set_pid(matpsi_id);
     for (int i=1; i<=PSIO_MAXVOL; ++i) {
@@ -447,6 +447,9 @@ void MatPsi::UseDirectJK() {
 void MatPsi::UsePKJK() {
     if(jk_ != NULL)
         jk_->finalize();
+    if ( !boost::filesystem::exists(matpsi_tempdir_str) ) {
+        boost::filesystem::create_directories(matpsi_tempdir_str);
+    }
     // create PKJK object
     PKJK* jk = new PKJK(process_environment_, basis_, psio_);
 
