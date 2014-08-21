@@ -346,15 +346,15 @@ void Vector::recv()
 void Vector::bcast(int broadcaster)
 {
     // Assume the user allocated the matrix to the correct size first.
-    for (int h=0; h<nirrep_; ++h) {
-        if (dimpi_[h] > 0)
-            WorldComm->bcast(vector_[h], dimpi_[h], broadcaster);
-    }
+    //~ for (int h=0; h<nirrep_; ++h) {
+        //~ if (dimpi_[h] > 0)
+            //~ WorldComm->bcast(vector_[h], dimpi_[h], broadcaster);
+    //~ }
 }
 
 void Vector::sum()
 {
-    for (int h=0; h<nirrep_; ++h)
-        if (dimpi_[h] > 0)
-            WorldComm->sum(vector_[h], dimpi_[h]);
+    //~ for (int h=0; h<nirrep_; ++h)
+        //~ if (dimpi_[h] > 0)
+            //~ WorldComm->sum(vector_[h], dimpi_[h]);
 }

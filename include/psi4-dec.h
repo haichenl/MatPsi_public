@@ -32,6 +32,7 @@
 #include <liboptions/liboptions.h>
 #include <exception.h>
 #include <libmints/typedefs.h>
+//~ #include <libparallel/parallel.h>
 
 namespace psi {
 
@@ -51,6 +52,9 @@ class Wavefunction;
 class PointGroup;
 class ExternalPotential;
 
+class LocalCommWrapper;
+typedef LocalCommWrapper           worldcomm;
+
 class Process
 {
 public:
@@ -67,6 +71,7 @@ public:
         boost::shared_ptr<PointGroup> parent_symmetry_;
         
         boost::shared_ptr<PSIO> psio_;
+        boost::shared_ptr<worldcomm> worldcomm_;
     public:
         void initialize();
 
@@ -120,6 +125,10 @@ public:
         /// "Global" psio pointer 
         boost::shared_ptr<PSIO> psio() const { return psio_; }
         void set_psio(boost::shared_ptr<PSIO> psio) { psio_ = psio; }
+        
+        /// WorldComm 
+        boost::shared_ptr<worldcomm> get_worldcomm() const { return worldcomm_; }
+        void set_worldcomm(boost::shared_ptr<worldcomm> worldcomm_in) { worldcomm_ = worldcomm_in; }
     };
 
     class Arguments

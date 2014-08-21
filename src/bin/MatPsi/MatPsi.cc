@@ -55,7 +55,7 @@ void MatPsi::common_init() {
     process_environment_.set_n_threads(ncores_);
     process_environment_.set_memory(memory_);
     worldcomm_ = initialize_communicator(0, NULL, process_environment_);
-    switch_worldcomm();
+    process_environment_.set_worldcomm(worldcomm_);
     
     // read in options 
     process_environment_.options.set_read_globals(true);
@@ -160,7 +160,7 @@ void MatPsi::set_ncores(int ncores) {
     ncores_ = ncores;
     process_environment_.set_n_threads(ncores_);
     worldcomm_ = initialize_communicator(0, NULL, process_environment_);
-    switch_worldcomm();
+    process_environment_.set_worldcomm(worldcomm_);
 }
 
 void MatPsi::set_memory(std::string memory_str) {
@@ -168,7 +168,7 @@ void MatPsi::set_memory(std::string memory_str) {
     memory_ = parse_memory_str(memory_str);
     process_environment_.set_memory(memory_);
     worldcomm_ = initialize_communicator(0, NULL, process_environment_);
-    switch_worldcomm();
+    process_environment_.set_worldcomm(worldcomm_);
 }
 
 void MatPsi::fix_mol() {

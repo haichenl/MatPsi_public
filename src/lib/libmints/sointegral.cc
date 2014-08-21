@@ -418,10 +418,15 @@ TwoBodySOInt::TwoBodySOInt(Process::Environment& process_environment_in, const s
 void TwoBodySOInt::common_init()
 {
     // MPI runtime settings (defaults provided for all communicators)
-    nthread_ = WorldComm->nthread();
-    comm_    = WorldComm->communicator();
-    nproc_   = WorldComm->nproc();
-    me_      = WorldComm->me();
+    //~ nthread_ = WorldComm->nthread();
+    //~ comm_    = WorldComm->communicator();
+    //~ nproc_   = WorldComm->nproc();
+    //~ me_      = WorldComm->me();
+    
+    nthread_ = process_environment_.get_worldcomm()->nthread();
+    comm_    = process_environment_.get_worldcomm()->communicator();
+    nproc_   = process_environment_.get_worldcomm()->nproc();
+    me_      = process_environment_.get_worldcomm()->me();
 
     // Try to reduce some work:
     b1_ = boost::shared_ptr<SOBasisSet>(new SOBasisSet(tb_[0]->basis1(), integral_));

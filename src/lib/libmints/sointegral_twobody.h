@@ -223,7 +223,8 @@ void TwoBodySOInt::compute_shell(int uish, int ujsh, int uksh, int ulsh, TwoBody
 {
     dprintf("uish %d, ujsh %d, uksh %d, ulsh %d\n", uish, ujsh, uksh, ulsh);
 
-    int thread = WorldComm->thread_id(pthread_self());
+    //~ int thread = WorldComm->thread_id(pthread_self());
+    int thread = 0;
 
     //~ mints_timer_on("TwoBodySOInt::compute_shell overall");
     //~ mints_timer_on("TwoBodySOInt::compute_shell setup");
@@ -439,7 +440,8 @@ void TwoBodySOInt::compute_shell(int uish, int ujsh, int uksh, int ulsh, TwoBody
 template<typename TwoBodySOIntFunctor>
 void TwoBodySOInt::provide_IJKL(int ish, int jsh, int ksh, int lsh, TwoBodySOIntFunctor& body)
 {
-    int thread = WorldComm->thread_id(pthread_self());
+    //~ int thread = WorldComm->thread_id(pthread_self());
+    int thread = 0;
 
     //~ mints_timer_on("TwoBodySOInt::provide_IJKL overall");
 
@@ -595,7 +597,8 @@ void TwoBodySOInt::provide_IJKL(int ish, int jsh, int ksh, int lsh, TwoBodySOInt
 template<typename TwoBodySOIntFunctor>
 void TwoBodySOInt::compute_shell_deriv1(int uish, int ujsh, int uksh, int ulsh, TwoBodySOIntFunctor& body)
 {
-    int thread = WorldComm->thread_id(pthread_self());
+    //~ int thread = WorldComm->thread_id(pthread_self());
+    int thread = 0;
 
     const double *aobuffer = tb_[thread]->buffer();
 
@@ -977,7 +980,8 @@ void TwoBodySOInt::compute_shell_deriv1(int uish, int ujsh, int uksh, int ulsh, 
 template<typename TwoBodySOIntFunctor>
 void TwoBodySOInt::provide_IJKL_deriv1(int ish, int jsh, int ksh, int lsh, TwoBodySOIntFunctor& body)
 {
-    int thread = WorldComm->thread_id(pthread_self());
+    //~ int thread = WorldComm->thread_id(pthread_self());
+    int thread = 0;
 
     //~ mints_timer_on("TwoBodySOInt::provide_IJKL overall");
 
@@ -1150,7 +1154,7 @@ void TwoBodySOInt::compute_integrals(TwoBodySOIntFunctor &functor)
             v++;
         }
 
-        WorldComm->sync();
+        //~ WorldComm->sync();
 #else
         throw PSIEXCEPTION("PSI4 was not built with MADNESS. "
                            "Please rebuild PSI4 with MADNESS, or "
@@ -1193,7 +1197,7 @@ void TwoBodySOInt::compute_integrals_deriv1(TwoBodySOIntFunctor &functor)
             v++;
         }
 
-        WorldComm->sync();
+        //~ WorldComm->sync();
 #else
         throw PSIEXCEPTION("PSI4 was not built with MADNESS. "
                            "Please rebuild PSI4 with MADNESS, or "

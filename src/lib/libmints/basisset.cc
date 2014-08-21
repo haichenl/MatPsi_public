@@ -118,14 +118,14 @@ boost::shared_ptr<Molecule> BasisSet::molecule() const
 
 void BasisSet::print(FILE *out) const
 {
-    if (WorldComm->me() == 0) {
+    //~ if (WorldComm->me() == 0) {
         fprintf(out, "  Basis Set: %s\n", name_.c_str());
         fprintf(out, "    Number of shells: %d\n", nshell());
         fprintf(out, "    Number of basis function: %d\n", nbf());
         fprintf(out, "    Number of Cartesian functions: %d\n", nao());
         fprintf(out, "    Spherical Harmonics?: %s\n", has_puream() ? "true" : "false");
         fprintf(out, "    Max angular momentum: %d\n\n", max_am());
-    }
+    //~ }
 }
 
 void BasisSet::print_by_level(FILE* out, int level) const
@@ -142,7 +142,7 @@ void BasisSet::print_by_level(FILE* out, int level) const
 
 void BasisSet::print_summary(FILE* out) const
 {
-    if (WorldComm->me() == 0) {
+    //~ if (WorldComm->me() == 0) {
         fprintf(out, "  -AO BASIS SET INFORMATION:\n");
         fprintf(out, "    Name                   = %s\n", name_.c_str());
         fprintf(out, "    Total number of shells = %d\n", nshell());
@@ -156,7 +156,7 @@ void BasisSet::print_summary(FILE* out) const
         fprintf(out,"  -Contraction Scheme:\n");
         fprintf(out, "    Atom   Type   All Primitives // Shells:\n");
         fprintf(out, "   ------ ------ --------------------------\n");
-    }
+    //~ }
 
     int *nprims = new int[max_am_ + 1];
     int *nunique = new int[max_am_ + 1];
@@ -169,10 +169,10 @@ void BasisSet::print_summary(FILE* out) const
         memset((void*) nunique, '\0', (max_am_ + 1) * sizeof(int));
         memset((void*) nshells, '\0', (max_am_ + 1) * sizeof(int));
 
-        if (WorldComm->me() == 0) {
+        //~ if (WorldComm->me() == 0) {
             fprintf(out, "    %4d    ", A+1);
             fprintf(out, "%2s     ", molecule_->symbol(A).c_str());
-        }
+        //~ }
 
         int first_shell = center_to_shell_[A];
         int n_shell = center_to_nshell_[A];
@@ -189,22 +189,22 @@ void BasisSet::print_summary(FILE* out) const
         for (int l = 0; l < max_am_ + 1; l++) {
             if (nprims[l] == 0)
                 continue;
-            if (WorldComm->me() == 0)
+            //~ if (WorldComm->me() == 0)
                 fprintf(out, "%d%c ", nprims[l], amtypes[l]);
         }
         // Shells
-        if (WorldComm->me() == 0)
+        //~ if (WorldComm->me() == 0)
             fprintf(out, "// ");
         for (int l = 0; l < max_am_ + 1; l++) {
             if (nshells[l] == 0)
                 continue;
-            if (WorldComm->me() == 0)
+            //~ if (WorldComm->me() == 0)
                 fprintf(out, "%d%c ", nshells[l], amtypes[l]);
         }
-        if (WorldComm->me() == 0)
+        //~ if (WorldComm->me() == 0)
             fprintf(out, "\n");
     }
-    if (WorldComm->me() == 0)
+    //~ if (WorldComm->me() == 0)
         fprintf(out, "\n");
 
     delete[] nprims;
@@ -217,7 +217,7 @@ void BasisSet::print_detail(FILE* out) const
 {
     print_summary(out);
 
-    if (WorldComm->me() == 0) {
+    //~ if (WorldComm->me() == 0) {
         fprintf(out, "  ==> AO Basis Functions <==\n");
         fprintf(out, "\n");
         fprintf(out, "    [ %s ]\n",name_.c_str());
@@ -226,13 +226,13 @@ void BasisSet::print_detail(FILE* out) const
         else
             fprintf(out, "    cartesian\n");
         fprintf(out, "    ****\n");
-    }
+    //~ }
 
     for (int uA = 0; uA < molecule_->nunique(); uA++) {
         const int A = molecule_->unique(uA);
-        if (WorldComm->me() == 0) {
+        //~ if (WorldComm->me() == 0) {
             fprintf(out, "   %2s %3d\n",molecule_->symbol(A).c_str(),A+1);
-        }
+        //~ }
 
         int first_shell = center_to_shell_[A];
         int n_shell = center_to_nshell_[A];
@@ -240,13 +240,13 @@ void BasisSet::print_detail(FILE* out) const
         for (int Q = 0; Q < n_shell; Q++)
             shells_[Q + first_shell].print(out);
 
-        if (WorldComm->me() == 0){
+        //~ if (WorldComm->me() == 0){
             fprintf(out, "    ****\n");
-        }
+        //~ }
     }
-    if (WorldComm->me() == 0){
+    //~ if (WorldComm->me() == 0){
         fprintf(out, "\n");
-    }
+    //~ }
 }
 
 const GaussianShell& BasisSet::shell(int si) const
@@ -369,14 +369,14 @@ boost::shared_ptr<BasisSet> BasisSet::construct(Process::Environment& process_en
                     // Need to wrap this is a try catch block
                     basis_atom_shell[basis.first][symbol] = parser->parse(process_environment_in, symbol, file);
 
-                    if (WorldComm->me() == 0)
+                    //~ if (WorldComm->me() == 0)
                         fprintf(outfile, "  Basis set %s for %s read from %s\n",
                                 basis.first.c_str(), symbol.c_str(), user_file.c_str());
                     not_found = false;
                 }
                 catch (BasisSetNotFound& e) {
                     // This is thrown when load_file fails
-                    if (WorldComm->me() == 0)
+                    //~ if (WorldComm->me() == 0)
                         fprintf(outfile, "  Unable to find %s for %s in %s.\n",
                                 basis.first.c_str(), symbol.c_str(), user_file.c_str());
                     not_found = true;

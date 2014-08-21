@@ -164,10 +164,4 @@ public:
     SharedMatrix RHF_K();   // exchange interaction matrix K
     SharedMatrix RHF_F();   // entire Fock matrix 
     
-    
-    // ##EXPERT## 
-    //*** used at the beginning of mex file to let a global pointer point to a MatPsi class member property 
-    void switch_worldcomm() { WorldComm = worldcomm_; }
-    // ##EXPERT## 
-    
 };

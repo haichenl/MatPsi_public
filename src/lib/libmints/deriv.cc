@@ -64,9 +64,10 @@ public:
     CorrelatedFunctor() {
         throw PSIEXCEPTION("CorrelatedRestrictedFunctor(): Default constructor called. This shouldn't happen.");
     }
-    CorrelatedFunctor(SharedVector results, boost::shared_ptr<PSIO> psio_in) : psio_(psio_in)
+    CorrelatedFunctor(SharedVector results, Process::Environment& process_environment_in) : psio_(process_environment_in.psio())
     {
-        nthread = WorldComm->nthread();
+        //~ nthread = WorldComm->nthread();
+        nthread = process_environment_in.get_worldcomm()->nthread();
         result.push_back(results);
         for (int i=1; i<nthread; ++i)
             result.push_back(SharedVector(result[0]->clone()));
@@ -113,7 +114,8 @@ public:
                     int sirrep, int sso,
                     double value)
     {
-        int thread = WorldComm->thread_id(pthread_self());
+        //~ int thread = WorldComm->thread_id(pthread_self());
+        int thread = 0;
 
         double prefactor = 8.0;
         if (pabs == qabs)
@@ -148,11 +150,12 @@ public:
 //        return *this;
 //    }
 
-    ScfRestrictedFunctor(SharedVector results, boost::shared_ptr<Matrix> D)
+    ScfRestrictedFunctor(SharedVector results, boost::shared_ptr<Matrix> D, Process::Environment& process_environment_in)
         : D_(D)
     {
         counter=0;
-        nthread = WorldComm->nthread();
+        //~ nthread = WorldComm->nthread();
+        nthread = process_environment_in.get_worldcomm()->nthread();
         result.push_back(results);
 
         for (int i=1; i<nthread; ++i)
@@ -180,7 +183,8 @@ public:
                     int sirrep, int sso,
                     double value)
     {
-        int thread = WorldComm->thread_id(pthread_self());
+        //~ int thread = WorldComm->thread_id(pthread_self());
+        int thread = 0;
 
         // Previously, we applied a factor of 4 after the fact...apply it from the beginning now.
         double prefactor = 4.0;
@@ -226,11 +230,12 @@ public:
     ScfAndDfCorrelationRestrictedFunctor(SharedVector results,
                                          ScfRestrictedFunctor& scf_functor,
                                          boost::shared_ptr<Matrix> D,
-                                         boost::shared_ptr<Matrix> D_ref)
+                                         boost::shared_ptr<Matrix> D_ref, Process::Environment& process_environment_in)
         : D_ref_(D_ref), D_(D), scf_functor_(scf_functor), results_(results)
     {
         counter=0;
-        nthread = WorldComm->nthread();
+        //~ nthread = WorldComm->nthread();
+        nthread = process_environment_in.get_worldcomm()->nthread();
         result_vec_.push_back(results);
 
         for (int i=1; i<nthread; ++i)
@@ -265,7 +270,8 @@ public:
                     int sirrep, int sso,
                     double value)
     {
-        int thread = WorldComm->thread_id(pthread_self());
+        //~ int thread = WorldComm->thread_id(pthread_self());
+        int thread = 0;
 
         bool braket = pabs!=rabs || qabs!=sabs;
         bool bra    = pabs!=qabs;
@@ -359,11 +365,12 @@ public:
 
     ScfUnrestrictedFunctor() { throw PSIEXCEPTION("ScfUnrestrictedFunctor(): Oh come on!!!"); }
 
-    ScfUnrestrictedFunctor(SharedVector results, boost::shared_ptr<Matrix> Da, boost::shared_ptr<Matrix> Db)
+    ScfUnrestrictedFunctor(SharedVector results, boost::shared_ptr<Matrix> Da, boost::shared_ptr<Matrix> Db, Process::Environment& process_environment_in)
         : Da_(Da),
           Db_(Db)
     {
-        nthread = WorldComm->nthread();
+        //~ nthread = WorldComm->nthread();
+        nthread = process_environment_in.get_worldcomm()->nthread();
         result.push_back(results);
         for (int i=1; i<nthread; ++i)
             result.push_back(SharedVector(result[0]->clone()));
@@ -389,7 +396,8 @@ public:
                     int sirrep, int sso,
                     double value)
     {
-        int thread = WorldComm->thread_id(pthread_self());
+        //~ int thread = WorldComm->thread_id(pthread_self());
+        int thread = 0;
         double prefactor = 1.0;
 
         if (pabs == qabs)
@@ -464,7 +472,8 @@ SharedMatrix Deriv::compute()
 
     // Initialize an ERI object requesting derivatives.
     std::vector<boost::shared_ptr<TwoBodyAOInt> > ao_eri;
-    for (int i=0; i<WorldComm->nthread(); ++i)
+    //~ for (int i=0; i<WorldComm->nthread(); ++i)
+    for (int i=0; i<process_environment_.get_worldcomm()->nthread(); ++i)
         ao_eri.push_back(boost::shared_ptr<TwoBodyAOInt>(integral_->eri(1)));
     TwoBodySOInt so_eri(process_environment_, ao_eri, integral_, cdsalcs_);
 
@@ -522,12 +531,12 @@ SharedMatrix Deriv::compute()
         if (wfn_->same_a_b_dens()) {  // RHF
             // We need to account for spin integration
             X->scale(2.0);
-            ScfRestrictedFunctor functor(TPDMcont_vector, Da);
+            ScfRestrictedFunctor functor(TPDMcont_vector, Da, process_environment_);
             so_eri.compute_integrals_deriv1(functor);
             functor.finalize();
         }
         else{ // ROHF and UHF
-            ScfUnrestrictedFunctor functor(TPDMcont_vector, Da, Db);
+            ScfUnrestrictedFunctor functor(TPDMcont_vector, Da, Db, process_environment_);
             so_eri.compute_integrals_deriv1(functor);
             functor.finalize();
         }
@@ -572,8 +581,8 @@ SharedMatrix Deriv::compute()
                 // In the restricted case, the alpha D is really the total D.  Undefine the beta one, so
                 // that the one-electron contribution, computed below, is correct.
                 Db = factory_->create_shared_matrix("NULL");
-                ScfRestrictedFunctor scf_functor(TPDM_ref_cont_vector, Da_ref);
-                ScfAndDfCorrelationRestrictedFunctor functor(Dcont_vector, scf_functor, Da, Da_ref);
+                ScfRestrictedFunctor scf_functor(TPDM_ref_cont_vector, Da_ref, process_environment_);
+                ScfAndDfCorrelationRestrictedFunctor functor(Dcont_vector, scf_functor, Da, Da_ref, process_environment_);
                 so_eri.compute_integrals_deriv1(functor);
                 functor.finalize();
                 tpdm_contr_ = wfn_->tpdm_gradient_contribution();
@@ -612,7 +621,7 @@ SharedMatrix Deriv::compute()
             X->scale(0.5);
 
             psio_->open(PSIF_AO_TPDM, PSIO_OPEN_OLD);
-            CorrelatedFunctor functor(TPDMcont_vector, psio_);
+            CorrelatedFunctor functor(TPDMcont_vector, process_environment_);
             so_eri.compute_integrals_deriv1(functor);
             functor.finalize();
             psio_->close(PSIF_AO_TPDM, 1);

@@ -3281,17 +3281,17 @@ void Matrix::recv()
 void Matrix::bcast(int broadcaster)
 {
     // Assume the user allocated the matrix to the correct size first.
-    for (int h=0; h<nirrep_; ++h) {
-        if (rowspi_[h] > 0 && colspi_[h] > 0)
-            WorldComm->bcast(matrix_[h][0], rowspi_[h] * colspi_[h^symmetry_], broadcaster);
-    }
+    //~ for (int h=0; h<nirrep_; ++h) {
+        //~ if (rowspi_[h] > 0 && colspi_[h] > 0)
+            //~ WorldComm->bcast(matrix_[h][0], rowspi_[h] * colspi_[h^symmetry_], broadcaster);
+    //~ }
 }
 
 void Matrix::sum()
 {
-    for (int h=0; h<nirrep_; ++h)
-        if (rowspi_[h] > 0 && colspi_[h] > 0)
-            WorldComm->sum(matrix_[h][0], rowspi_[h] * colspi_[h^symmetry_]);
+    //~ for (int h=0; h<nirrep_; ++h)
+        //~ if (rowspi_[h] > 0 && colspi_[h] > 0)
+            //~ WorldComm->sum(matrix_[h][0], rowspi_[h] * colspi_[h^symmetry_]);
 }
 
 bool Matrix::equal(const Matrix& rhs)

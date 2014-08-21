@@ -100,13 +100,15 @@ vector<string> BasisSetParser::load_file(const std::string& filename,
                                          const std::string& basisname)
 {
     filename_ = filename;
-    int me = WorldComm->me();
-    int nproc = WorldComm->nproc();
+    //~ int me = WorldComm->me();
+    //~ int nproc = WorldComm->nproc();
+    int me = 0;
+    int nproc = 1;
 
     // Loads an entire file.
     vector<string> lines;
 
-    if (WorldComm->me() == 0) {
+    //~ if (WorldComm->me() == 0) {
         smatch what;
 
         // temp variable
@@ -144,10 +146,10 @@ vector<string> BasisSetParser::load_file(const std::string& filename,
                     found_basisname = true;
             }
         }
-    }
+    //~ }
 
-    if (nproc > 1)
-        WorldComm->bcast_serializable(lines, 0);
+    //~ if (nproc > 1)
+        //~ WorldComm->bcast_serializable(lines, 0);
 
     return lines;
 }

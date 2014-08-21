@@ -88,7 +88,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     // Get the class instance pointer from the second input
     MatPsi* MatPsi_obj = convertMat2Ptr<MatPsi>(prhs[1]);
-    MatPsi_obj->switch_worldcomm();
     
     //*** Call the various class methods 
     

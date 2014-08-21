@@ -58,21 +58,21 @@ ULI PSIO::rd_toclen(unsigned int unit) {
   
   /* Seek vol[0] to its beginning */
   stream = this_unit->vol[0].stream;
-  if (WorldComm->me() == 0) {
+  //~ if (WorldComm->me() == 0) {
     errcod = ::lseek(stream, 0L, SEEK_SET);
-  }
-  WorldComm->bcast(&(errcod), 1, 0);
+  //~ }
+  //~ WorldComm->bcast(&(errcod), 1, 0);
   //WorldComm->raw_bcast(&(errcod), sizeof(int), 0);
   if (errcod == -1)
     psio_error(unit, PSIO_ERROR_LSEEK);
   
   /* Read the value */
-  if (WorldComm->me() == 0) {
+  //~ if (WorldComm->me() == 0) {
     errcod = ::read(stream, (char *) &len, sizeof(ULI));
-  }
+  //~ }
 
-  WorldComm->bcast(&(errcod), 1, 0);
-  WorldComm->bcast(&(len), 1, 0);
+  //~ WorldComm->bcast(&(errcod), 1, 0);
+  //~ WorldComm->bcast(&(len), 1, 0);
   //WorldComm->raw_bcast(&(errcod), sizeof(int), 0);
   //WorldComm->raw_bcast(&(len), sizeof(ULI), 0);
 
@@ -89,10 +89,10 @@ void PSIO::wt_toclen(unsigned int unit, ULI len) {
   
   /* Seek vol[0] to its beginning */
   stream = this_unit->vol[0].stream;
-  if (WorldComm->me() == 0) {
+  //~ if (WorldComm->me() == 0) {
     errcod = ::lseek(stream, 0L, SEEK_SET);
-  }
-  WorldComm->bcast(&(errcod), 1, 0);
+  //~ }
+  //~ WorldComm->bcast(&(errcod), 1, 0);
   //WorldComm->raw_bcast(&(errcod), sizeof(int), 0);
   if (errcod == -1) {
     fprintf(stderr, "Error in PSIO_WT_TOCLEN()!\n");
@@ -100,10 +100,10 @@ void PSIO::wt_toclen(unsigned int unit, ULI len) {
   }
   
   /* Write the value */
-  if (WorldComm->me() == 0) {
+  //~ if (WorldComm->me() == 0) {
     errcod = ::write(stream, (char *) &len, sizeof(ULI));
-  }
-  WorldComm->bcast(&(errcod), 1, 0);
+  //~ }
+  //~ WorldComm->bcast(&(errcod), 1, 0);
   //WorldComm->raw_bcast(&(errcod), sizeof(int), 0);
   if(errcod != sizeof(ULI)) {
     fprintf(stderr, "PSIO_ERROR: Failed to write toclen to unit %d.\n", unit);
