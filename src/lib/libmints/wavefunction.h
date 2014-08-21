@@ -233,6 +233,10 @@ private:
     void common_init();
 
 public:
+    
+    /// Use "global" psio 
+    Wavefunction(Process::Environment& process_environment_in);
+    
     /// Set the PSIO object.
     Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio);
     Wavefunction(Process::Environment& process_environment_in, Options & options, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);

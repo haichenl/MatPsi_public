@@ -99,6 +99,9 @@ protected:
     void whether_to_use_StartingC();
 
 public:
+    
+    RHF(Process::Environment& process_environment_in, boost::shared_ptr<JK> jk_in);
+    
     RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
     RHF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio);
     virtual ~RHF();

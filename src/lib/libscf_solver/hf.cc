@@ -69,6 +69,15 @@ using namespace psi;
 
 namespace psi { namespace scf {
 
+HF::HF(Process::Environment& process_environment_in, boost::shared_ptr<JK> jk_in)
+    : Wavefunction(process_environment_in),
+      nuclear_dipole_contribution_(3),
+      nuclear_quadrupole_contribution_(6)
+{
+    jk_ = jk_in;
+    common_init();
+}
+
 HF::HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt)
     : Wavefunction(process_environment_in, options, psio, chkpt),
       nuclear_dipole_contribution_(3),

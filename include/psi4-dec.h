@@ -65,6 +65,8 @@ public:
         boost::shared_ptr<Vector> frequencies_;
         boost::shared_ptr<Wavefunction> wavefunction_;
         boost::shared_ptr<PointGroup> parent_symmetry_;
+        
+        boost::shared_ptr<PSIO> psio_;
     public:
         void initialize();
 
@@ -114,6 +116,10 @@ public:
 
         /// "Global" liboptions object.
         Options options;
+        
+        /// "Global" psio pointer 
+        boost::shared_ptr<PSIO> psio() const { return psio_; }
+        void set_psio(boost::shared_ptr<PSIO> psio) { psio_ = psio; }
     };
 
     class Arguments

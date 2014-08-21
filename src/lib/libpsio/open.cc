@@ -39,9 +39,17 @@
 #include <libpsio/psio.hpp>
 #include <libparallel/parallel.h>
 
+#include <boost/filesystem.hpp>
+
 namespace psi {
 
 void PSIO::open(unsigned int unit, int status) {
+    
+    // check if our working folder exists 
+    if ( !boost::filesystem::exists(_psio_manager_->get_default_path()) ) {
+        boost::filesystem::create_directories(_psio_manager_->get_default_path());
+    }
+    
   unsigned int i;
   char *name, *path;
   psio_ud *this_unit;

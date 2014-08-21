@@ -15,7 +15,6 @@ namespace psi {
             bool suppress_printing = false);
 }
 
-
 unsigned long int parse_memory_str(const std::string& memory_str) {
     std::string memory_str_ = memory_str;
     boost::algorithm::to_lower(memory_str_);
@@ -84,6 +83,7 @@ void MatPsi::common_init() {
         psio_->filecfg_kwd("DEFAULT", kwd, -1, matpsi_tempdir_str.c_str());
     }
     psio_->_psio_manager_->set_default_path(matpsi_tempdir_str);
+    process_environment_.set_psio(psio_);
     
     // create molecule object and set its basis set name 
     molecule_ = psi::Molecule::create_molecule_from_string(process_environment_, molstring_);
@@ -101,6 +101,7 @@ void MatPsi::common_init() {
     matfac_ = boost::shared_ptr<MatrixFactory>(new MatrixFactory);
     matfac_->init_with(1, nbf, nbf);
 }
+
 
 void MatPsi::set_basis(const std::string& basisname) {
     if(jk_ != NULL)
@@ -606,7 +607,7 @@ SharedMatrix MatPsi::OccMO2G(SharedMatrix OccMO) {
 void MatPsi::RHF_reset() {
     //~ if(rhf_ != NULL)
         //~ rhf_->extern_finalize(); // really tired of trying when we should do finalize, just be it, seems to work 
-    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, process_environment_.options, jk_, psio_));
+    rhf_ = boost::shared_ptr<scf::RHF>(new scf::RHF(process_environment_, jk_));
     process_environment_.set_wavefunction(rhf_);
 }
 

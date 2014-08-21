@@ -354,6 +354,9 @@ protected:
     virtual void whether_to_use_StartingC() = 0;
 
 public:
+    
+    HF(Process::Environment& process_environment_in, boost::shared_ptr<JK> jk_in);
+    
     HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Chkpt> chkpt);
     HF(Process::Environment& process_environment_in, Options& options, boost::shared_ptr<JK> jk_in, boost::shared_ptr<PSIO> psio);
     
