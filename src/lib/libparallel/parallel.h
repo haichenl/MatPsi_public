@@ -46,7 +46,7 @@ typedef psi::LocalCommWrapper           worldcomm;
 namespace psi {
 
     extern FILE *outfile;
-    extern boost::shared_ptr<worldcomm> WorldComm;
+    //~ extern boost::shared_ptr<worldcomm> WorldComm;
 
     // A templated version of init comunicator.
     template <typename comm_type>

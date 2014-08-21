@@ -26,7 +26,7 @@
 
 namespace psi {
 
-boost::shared_ptr<worldcomm> WorldComm;
+//~ boost::shared_ptr<worldcomm> WorldComm;
 
 boost::shared_ptr<worldcomm> initialize_communicator(const int &argc, char **argv, Process::Environment& process_environment_in) {
     return boost::shared_ptr<worldcomm>(initialize_specific_communicator<worldcomm>(argc, argv, process_environment_in));
