@@ -74,43 +74,43 @@ double SAPT0::compute_energy()
   psio_->open(PSIF_SAPT_BB_DF_INTS,PSIO_OPEN_NEW);
   psio_->open(PSIF_SAPT_AB_DF_INTS,PSIO_OPEN_NEW);
 
-  timer_on("DF Integrals       ");
+  //~ timer_on("DF Integrals       ");
     if (aio_dfints_)
       df_integrals_aio();
     else
       df_integrals();
-  timer_off("DF Integrals       ");
-  timer_on("W Integrals        ");
+  //~ timer_off("DF Integrals       ");
+  //~ timer_on("W Integrals        ");
     w_integrals();
-  timer_off("W Integrals        ");
+  //~ timer_off("W Integrals        ");
   if (!elst_basis_) {
-    timer_on("Elst10             ");
+    //~ timer_on("Elst10             ");
       elst10();
-    timer_off("Elst10             ");
-    timer_on("Exch10             ");
+    //~ timer_off("Elst10             ");
+    //~ timer_on("Exch10             ");
       exch10();
-    timer_off("Exch10             ");
-    timer_on("Exch10 S^2         ");
+    //~ timer_off("Exch10             ");
+    //~ timer_on("Exch10 S^2         ");
       exch10_s2();
-    timer_off("Exch10 S^2         ");
+    //~ timer_off("Exch10 S^2         ");
   }
-  timer_on("Ind20              ");
+  //~ timer_on("Ind20              ");
     if (debug_ || no_response_) ind20();
     if (!no_response_) ind20r();
-  timer_off("Ind20              ");
-  timer_on("Exch-Ind20         ");
+  //~ timer_off("Ind20              ");
+  //~ timer_on("Exch-Ind20         ");
     exch_ind20A_B();
     exch_ind20B_A();
-  timer_off("Exch-Ind20         ");
+  //~ timer_off("Exch-Ind20         ");
   if (debug_) disp20();
-  timer_on("Exch-Disp20 N^5    ");
+  //~ timer_on("Exch-Disp20 N^5    ");
     psio_->open(PSIF_SAPT_TEMP,PSIO_OPEN_NEW);
     exch_disp20_n5();
-  timer_off("Exch-Disp20 N^5    ");
-  timer_on("Exch-Disp20 N^4    ");
+  //~ timer_off("Exch-Disp20 N^5    ");
+  //~ timer_on("Exch-Disp20 N^4    ");
     exch_disp20_n4();
     psio_->close(PSIF_SAPT_TEMP,0);
-  timer_off("Exch-Disp20 N^4    ");
+  //~ timer_off("Exch-Disp20 N^4    ");
 
   print_results();
 
@@ -271,18 +271,18 @@ void SAPT0::first_order_terms()
   psio_->open(PSIF_SAPT_BB_DF_INTS,PSIO_OPEN_NEW);
   psio_->open(PSIF_SAPT_AB_DF_INTS,PSIO_OPEN_NEW);
 
-  timer_on("OO DF Integrals    ");
+  //~ timer_on("OO DF Integrals    ");
     oo_df_integrals();
-  timer_off("OO DF Integrals    ");
-  timer_on("Elst10             ");
+  //~ timer_off("OO DF Integrals    ");
+  //~ timer_on("Elst10             ");
     elst10();
-  timer_off("Elst10             ");
-  timer_on("Exch10             ");
+  //~ timer_off("Elst10             ");
+  //~ timer_on("Exch10             ");
     exch10();
-  timer_off("Exch10             ");
-  timer_on("Exch10 S^2         ");
+  //~ timer_off("Exch10             ");
+  //~ timer_on("Exch10 S^2         ");
     exch10_s2();
-  timer_off("Exch10 S^2         ");
+  //~ timer_off("Exch10 S^2         ");
 
   psio_->close(PSIF_SAPT_AA_DF_INTS,1);
   psio_->close(PSIF_SAPT_BB_DF_INTS,1);

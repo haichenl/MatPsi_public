@@ -129,7 +129,7 @@ int DPD::buf4_mat_irrep_wrt(dpdbuf4 *Buf, int irrep)
     case 12: /* No change in pq or rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_wrt_12");
+        //~ timer_on("buf_wrt_12");
 #endif
 
         if(Buf->file.incore && size) {
@@ -146,7 +146,7 @@ int DPD::buf4_mat_irrep_wrt(dpdbuf4 *Buf, int irrep)
         }
 
 #ifdef DPD_TIMER
-        timer_off("buf_wrt_12");
+        //~ timer_off("buf_wrt_12");
 #endif
 
         break;

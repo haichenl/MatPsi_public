@@ -53,14 +53,14 @@ void SAPT2p::disp2ccd() //!
   }
 
   // Calculate monomer A CCD amplitudes
-timer_on("CCD Prep           ");
+//~ timer_on("CCD Prep           ");
   ccd_prep("T ARAR Amplitudes","Theta ARAR Amplitudes","G ARAR Integrals",
     "G ARRA Integrals","AAAA Integrals","ARAR Integrals","AARR Integrals",
     "RRRR+ Integrals","RRRR- Integrals",PSIF_SAPT_AA_DF_INTS,"AA RI Integrals",
     "AR RI Integrals","RR RI Integrals",evalsA_,noccA_,
     nvirA_,foccA_,mo2noA,
     "T2 ARAR Amplitudes");
-timer_off("CCD Prep           ");
+//~ timer_off("CCD Prep           ");
   ccd_iterate("T ARAR Amplitudes","T ARAR Error","Theta ARAR Amplitudes",
     "G ARAR Integrals","G ARRA Integrals","AAAA Integrals","ARAR Integrals",
     "AARR Integrals","RRRR+ Integrals","RRRR- Integrals",evalsA_,
@@ -71,14 +71,14 @@ timer_off("CCD Prep           ");
     fflush(outfile);
   }
   // Calculate monomer B CCD amplitudes
-timer_on("CCD Prep           ");
+//~ timer_on("CCD Prep           ");
   ccd_prep("T BSBS Amplitudes","Theta BSBS Amplitudes","G BSBS Integrals",
     "G BSSB Integrals","BBBB Integrals","BSBS Integrals","BBSS Integrals",
     "SSSS+ Integrals","SSSS- Integrals",PSIF_SAPT_BB_DF_INTS,"BB RI Integrals",
     "BS RI Integrals","SS RI Integrals",evalsB_,noccB_,
     nvirB_,foccB_,mo2noB,
     "T2 BSBS Amplitudes");
-timer_off("CCD Prep           ");
+//~ timer_off("CCD Prep           ");
   ccd_iterate("T BSBS Amplitudes","T BSBS Error","Theta BSBS Amplitudes",
     "G BSBS Integrals","G BSSB Integrals","BBBB Integrals","BSBS Integrals",
     "BBSS Integrals","SSSS+ Integrals","SSSS- Integrals",evalsB_,
@@ -89,7 +89,7 @@ timer_off("CCD Prep           ");
     fflush(outfile);
   }
   // Calculate dispersion CCD amplitudes
-timer_on("CCD Disp Prep      ");
+//~ timer_on("CCD Disp Prep      ");
   r_ccd_prep("T ARBS Amplitudes","ARBS Integrals","T ARBS (ARBS)",
     "T ARAR Amplitudes","Theta ARAR Amplitudes","T BSBS Amplitudes",
     "Theta BSBS Amplitudes","G ARAR Integrals","G BSBS Integrals",
@@ -98,7 +98,7 @@ timer_on("CCD Disp Prep      ");
     PSIF_SAPT_BB_DF_INTS,"BS RI Integrals",evalsA_,evalsB_,
     noccA_,nvirA_,foccA_,noccB_,
     nvirB_,foccB_);
-timer_off("CCD Disp Prep      ");
+//~ timer_off("CCD Disp Prep      ");
   double disp2_ccd = r_ccd_iterate("T ARBS Amplitudes","T ARBS Error",
     "T ARBS (ARBS)","G ARRA Integrals","G BSSB Integrals","Theta x G ARAR",
     "T x G AA","T x G RR","Theta x G BSBS","T x G BB","T x G SS",
@@ -143,12 +143,12 @@ timer_off("CCD Disp Prep      ");
     fflush(outfile);
   }
   // Calculate intramonomer dispersion CCD amplitudes for monomer A
-timer_on("CCD Intra Prep     ");
+//~ timer_on("CCD Intra Prep     ");
   s_ccd_prep("S ARAR Amplitudes","S ARAR (tARBS)","T ARAR Amplitudes",
     "Theta ARAR Amplitudes","T ARBS Amplitudes","G BSBS Integrals",
     "ARBS Integrals",evalsA_,noccA_,nvirA_,
     foccA_,noccB_,nvirB_,foccB_);
-timer_off("CCD Intra Prep     ");
+//~ timer_off("CCD Intra Prep     ");
   disp2_ccd += s_ccd_iterate("S ARAR Amplitudes","S ARAR Error",
     "S ARAR (tARBS)","T ARAR Amplitudes","G ARAR Integrals","G ARRA Integrals",
     "AAAA Integrals","ARAR Integrals","AARR Integrals","RRRR+ Integrals",
@@ -161,12 +161,12 @@ timer_off("CCD Intra Prep     ");
     fflush(outfile);
   }
   // Calculate intramonomer dispersion CCD amplitudes for monomer B
-timer_on("CCD Intra Prep     ");
+//~ timer_on("CCD Intra Prep     ");
   s_ccd_prep("S BSBS Amplitudes","S BSBS (tBSAR)","T BSBS Amplitudes",
     "Theta BSBS Amplitudes","T BSAR Amplitudes","G ARAR Integrals",
     "BSAR Integrals",evalsB_,noccB_,nvirB_,
     foccB_,noccA_,nvirA_,foccA_);
-timer_off("CCD Intra Prep     ");
+//~ timer_off("CCD Intra Prep     ");
   disp2_ccd += s_ccd_iterate("S BSBS Amplitudes","S BSBS Error",
     "S BSBS (tBSAR)","T BSBS Amplitudes","G BSBS Integrals","G BSSB Integrals",
     "BBBB Integrals","BSBS Integrals","BBSS Integrals","SSSS+ Integrals",
@@ -429,10 +429,10 @@ double SAPT2p::r_ccd_iterate(const char *TARBS, const char *TARBSerr, const char
     }
     E_old = E_new;
 
-timer_on("CCD Disp Amps      ");
+//~ timer_on("CCD Disp Amps      ");
     RMS = r_ccd_amplitudes(TARBS,TARBSerr,CA_RBS,GARRA,GBSSB,XARAR,XAA,XRR,
       XBSBS,XBB,XSS,evalsA_,evalsB_,noccA_,virA,foccA_,noccB_,virB,foccB_);
-timer_off("CCD Disp Amps      ");
+//~ timer_off("CCD Disp Amps      ");
 
     diis.store_vectors();
     if (iter > min_ccd_vecs_) {
@@ -722,10 +722,10 @@ double SAPT2p::s_ccd_iterate(const char *SARAR, const char *SARARerr, const char
     }
     E_old = E_new;
 
-timer_on("CCD Intra Amps     ");
+//~ timer_on("CCD Intra Amps     ");
     RMS = s_ccd_amplitudes(SARAR,SARARerr,CA_RAR,TARAR,GARAR,GARRA,AAAA,ARAR,
       AARR,RRRRp,RRRRm,XARAR,YARAR,XAA,XRR,evalsA_,noccA_,virA,foccA_,mo2no);
-timer_off("CCD Intra Amps     ");
+//~ timer_off("CCD Intra Amps     ");
 
     diis.store_vectors();
     if (iter > min_ccd_vecs_) {
@@ -1152,7 +1152,7 @@ void SAPT2p::vvvv_prep(const char *RRRRp, const char *RRRRm, //!
   double** B_p_RR, int virA, int ndf,
   boost::shared_ptr<Matrix> mo2no)
 {
-  timer_on("v^4 Prep           ");
+  //~ timer_on("v^4 Prep           ");
 
   boost::shared_ptr<Matrix> B2;
   boost::shared_ptr<Matrix> B3;
@@ -1218,12 +1218,12 @@ void SAPT2p::vvvv_prep(const char *RRRRp, const char *RRRRm, //!
   free(yRR);
   free_block(RR);
 
-  timer_off("v^4 Prep           ");
+  //~ timer_off("v^4 Prep           ");
 }
 double **SAPT2p::vvvv_ccd(const char *TARAR, const char *RRRRp, const char *RRRRm, //!
   int occA, int virA, boost::shared_ptr<Matrix> mo2no)
 {
-  timer_on("v^4 Term           ");
+  //~ timer_on("v^4 Term           ");
 
   double **tARAR;
   int virA2;
@@ -1414,7 +1414,7 @@ double **SAPT2p::vvvv_ccd(const char *TARAR, const char *RRRRp, const char *RRRR
     ret = t2AARR;
   }
 
-  timer_off("v^4 Term           ");
+  //~ timer_off("v^4 Term           ");
   return(ret);
 }
 
@@ -1671,10 +1671,10 @@ void SAPT2p::ccd_iterate(const char *TARAR, const char *TARARerr, const char *Th
 
     E_old = E_new;
 
-timer_on("CCD Amps           ");
+//~ timer_on("CCD Amps           ");
     RMS = ccd_amplitudes(TARAR,TARARerr,ThetaARAR,GARAR,GARRA,AAAA,ARAR,AARR,
       RRRRp,RRRRm,evals,noccA,virA,foccA,mo2no);
-timer_off("CCD Amps           ");
+//~ timer_off("CCD Amps           ");
 
     diis.store_vectors();
     if (iter > min_ccd_vecs_) {

@@ -177,12 +177,12 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
                             jk = CIjAb->params->rowidx[J][K];
                             kj = CIjAb->params->rowidx[K][J];
 #ifdef T3_TIMER_ON              
-                            timer_on("T3_RHF");
+                            //~ timer_on("T3_RHF");
 #endif
                             T3_RHF(W3, nirreps, I, Gi, J, Gj, K, Gk, CIjAb, WAbEi, WMbIj,
                                    &fIJ2, &fAB2, occpi, occ_off, virtpi, vir_off, omega);
 #ifdef T3_TIMER_ON              
-                            timer_off("T3_RHF");
+                            //~ timer_off("T3_RHF");
 #endif
                             if(newtrips) {
                                 /* generate lincombs of triples needed for singles and doubles */
@@ -214,7 +214,7 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
                             /* do (Wmnie*X3(ab,c) --> SIjAb) contractions that use W3(ab,c) first */
                             if (do_doubles) {
 #ifdef T3_TIMER_ON              
-                                timer_on("X3*Wmnie");
+                                //~ timer_on("X3*Wmnie");
 #endif
                                 if(newtrips) {
                                     /* S_liba <-- -W_ijkabc W_jklc */
@@ -356,12 +356,12 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
                                     }
                                 } /* else no newtrips */
 #ifdef T3_TIMER_ON              
-                                timer_off("X3*Wmnie");
+                                //~ timer_off("X3*Wmnie");
 #endif
                             } /* end Wmnie*X3 doubles contributions */
 
 #ifdef T3_TIMER_ON              
-                            timer_on("X3_sort");
+                            //~ timer_on("X3_sort");
 #endif
                             if(newtrips) {
                                 /* sort W(ab,c) to W(a,bc) */
@@ -401,7 +401,7 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
                                 }
                             }
 #ifdef T3_TIMER_ON              
-                            timer_off("X3_sort");
+                            //~ timer_off("X3_sort");
 #endif
 
                             /*** X3(a,bc)*Dints --> SIA Contributions ***/
@@ -448,7 +448,7 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
                             /*** X3(a,bc)*Wamef --> SIjAb Contributions ***/
                             if (do_doubles) {
 #ifdef T3_TIMER_ON              
-                                timer_on("X3*Wamef");
+                                //~ timer_on("X3*Wamef");
 #endif
                                 if(newtrips) {
                                     /* S_IjAb <-- V_ijkabc F_kc */
@@ -660,7 +660,7 @@ void DPD::cc3_sigma_RHF(dpdbuf4 *CIjAb, dpdbuf4 *WAbEi, dpdbuf4 *WMbIj,
 
                                 } /* no newtrips */
 #ifdef T3_TIMER_ON              
-                                timer_off("X3*Wamef");
+                                //~ timer_off("X3*Wamef");
 #endif
                             } /* end Wamef*X3->Sijab contributions */
                         } /* k */

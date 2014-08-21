@@ -56,7 +56,7 @@ int DPD::dot24(dpdfile2 *T, dpdbuf4 *I, dpdfile2 *Z,
     file2_mat_rd(Z);
 
 #ifdef DPD_TIMER
-    timer_on("dot24");
+    //~ timer_on("dot24");
 #endif
 
     /* loop over row irreps of buf4, h = Gpq = Grs^GI (symm: Gpq = Grs) */
@@ -127,7 +127,7 @@ int DPD::dot24(dpdfile2 *T, dpdbuf4 *I, dpdfile2 *Z,
     }
 
 #ifdef DPD_TIMER
-    timer_off("dot24");
+    //~ timer_off("dot24");
 #endif
 
     /* Close the two-index quantities */

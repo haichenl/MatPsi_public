@@ -125,9 +125,9 @@ void RKS::form_V()
 }
 void RKS::form_G()
 {
-    timer_on("Form V");
+    //~ timer_on("Form V");
     form_V();
-    timer_off("Form V");
+    //~ timer_off("Form V");
 
     // Push the C matrix on
     std::vector<SharedMatrix> & C = jk_->C_left();
@@ -289,9 +289,9 @@ void UKS::form_V()
 }
 void UKS::form_G()
 {
-    timer_on("Form V");
+    //~ timer_on("Form V");
     form_V();
-    timer_off("Form V");
+    //~ timer_off("Form V");
 
     // Push the C matrix on
     std::vector<SharedMatrix> & C = jk_->C_left();

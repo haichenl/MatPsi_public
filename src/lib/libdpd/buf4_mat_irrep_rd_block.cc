@@ -45,7 +45,7 @@ int DPD::buf4_mat_irrep_rd_block(dpdbuf4 *Buf, int irrep, int start_pq,
     double value;
 
 #ifdef DPD_TIMER
-    timer_on("buf4_rd_bk");
+    //~ timer_on("buf4_rd_bk");
 #endif
 
     all_buf_irrep = Buf->file.my_irrep;
@@ -524,7 +524,7 @@ int DPD::buf4_mat_irrep_rd_block(dpdbuf4 *Buf, int irrep, int start_pq,
     }
 
 #ifdef DPD_TIMER
-    timer_off("buf4_rd_bk");
+    //~ timer_off("buf4_rd_bk");
 #endif
     return 0;
 

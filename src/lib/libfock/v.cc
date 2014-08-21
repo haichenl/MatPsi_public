@@ -356,27 +356,27 @@ void VBase::AO2USO()
 }
 void VBase::initialize()
 {
-    timer_on("V: Grid");
+    //~ timer_on("V: Grid");
     grid_ = boost::shared_ptr<DFTGrid>(new DFTGrid(process_environment_, primary_->molecule(),primary_,options_));
-    timer_off("V: Grid");
+    //~ timer_off("V: Grid");
 }
 void VBase::compute()
 {
-    timer_on("V: D");
+    //~ timer_on("V: D");
     compute_D();
-    timer_off("V: D");
+    //~ timer_off("V: D");
 
-    timer_on("V: USO2AO");
+    //~ timer_on("V: USO2AO");
     USO2AO();
-    timer_off("V: USO2AO");
+    //~ timer_off("V: USO2AO");
 
-    timer_on("V: V");
+    //~ timer_on("V: V");
     compute_V();
-    timer_off("V: V");
+    //~ timer_off("V: V");
 
-    timer_on("V: AO2USO");
+    //~ timer_on("V: AO2USO");
     AO2USO();
-    timer_off("V: AO2USO");
+    //~ timer_off("V: AO2USO");
 }
 SharedMatrix VBase::compute_gradient()
 {
@@ -467,19 +467,19 @@ void RV::compute_V()
         const std::vector<int>& function_map = block->functions_local_to_global();
         int nlocal = function_map.size();
 
-        timer_on("Properties");
+        //~ timer_on("Properties");
         properties_->compute_points(block);
-        timer_off("Properties");
-        timer_on("Functional");
+        //~ timer_off("Properties");
+        //~ timer_on("Functional");
         std::map<std::string, SharedVector>& vals = functional_->compute_functional(properties_->point_values(), npoints); 
-        timer_off("Functional");
+        //~ timer_off("Functional");
 
         if (debug_ > 4) {
             block->print(outfile, debug_);
             properties_->print(outfile, debug_);
         }
 
-        timer_on("V_XC");
+        //~ timer_on("V_XC");
         double** phi = properties_->basis_value("PHI")->pointer();
         double *restrict rho_a = properties_->point_value("RHO_A")->pointer();
         double *restrict zk = vals["V"]->pointer(); 
@@ -496,16 +496,16 @@ void RV::compute_V()
         rhoazq      += C_DDOT(npoints,QTp,1,z,1);
 
         // => LSDA contribution (symmetrized) <= //
-        timer_on("LSDA");
+        //~ timer_on("LSDA");
         for (int P = 0; P < npoints; P++) {
             ::memset(static_cast<void*>(Tp[P]),'\0',nlocal*sizeof(double));
             C_DAXPY(nlocal,0.5 * v_rho_a[P] * w[P], phi[P], 1, Tp[P], 1); 
         }
-        timer_off("LSDA");
+        //~ timer_off("LSDA");
         
         // => GGA contribution (symmetrized) <= // 
         if (ansatz >= 1) {
-            timer_on("GGA");
+            //~ timer_on("GGA");
             double** phix = properties_->basis_value("PHI_X")->pointer();
             double** phiy = properties_->basis_value("PHI_Y")->pointer();
             double** phiz = properties_->basis_value("PHI_Z")->pointer();
@@ -520,11 +520,11 @@ void RV::compute_V()
                 C_DAXPY(nlocal,w[P] * (2.0 * v_sigma_aa[P] * rho_ay[P] + v_sigma_ab[P] * rho_ay[P]), phiy[P], 1, Tp[P], 1); 
                 C_DAXPY(nlocal,w[P] * (2.0 * v_sigma_aa[P] * rho_az[P] + v_sigma_ab[P] * rho_az[P]), phiz[P], 1, Tp[P], 1); 
             }        
-            timer_off("GGA");
+            //~ timer_off("GGA");
         }
 
         // Single GEMM slams GGA+LSDA together (man but GEM's hot!)
-        timer_on("LSDA");
+        //~ timer_on("LSDA");
         C_DGEMM('T','N',nlocal,nlocal,npoints,1.0,phi[0],max_functions,Tp[0],max_functions,0.0,V2p[0],max_functions);
 
         // Symmetrization (V is Hermitian)
@@ -533,11 +533,11 @@ void RV::compute_V()
                 V2p[m][n] = V2p[n][m] = V2p[m][n] + V2p[n][m]; 
             }
         } 
-        timer_off("LSDA");
+        //~ timer_off("LSDA");
 
         // => Meta contribution <= //
         if (ansatz >= 2) {
-            timer_on("Meta");
+            //~ timer_on("Meta");
             double** phix = properties_->basis_value("PHI_X")->pointer();
             double** phiy = properties_->basis_value("PHI_Y")->pointer();
             double** phiz = properties_->basis_value("PHI_Z")->pointer();
@@ -556,7 +556,7 @@ void RV::compute_V()
                 }        
                 C_DGEMM('T','N',nlocal,nlocal,npoints,1.0,phiw[0],max_functions,Tp[0],max_functions,1.0,V2p[0],max_functions);
             }            
-            timer_off("Meta");
+            //~ timer_off("Meta");
         }       
  
         // => Unpacking <= //
@@ -569,7 +569,7 @@ void RV::compute_V()
             }
             Vp[mg][mg] += V2p[ml][ml];
         }
-        timer_off("V_XC");
+        //~ timer_off("V_XC");
     } 
    
     quad_values_["FUNCTIONAL"] = functionalq;
@@ -651,12 +651,12 @@ SharedMatrix RV::compute_gradient()
         const std::vector<int>& function_map = block->functions_local_to_global();
         int nlocal = function_map.size();
 
-        timer_on("Properties");
+        //~ timer_on("Properties");
         properties_->compute_points(block);
-        timer_off("Properties");
-        timer_on("Functional");
+        //~ timer_off("Properties");
+        //~ timer_on("Functional");
         std::map<std::string, SharedVector>& vals = functional_->compute_functional(properties_->point_values(), npoints); 
-        timer_off("Functional");
+        //~ timer_off("Functional");
 
         double** phi = properties_->basis_value("PHI")->pointer();
         double** phi_x = properties_->basis_value("PHI_X")->pointer();
@@ -917,19 +917,19 @@ void UV::compute_V()
         const std::vector<int>& function_map = block->functions_local_to_global();
         int nlocal = function_map.size();
 
-        timer_on("Properties");
+        //~ timer_on("Properties");
         properties_->compute_points(block);
-        timer_off("Properties");
-        timer_on("Functional");
+        //~ timer_off("Properties");
+        //~ timer_on("Functional");
         std::map<std::string, SharedVector>& vals = functional_->compute_functional(properties_->point_values(), npoints); 
-        timer_off("Functional");
+        //~ timer_off("Functional");
 
         if (debug_ > 3) {
             block->print(outfile, debug_);
             properties_->print(outfile, debug_);
         }
 
-        timer_on("V_XC");
+        //~ timer_on("V_XC");
         double** phi = properties_->basis_value("PHI")->pointer();
         double *restrict rho_a = properties_->point_value("RHO_A")->pointer();
         double *restrict rho_b = properties_->point_value("RHO_B")->pointer();
@@ -953,18 +953,18 @@ void UV::compute_V()
         rhobzq      += C_DDOT(npoints,QTbp,1,z,1);
 
         // => LSDA contribution (symmetrized) <= //
-        timer_on("LSDA");
+        //~ timer_on("LSDA");
         for (int P = 0; P < npoints; P++) {
             ::memset(static_cast<void*>(Tap[P]),'\0',nlocal*sizeof(double));
             ::memset(static_cast<void*>(Tbp[P]),'\0',nlocal*sizeof(double));
             C_DAXPY(nlocal,0.5 * v_rho_a[P] * w[P], phi[P], 1, Tap[P], 1); 
             C_DAXPY(nlocal,0.5 * v_rho_b[P] * w[P], phi[P], 1, Tbp[P], 1); 
         }
-        timer_off("LSDA");
+        //~ timer_off("LSDA");
         
         // => GGA contribution (symmetrized) <= // 
         if (ansatz >= 1) {
-            timer_on("GGA");
+            //~ timer_on("GGA");
             double** phix = properties_->basis_value("PHI_X")->pointer();
             double** phiy = properties_->basis_value("PHI_Y")->pointer();
             double** phiz = properties_->basis_value("PHI_Z")->pointer();
@@ -986,10 +986,10 @@ void UV::compute_V()
                 C_DAXPY(nlocal,w[P] * (2.0 * v_sigma_bb[P] * rho_by[P] + v_sigma_ab[P] * rho_ay[P]), phiy[P], 1, Tbp[P], 1); 
                 C_DAXPY(nlocal,w[P] * (2.0 * v_sigma_bb[P] * rho_bz[P] + v_sigma_ab[P] * rho_az[P]), phiz[P], 1, Tbp[P], 1); 
             }        
-            timer_off("GGA");
+            //~ timer_off("GGA");
         }
 
-        timer_on("LSDA");
+        //~ timer_on("LSDA");
         // Single GEMM slams GGA+LSDA together (man but GEM's hot!)
         C_DGEMM('T','N',nlocal,nlocal,npoints,1.0,phi[0],max_functions,Tap[0],max_functions,0.0,Va2p[0],max_functions);
         C_DGEMM('T','N',nlocal,nlocal,npoints,1.0,phi[0],max_functions,Tbp[0],max_functions,0.0,Vb2p[0],max_functions);
@@ -1001,11 +1001,11 @@ void UV::compute_V()
                 Vb2p[m][n] = Vb2p[n][m] = Vb2p[m][n] + Vb2p[n][m]; 
             }
         }
-        timer_off("LSDA");
+        //~ timer_off("LSDA");
         
         // => Meta contribution <= //
         if (ansatz >= 2) {
-            timer_on("Meta");
+            //~ timer_on("Meta");
             double** phix = properties_->basis_value("PHI_X")->pointer();
             double** phiy = properties_->basis_value("PHI_Y")->pointer();
             double** phiz = properties_->basis_value("PHI_Z")->pointer();
@@ -1038,7 +1038,7 @@ void UV::compute_V()
                 }            
             }
 
-            timer_off("Meta");
+            //~ timer_off("Meta");
         }       
  
         // => Unpacking <= //
@@ -1054,7 +1054,7 @@ void UV::compute_V()
             Vap[mg][mg] += Va2p[ml][ml];
             Vbp[mg][mg] += Vb2p[ml][ml];
         }
-        timer_off("V_XC");
+        //~ timer_off("V_XC");
     } 
    
     quad_values_["FUNCTIONAL"] = functionalq;
@@ -1141,12 +1141,12 @@ SharedMatrix UV::compute_gradient()
         const std::vector<int>& function_map = block->functions_local_to_global();
         int nlocal = function_map.size();
 
-        timer_on("Properties");
+        //~ timer_on("Properties");
         properties_->compute_points(block);
-        timer_off("Properties");
-        timer_on("Functional");
+        //~ timer_off("Properties");
+        //~ timer_on("Functional");
         std::map<std::string, SharedVector>& vals = functional_->compute_functional(properties_->point_values(), npoints); 
-        timer_off("Functional");
+        //~ timer_off("Functional");
 
         double** phi = properties_->basis_value("PHI")->pointer();
         double** phi_x = properties_->basis_value("PHI_X")->pointer();

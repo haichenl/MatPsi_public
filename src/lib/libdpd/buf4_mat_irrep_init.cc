@@ -51,7 +51,7 @@ int DPD::buf4_mat_irrep_init(dpdbuf4 *Buf, int irrep)
     size = ((long) rowtot) * ((long) coltot);
 
 #ifdef DPD_TIMER
-    timer_on("buf4_init");
+    //~ timer_on("buf4_init");
 #endif
 
     if(size) {
@@ -70,7 +70,7 @@ int DPD::buf4_mat_irrep_init(dpdbuf4 *Buf, int irrep)
     }
 
 #ifdef DPD_TIMER
-    timer_off("buf4_init");
+    //~ timer_off("buf4_init");
 #endif
 
     return 0;

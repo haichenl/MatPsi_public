@@ -53,7 +53,7 @@ int DPD::buf4_axpy(dpdbuf4 *BufX, dpdbuf4 *BufY, double alpha)
     my_irrep = BufX->file.my_irrep;
 
 #ifdef DPD_TIMER
-    timer_on("buf4_axpy");
+    //~ timer_on("buf4_axpy");
 #endif
 
     for(h=0; h < nirreps; h++) {
@@ -144,7 +144,7 @@ int DPD::buf4_axpy(dpdbuf4 *BufX, dpdbuf4 *BufY, double alpha)
     }
 
 #ifdef DPD_TIMER
-    timer_off("buf4_axpy");
+    //~ timer_off("buf4_axpy");
 #endif
 
     return 0;

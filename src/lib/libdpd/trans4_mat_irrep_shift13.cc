@@ -43,7 +43,7 @@ int DPD::trans4_mat_irrep_shift13(dpdtrans4 *Trans, int buf_block)
     double *data;
 
 #ifdef DPD_TIMER
-    timer_on("shift");
+    //~ timer_on("shift");
 #endif
 
     all_buf_irrep = Trans->buf.file.my_irrep;
@@ -99,7 +99,7 @@ int DPD::trans4_mat_irrep_shift13(dpdtrans4 *Trans, int buf_block)
     free(count); free(dataoff);
 
 #ifdef DPD_TIMER
-    timer_off("shift");
+    //~ timer_off("shift");
 #endif
 
     return 0;

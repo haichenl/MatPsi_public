@@ -73,7 +73,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
     long int size;
 
 #ifdef DPD_TIMER
-    timer_on("buf_rd");
+    //~ timer_on("buf_rd");
 #endif
 
     all_buf_irrep = Buf->file.my_irrep;
@@ -173,7 +173,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
     case 11: /* No change in pq or rs; antisymmetrize */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_11");
+        //~ timer_on("buf_rd_11");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -209,7 +209,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_11");
+        //~ timer_off("buf_rd_11");
 #endif
 
         break;
@@ -217,7 +217,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
     case 12: /* No change in pq or rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_12");
+        //~ timer_on("buf_rd_12");
 #endif
 
         //      if(Buf->file.incore && size) {
@@ -238,14 +238,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         }
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_12");
+        //~ timer_off("buf_rd_12");
 #endif
 
         break;
     case 21: /* Unpack pq; no change in rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_21");
+        //~ timer_on("buf_rd_21");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -286,14 +286,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_21");
+        //~ timer_off("buf_rd_21");
 #endif
 
         break;
     case 22: /* Pack pq; no change in rs; antisymmetrize */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_22");
+        //~ timer_on("buf_rd_22");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -332,14 +332,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_22");
+        //~ timer_off("buf_rd_22");
 #endif
 
         break;
     case 23: /* Pack pq; no change in rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_23");
+        //~ timer_on("buf_rd_23");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -370,14 +370,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_23");
+        //~ timer_off("buf_rd_23");
 #endif
 
         break;
     case 31: /* No change in pq; unpack rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_31");
+        //~ timer_on("buf_rd_31");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -414,14 +414,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_31");
+        //~ timer_off("buf_rd_31");
 #endif
 
         break;
     case 32: /* No change in pq; pack rs; antisymmetrize */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_32");
+        //~ timer_on("buf_rd_32");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -457,14 +457,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_32");
+        //~ timer_off("buf_rd_32");
 #endif
 
         break;
     case 33: /* No change in pq; pack rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_33");
+        //~ timer_on("buf_rd_33");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -496,14 +496,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_33");
+        //~ timer_off("buf_rd_33");
 #endif
 
         break;
     case 41: /* Unpack pq and rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_41");
+        //~ timer_on("buf_rd_41");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -549,7 +549,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_41");
+        //~ timer_off("buf_rd_41");
 #endif
         break;
     case 42: /* Pack pq; unpack rs */
@@ -565,7 +565,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
     case 44: /* Pack pq; pack rs; antisymmetrize */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_44");
+        //~ timer_on("buf_rd_44");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -603,14 +603,14 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_44");
+        //~ timer_off("buf_rd_44");
 #endif
 
         break;
     case 45: /* Pack pq and rs */
 
 #ifdef DPD_TIMER
-        timer_on("buf_rd_45");
+        //~ timer_on("buf_rd_45");
 #endif
 
         /* Prepare the input buffer from the input file */
@@ -648,7 +648,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
         file4_mat_irrep_row_close(&(Buf->file), irrep);
 
 #ifdef DPD_TIMER
-        timer_off("buf_rd_45");
+        //~ timer_off("buf_rd_45");
 #endif
 
         break;
@@ -659,7 +659,7 @@ int DPD::buf4_mat_irrep_rd(dpdbuf4 *Buf, int irrep)
     }
 
 #ifdef DPD_TIMER
-    timer_off("buf_rd");
+    //~ timer_off("buf_rd");
 #endif
 
     return 0;

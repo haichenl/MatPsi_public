@@ -56,7 +56,7 @@ int DPD::dot14(dpdfile2 *T, dpdbuf4 *I, dpdfile2 *Z,
     file2_mat_rd(Z);
 
 #ifdef DPD_TIMER
-    timer_on("dot14");
+    //~ timer_on("dot14");
 #endif
 
     /* loop over irreps of buffer I; h = Gpq */
@@ -125,7 +125,7 @@ int DPD::dot14(dpdfile2 *T, dpdbuf4 *I, dpdfile2 *Z,
     }
 
 #ifdef DPD_TIMER
-    timer_off("dot14");
+    //~ timer_off("dot14");
 #endif
 
     /* Close the two-index quantities */

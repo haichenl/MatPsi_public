@@ -43,7 +43,7 @@ int DPD::file4_mat_irrep_rd(dpdfile4 *File, int irrep)
     if(psio_tocscan(File->filenum, File->label) == NULL) return 1;
 
 #ifdef DPD_TIMER
-    timer_on("file4_rd");
+    //~ timer_on("file4_rd");
 #endif
 
     my_irrep = File->my_irrep;
@@ -57,7 +57,7 @@ int DPD::file4_mat_irrep_rd(dpdfile4 *File, int irrep)
                 size*((long) sizeof(double)), irrep_ptr, &next_address);
 
 #ifdef DPD_TIMER
-    timer_off("file4_rd");
+    //~ timer_off("file4_rd");
 #endif
 
     return 0;

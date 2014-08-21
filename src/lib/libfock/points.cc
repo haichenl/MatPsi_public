@@ -97,9 +97,9 @@ void RKSFunctions::compute_points(boost::shared_ptr<BlockOPoints> block)
         throw PSIEXCEPTION("RKSFunctions: call set_pointers.");
 
     // => Build basis function values <= //
-    timer_on("Points");
+    //~ timer_on("Points");
     BasisFunctions::compute_functions(block);
-    timer_off("Points");
+    //~ timer_off("Points");
 
     // => Global information <= //
     int npoints = block->npoints();
@@ -278,9 +278,9 @@ void UKSFunctions::compute_points(boost::shared_ptr<BlockOPoints> block)
         throw PSIEXCEPTION("RKSFunctions: call set_pointers.");
     
     // => Build basis function values <= //
-    timer_on("Points");
+    //~ timer_on("Points");
     BasisFunctions::compute_functions(block);
-    timer_off("Points");
+    //~ timer_off("Points");
 
     // => Global information <= //
     int npoints = block->npoints();

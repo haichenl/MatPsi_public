@@ -183,34 +183,6 @@ boost::shared_ptr<JK> JK::build_JK(Process::Environment& process_environment_in,
 
         return boost::shared_ptr<JK>(jk);
 
-#if 0
-    } else if (options.get_str("SCF_TYPE") == "PS") {
-
-        PSJK* jk = new PSJK(process_environment_in, primary,options, psio_in);
-
-        if (options["INTS_TOLERANCE"].has_changed())
-            jk->set_cutoff(options.get_double("INTS_TOLERANCE"));
-        if (options["PRINT"].has_changed())
-            jk->set_print(options.get_int("PRINT"));
-        if (options["DEBUG"].has_changed())
-            jk->set_debug(options.get_int("DEBUG"));
-        if (options["BENCH"].has_changed())
-            jk->set_bench(options.get_int("BENCH"));
-        if (options["DF_INTS_NUM_THREADS"].has_changed())
-            jk->set_df_ints_num_threads(options.get_int("DF_INTS_NUM_THREADS"));
-        if (options["PS_THETA"].has_changed())
-            jk->set_theta(options.get_double("PS_THETA"));
-        if (options["PS_DEALIASING"].has_changed())
-            jk->set_dealiasing(options.get_str("PS_DEALIASING"));
-        if (options["DEALIAS_BASIS_SCF"].has_changed()) {
-            if (options.get_str("DEALIAS_BASIS_SCF") != "") {
-                boost::shared_ptr<BasisSet> dealias = BasisSet::construct(process_environment_in, parser, primary->molecule(), "DEALIAS_BASIS_SCF");
-                jk->set_dealias_basis(dealias);
-            }
-        }
-
-        return boost::shared_ptr<JK>(jk);
-#endif
     } else {
         throw PSIEXCEPTION("JK::build_JK: Unknown SCF Type");
     }
@@ -2860,7 +2832,7 @@ void DFJK::initialize_JK_core()
 
     int numP,Pshell,MU,NU,P,PHI,mu,nu,nummu,numnu,omu,onu;
 
-    timer_on("JK: (A|mn)");
+    //~ timer_on("JK: (A|mn)");
 
     //The integrals (A|mn)
     #pragma omp parallel for private (numP, Pshell, MU, NU, P, PHI, mu, nu, nummu, numnu, omu, onu, rank) schedule (dynamic) num_threads(nthread)
@@ -2892,18 +2864,18 @@ void DFJK::initialize_JK_core()
         }
     }
 
-    timer_off("JK: (A|mn)");
+    //~ timer_off("JK: (A|mn)");
 
     delete []buffer;
     delete []eri;
 
-    timer_on("JK: (A|Q)^-1/2");
+    //~ timer_on("JK: (A|Q)^-1/2");
 
     boost::shared_ptr<FittingMetric> Jinv(new FittingMetric(auxiliary_, true));
     Jinv->form_eig_inverse();
     double** Jinvp = Jinv->get_metric()->pointer();
 
-    timer_off("JK: (A|Q)^-1/2");
+    //~ timer_off("JK: (A|Q)^-1/2");
 
     ULI max_cols = (memory_-three_memory-two_memory) / auxiliary_->nbf();
     if (max_cols < 1)
@@ -2919,7 +2891,7 @@ void DFJK::initialize_JK_core()
     int ncol = 0;
     int col = 0;
 
-    timer_on("JK: (Q|mn)");
+    //~ timer_on("JK: (Q|mn)");
 
     for (int block = 0; block < nblocks; block++) {
 
@@ -2938,7 +2910,7 @@ void DFJK::initialize_JK_core()
         col += ncol;
     }
 
-    timer_off("JK: (Q|mn)");
+    //~ timer_off("JK: (Q|mn)");
     //Qmn_->print();
 
     if (df_ints_io_ == "SAVE") {
@@ -3152,7 +3124,7 @@ void DFJK::initialize_JK_disk()
 
     // ==> Prestripe/Jinv <== //
 
-    timer_on("JK: (A|Q)^-1");
+    //~ timer_on("JK: (A|Q)^-1");
 
     psio_->open(unit_,PSIO_OPEN_NEW);
     boost::shared_ptr<AIOHandler> aio(new AIOHandler(psio_));
@@ -3168,7 +3140,7 @@ void DFJK::initialize_JK_disk()
     // Synch up
     aio->synchronize();
 
-    timer_off("JK: (A|Q)^-1");
+    //~ timer_off("JK: (A|Q)^-1");
 
     // ==> Thread setup <== //
     int nthread = 1;
@@ -3195,7 +3167,7 @@ void DFJK::initialize_JK_disk()
 
         // ==> (A|mn) integrals <== //
 
-        timer_on("JK: (A|mn)");
+        //~ timer_on("JK: (A|mn)");
 
         #pragma omp parallel for schedule(guided) num_threads(nthread)
         for (int MUNU = MN_start_val; MUNU < MN_start_val + MN_col_val; MUNU++) {
@@ -3231,11 +3203,11 @@ void DFJK::initialize_JK_disk()
             }
         }
 
-        timer_off("JK: (A|mn)");
+        //~ timer_off("JK: (A|mn)");
 
         // ==> (Q|mn) fitting <== //
 
-        timer_on("JK: (Q|mn)");
+        //~ timer_on("JK: (Q|mn)");
 
         for (int mn = 0; mn < mn_col_val; mn+=naux) {
             int cols = naux;
@@ -3248,11 +3220,11 @@ void DFJK::initialize_JK_disk()
             C_DGEMM('N','N',naux,cols,naux,1.0,Jinvp[0],naux,Amnp[0],naux,0.0,&Qmnp[0][mn],max_cols);
         }
 
-        timer_off("JK: (Q|mn)");
+        //~ timer_off("JK: (Q|mn)");
 
         // ==> Disk striping <== //
 
-        timer_on("JK: (Q|mn) Write");
+        //~ timer_on("JK: (Q|mn) Write");
 
         psio_address addr;
         for (int Q = 0; Q < naux; Q++) {
@@ -3260,7 +3232,7 @@ void DFJK::initialize_JK_disk()
             psio_->write(unit_,"(Q|mn) Integrals", (char*)Qmnp[Q],mn_col_val*sizeof(double),addr,&addr);
         }
 
-        timer_off("JK: (Q|mn) Write");
+        //~ timer_off("JK: (Q|mn) Write");
     }
 
     // ==> Close out <== //
@@ -3328,7 +3300,7 @@ void DFJK::initialize_wK_core()
     int numP,Pshell,MU,NU,P,PHI,mu,nu,nummu,numnu,omu,onu;
     //The integrals (A|mn)
 
-    timer_on("JK: (A|mn)^L");
+    //~ timer_on("JK: (A|mn)^L");
 
     #pragma omp parallel for private (numP, Pshell, MU, NU, P, PHI, mu, nu, nummu, numnu, omu, onu, rank) schedule (dynamic) num_threads(nthread)
     for (MU=0; MU < primary_->nshell(); ++MU) {
@@ -3359,28 +3331,28 @@ void DFJK::initialize_wK_core()
         }
     }
 
-    timer_off("JK: (A|mn)^L");
+    //~ timer_off("JK: (A|mn)^L");
 
     delete []buffer;
     delete []eri;
 
     // => Fitting <= //
 
-    timer_on("JK: (A|Q)^-1");
+    //~ timer_on("JK: (A|Q)^-1");
 
     // Fitting metric
     boost::shared_ptr<FittingMetric> Jinv(new FittingMetric(auxiliary_, true));
     Jinv->form_full_eig_inverse();
     double** Jinvp = Jinv->get_metric()->pointer();
 
-    timer_off("JK: (A|Q)^-1");
+    //~ timer_off("JK: (A|Q)^-1");
 
-    timer_on("JK: (Q|mn)^L");
+    //~ timer_on("JK: (Q|mn)^L");
 
     // Fitting in one GEMM (being a clever bastard)
     C_DGEMM('N','N',naux,ntri,naux,1.0,Jinvp[0],naux,Qmn2p[0],ntri,0.0,Qmnp[0],ntri);
 
-    timer_off("JK: (Q|mn)^L");
+    //~ timer_off("JK: (Q|mn)^L");
 
     // => Right Integrals <= //
 
@@ -3393,7 +3365,7 @@ void DFJK::initialize_wK_core()
 
     //The integrals (A|w|mn)
 
-    timer_on("JK: (A|mn)^R");
+    //~ timer_on("JK: (A|mn)^R");
 
     #pragma omp parallel for private (numP, Pshell, MU, NU, P, PHI, mu, nu, nummu, numnu, omu, onu, rank) schedule (dynamic) num_threads(nthread)
     for (MU=0; MU < primary_->nshell(); ++MU) {
@@ -3424,7 +3396,7 @@ void DFJK::initialize_wK_core()
         }
     }
 
-    timer_off("JK: (A|mn)^R");
+    //~ timer_off("JK: (A|mn)^R");
 
     delete []buffer2;
     delete []eri2;
@@ -3687,7 +3659,7 @@ void DFJK::initialize_wK_disk()
 
         // ==> (A|mn) integrals <== //
 
-        timer_on("JK: (A|mn)^L");
+        //~ timer_on("JK: (A|mn)^L");
 
         #pragma omp parallel for schedule(guided) num_threads(nthread)
         for (int MUNU = MN_start_val; MUNU < MN_start_val + MN_col_val; MUNU++) {
@@ -3723,11 +3695,11 @@ void DFJK::initialize_wK_disk()
             }
         }
 
-        timer_off("JK: (A|mn)^L");
+        //~ timer_off("JK: (A|mn)^L");
 
         // ==> (Q|mn) fitting <== //
 
-        timer_on("JK: (Q|mn)^L");
+        //~ timer_on("JK: (Q|mn)^L");
 
         for (int mn = 0; mn < mn_col_val; mn+=naux) {
             int cols = naux;
@@ -3740,11 +3712,11 @@ void DFJK::initialize_wK_disk()
             C_DGEMM('N','N',naux,cols,naux,1.0,Jinvp[0],naux,Amnp[0],naux,0.0,&Qmnp[0][mn],max_cols);
         }
 
-        timer_off("JK: (Q|mn)^L");
+        //~ timer_off("JK: (Q|mn)^L");
 
         // ==> Disk striping <== //
 
-        timer_on("JK: (Q|mn)^L Write");
+        //~ timer_on("JK: (Q|mn)^L Write");
 
         psio_address addr;
         for (int Q = 0; Q < naux; Q++) {
@@ -3752,7 +3724,7 @@ void DFJK::initialize_wK_disk()
             psio_->write(unit_,"Left (Q|w|mn) Integrals", (char*)Qmnp[Q],mn_col_val*sizeof(double),addr,&addr);
         }
 
-        timer_off("JK: (Q|mn)^L Write");
+        //~ timer_off("JK: (Q|mn)^L Write");
 
     }
 
@@ -3809,7 +3781,7 @@ void DFJK::initialize_wK_disk()
 
         // Compute TEI tensor block (A|mn)
 
-        timer_on("JK: (Q|mn)^R");
+        //~ timer_on("JK: (Q|mn)^R");
 
         #pragma omp parallel for schedule(dynamic) num_threads(nthread)
         for (long int QMN = 0L; QMN < (Qstop - Qstart) * (ULI) npairs; QMN++) {
@@ -3851,14 +3823,14 @@ void DFJK::initialize_wK_disk()
             }
         }
 
-        timer_off("JK: (Q|mn)^R");
+        //~ timer_off("JK: (Q|mn)^R");
 
         // Dump block to disk
-        timer_on("JK: (Q|mn)^R Write");
+        //~ timer_on("JK: (Q|mn)^R Write");
 
         psio_->write(unit_,"Right (Q|w|mn) Integrals",(char*)Amn2p[0],sizeof(double)*nrows*ntri,next_AIA,&next_AIA);
 
-        timer_off("JK: (Q|mn)^R Write");
+        //~ timer_off("JK: (Q|mn)^R Write");
 
     }
     Amn2.reset();
@@ -3940,7 +3912,7 @@ void DFJK::rebuild_wK_disk()
 
         // Compute TEI tensor block (A|mn)
 
-        timer_on("JK: (Q|mn)^R");
+        //~ timer_on("JK: (Q|mn)^R");
 
         #pragma omp parallel for schedule(dynamic) num_threads(nthread)
         for (long int QMN = 0L; QMN < (Qstop - Qstart) * (ULI) npairs; QMN++) {
@@ -3982,14 +3954,14 @@ void DFJK::rebuild_wK_disk()
             }
         }
 
-        timer_off("JK: (Q|mn)^R");
+        //~ timer_off("JK: (Q|mn)^R");
 
         // Dump block to disk
-        timer_on("JK: (Q|mn)^R Write");
+        //~ timer_on("JK: (Q|mn)^R Write");
 
         psio_->write(unit_,"Right (Q|w|mn) Integrals",(char*)Amn2p[0],sizeof(double)*nrows*ntri,next_AIA,&next_AIA);
 
-        timer_off("JK: (Q|mn)^R Write");
+        //~ timer_off("JK: (Q|mn)^R Write");
 
     }
     Amn2.reset();
@@ -4003,14 +3975,14 @@ void DFJK::manage_JK_core()
     for (int Q = 0 ; Q < auxiliary_->nbf(); Q += max_rows_) {
         int naux = (auxiliary_->nbf() - Q <= max_rows_ ? auxiliary_->nbf() - Q : max_rows_);
         if (do_J_) {
-            timer_on("JK: J");
+            //~ timer_on("JK: J");
             block_J(&Qmn_->pointer()[Q],naux);
-            timer_off("JK: J");
+            //~ timer_off("JK: J");
         }
         if (do_K_) {
-            timer_on("JK: K");
+            //~ timer_on("JK: K");
             block_K(&Qmn_->pointer()[Q],naux);
-            timer_off("JK: K");
+            //~ timer_off("JK: K");
         }
     }
 }
@@ -4023,19 +3995,19 @@ void DFJK::manage_JK_disk()
         int naux = (auxiliary_->nbf() - Q <= max_rows_ ? auxiliary_->nbf() - Q : max_rows_);
         psio_address addr = psio_get_address(PSIO_ZERO, (Q*(ULI) ntri) * sizeof(double));
 
-        timer_on("JK: (Q|mn) Read");
+        //~ timer_on("JK: (Q|mn) Read");
         psio_->read(unit_,"(Q|mn) Integrals", (char*)(Qmn_->pointer()[0]),sizeof(double)*naux*ntri,addr,&addr);
-        timer_off("JK: (Q|mn) Read");
+        //~ timer_off("JK: (Q|mn) Read");
 
         if (do_J_) {
-            timer_on("JK: J");
+            //~ timer_on("JK: J");
             block_J(&Qmn_->pointer()[0],naux);
-            timer_off("JK: J");
+            //~ timer_off("JK: J");
         }
         if (do_K_) {
-            timer_on("JK: K");
+            //~ timer_on("JK: K");
             block_K(&Qmn_->pointer()[0],naux);
-            timer_off("JK: K");
+            //~ timer_off("JK: K");
         }
     }
     psio_->close(unit_,1);
@@ -4048,9 +4020,9 @@ void DFJK::manage_wK_core()
     for (int Q = 0 ; Q < auxiliary_->nbf(); Q += max_rows_w) {
         int naux = (auxiliary_->nbf() - Q <= max_rows_w ? auxiliary_->nbf() - Q : max_rows_w);
 
-        timer_on("JK: wK");
+        //~ timer_on("JK: wK");
         block_wK(&Qlmn_->pointer()[Q],&Qrmn_->pointer()[Q],naux);
-        timer_off("JK: wK");
+        //~ timer_off("JK: wK");
     }
 }
 void DFJK::manage_wK_disk()
@@ -4065,19 +4037,19 @@ void DFJK::manage_wK_disk()
         int naux = (auxiliary_->nbf() - Q <= max_rows_w ? auxiliary_->nbf() - Q : max_rows_w);
         psio_address addr = psio_get_address(PSIO_ZERO, (Q*(ULI) ntri) * sizeof(double));
 
-        timer_on("JK: (Q|mn)^L Read");
+        //~ timer_on("JK: (Q|mn)^L Read");
         psio_->read(unit_,"Left (Q|w|mn) Integrals", (char*)(Qlmn_->pointer()[0]),sizeof(double)*naux*ntri,addr,&addr);
-        timer_off("JK: (Q|mn)^L Read");
+        //~ timer_off("JK: (Q|mn)^L Read");
 
         addr = psio_get_address(PSIO_ZERO, (Q*(ULI) ntri) * sizeof(double));
 
-        timer_on("JK: (Q|mn)^R Read");
+        //~ timer_on("JK: (Q|mn)^R Read");
         psio_->read(unit_,"Right (Q|w|mn) Integrals", (char*)(Qrmn_->pointer()[0]),sizeof(double)*naux*ntri,addr,&addr);
-        timer_off("JK: (Q|mn)^R Read");
+        //~ timer_off("JK: (Q|mn)^R Read");
 
-        timer_on("JK: wK");
+        //~ timer_on("JK: wK");
         block_wK(&Qlmn_->pointer()[0],&Qrmn_->pointer()[0],naux);
-        timer_off("JK: wK");
+        //~ timer_off("JK: wK");
     }
     psio_->close(unit_,1);
     Qlmn_.reset();
@@ -4101,13 +4073,13 @@ void DFJK::block_J(double** Qmnp, int naux)
             D2p[mn] = (m == n ? Dp[m][n] : Dp[m][n] + Dp[n][m]);
         }
 
-        timer_on("JK: J1");
+        //~ timer_on("JK: J1");
         C_DGEMV('N',naux,num_nm,1.0,Qmnp[0],num_nm,D2p,1,0.0,dp,1);
-        timer_off("JK: J1");
+        //~ timer_off("JK: J1");
 
-        timer_on("JK: J2");
+        //~ timer_on("JK: J2");
         C_DGEMV('T',naux,num_nm,1.0,Qmnp[0],num_nm,dp,1,0.0,J2p,1);
-        timer_off("JK: J2");
+        //~ timer_off("JK: J2");
         for (unsigned long int mn = 0; mn < num_nm; ++mn) {
             int m = function_pairs[mn].first;
             int n = function_pairs[mn].second;
@@ -4137,7 +4109,7 @@ void DFJK::block_K(double** Qmnp, int naux)
 
         if (N == 0 || C_left_[N].get() != C_left_[N-1].get()) {
 
-            timer_on("JK: K1");
+            //~ timer_on("JK: K1");
 
             #pragma omp parallel for schedule (dynamic)
             for (int m = 0; m < nbf; m++) {
@@ -4167,7 +4139,7 @@ void DFJK::block_K(double** Qmnp, int naux)
                 }
             }
 
-            timer_off("JK: K1");
+            //~ timer_off("JK: K1");
 
         }
 
@@ -4177,7 +4149,7 @@ void DFJK::block_K(double** Qmnp, int naux)
                 ::memcpy((void*) Erp[0], (void*) Elp[0], sizeof(double) * naux * nocc * nbf);
             } else {
 
-                timer_on("JK: K1");
+                //~ timer_on("JK: K1");
 
                 #pragma omp parallel for schedule (dynamic)
                 for (int m = 0; m < nbf; m++) {
@@ -4207,15 +4179,15 @@ void DFJK::block_K(double** Qmnp, int naux)
                     }
                 }
 
-                timer_off("JK: K1");
+                //~ timer_off("JK: K1");
 
             }
 
         }
 
-        timer_on("JK: K2");
+        //~ timer_on("JK: K2");
         C_DGEMM('N','T',nbf,nbf,naux*nocc,1.0,Elp[0],naux*nocc,Erp[0],naux*nocc,1.0,Kp[0],nbf);
-        timer_off("JK: K2");
+        //~ timer_off("JK: K2");
     }
 
 }
@@ -4240,7 +4212,7 @@ void DFJK::block_wK(double** Qlmnp, double** Qrmnp, int naux)
 
         if (N == 0 || C_left_[N].get() != C_left_[N-1].get()) {
 
-            timer_on("JK: wK1");
+            //~ timer_on("JK: wK1");
 
             #pragma omp parallel for schedule (dynamic)
             for (int m = 0; m < nbf; m++) {
@@ -4266,11 +4238,11 @@ void DFJK::block_wK(double** Qlmnp, double** Qrmnp, int naux)
                 C_DGEMM('N','T',nocc,naux,rows,1.0,Ctp[0],nbf,QSp[0],nbf,0.0,&Elp[0][m*(ULI)nocc*naux],naux);
             }
 
-            timer_off("JK: wK1");
+            //~ timer_off("JK: wK1");
 
         }
 
-        timer_on("JK: wK1");
+        //~ timer_on("JK: wK1");
 
         #pragma omp parallel for schedule (dynamic)
         for (int m = 0; m < nbf; m++) {
@@ -4296,11 +4268,11 @@ void DFJK::block_wK(double** Qlmnp, double** Qrmnp, int naux)
             C_DGEMM('N','T',nocc,naux,rows,1.0,Ctp[0],nbf,QSp[0],nbf,0.0,&Erp[0][m*(ULI)nocc*naux],naux);
         }
 
-        timer_off("JK: wK1");
+        //~ timer_off("JK: wK1");
 
-        timer_on("JK: wK2");
+        //~ timer_on("JK: wK2");
         C_DGEMM('N','T',nbf,nbf,naux*nocc,1.0,Elp[0],naux*nocc,Erp[0],naux*nocc,1.0,wKp[0],nbf);
-        timer_off("JK: wK2");
+        //~ timer_off("JK: wK2");
     }
 }
 
@@ -4319,7 +4291,7 @@ void CDJK::initialize_JK_disk()
 void CDJK::initialize_JK_core()
 {
     // generate CD integrals with lib3index
-    timer_on("CD: cholesky decomposition");
+    //~ timer_on("CD: cholesky decomposition");
     boost::shared_ptr<IntegralFactory> integral (new IntegralFactory(primary_,primary_,primary_,primary_));
     boost::shared_ptr<CholeskyERI> Ch (new CholeskyERI(boost::shared_ptr<TwoBodyAOInt>(integral->eri()),0.0,cholesky_tolerance_,memory_));
     Ch->choleskify();
@@ -4327,7 +4299,7 @@ void CDJK::initialize_JK_core()
 
     boost::shared_ptr<Matrix> L = Ch->L();
     double ** Lp = L->pointer();
-    timer_off("CD: cholesky decomposition");
+    //~ timer_off("CD: cholesky decomposition");
 
     int ntri = sieve_->function_pairs().size();
     ULI three_memory = ncholesky_ * ntri;
@@ -4343,7 +4315,7 @@ void CDJK::initialize_JK_core()
 
     const std::vector<long int>& schwarz_fun_pairs = sieve_->function_pairs_reverse();
 
-    timer_on("CD: schwarz");
+    //~ timer_on("CD: schwarz");
     for (long int mu = 0; mu < nbf; mu++) {
         for (long int nu = mu; nu < nbf; nu++) {
             if ( schwarz_fun_pairs[nu*(nu+1)/2+mu] < 0 ) continue;
@@ -4352,7 +4324,7 @@ void CDJK::initialize_JK_core()
             }
         }
     }
-    timer_off("CD: schwarz");
+    //~ timer_off("CD: schwarz");
 
     if (df_ints_io_ == "SAVE") {
         // stick ncholesky in process environment for other codes that may use the integrals
@@ -4368,14 +4340,14 @@ void CDJK::manage_JK_core()
     for (int Q = 0 ; Q < ncholesky_; Q += max_rows_) {
         int naux = (ncholesky_ - Q <= max_rows_ ? ncholesky_ - Q : max_rows_);
         if (do_J_) {
-            timer_on("JK: J");
+            //~ timer_on("JK: J");
             block_J(&Qmn_->pointer()[Q],naux);
-            timer_off("JK: J");
+            //~ timer_off("JK: J");
         }
         if (do_K_) {
-            timer_on("JK: K");
+            //~ timer_on("JK: K");
             block_K(&Qmn_->pointer()[Q],naux);
-            timer_off("JK: K");
+            //~ timer_off("JK: K");
         }
     }
 }
@@ -5264,831 +5236,6 @@ void ICJK::compute_JK() {
 
 
 
-#if 0
 
-PSJK::PSJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary,
-    Options& options, boost::shared_ptr<PSIO> psio_in) :
-    JK(process_environment_in, primary), options_(options)
-{
-    psio_ = psio_in;
-    common_init();
-}
-PSJK::~PSJK()
-{
-}
-void PSJK::common_init()
-{
-    df_ints_num_threads_ = 1;
-    #ifdef _OPENMP
-        df_ints_num_threads_ = omp_get_max_threads();
-    #endif
-    unit_ = PSIF_DFSCF_BJ;
-    theta_ = 0.3;
-    //~ psio_ = PSIO::shared_object();
-    dealiasing_ = "QUADRATURE";
-}
-void PSJK::print_header() const
-{
-    if (print_) {
-        fprintf(outfile, "  ==> PSJK: Pseudospectral J/K Matrices <==\n\n");
-
-        fprintf(outfile, "    J tasked:          %11s\n", (do_J_ ? "Yes" : "No"));
-        fprintf(outfile, "    K tasked:          %11s\n", (do_K_ ? "Yes" : "No"));
-        fprintf(outfile, "    wK tasked:         %11s\n", (do_wK_ ? "Yes" : "No"));
-        if (do_wK_)
-            fprintf(outfile, "    Omega:             %11.3E\n", omega_);
-        fprintf(outfile, "    OpenMP threads:    %11d\n", omp_nthread_);
-        fprintf(outfile, "    Integrals threads: %11d\n", df_ints_num_threads_);
-        fprintf(outfile, "    Memory (MB):       %11ld\n", (memory_ *8L) / (1024L * 1024L));
-        fprintf(outfile, "    Schwarz Cutoff:    %11.0E\n", cutoff_);
-        fprintf(outfile, "    Theta:             %11.3E\n", theta_);
-        fprintf(outfile, "    Dealiasing:        %11s\n", dealiasing_.c_str());
-        fprintf(outfile, "\n");
-
-        fprintf(outfile, "   => Quadrature Grid <=\n\n");
-        fprintf(outfile, "    Total Points:      %11d\n", grid_->rowspi()[0]);
-        fprintf(outfile, "\n");
-        // TODO print grid algorithm details
-
-        if (dealiasing_ == "DEALIAS") {
-            fprintf(outfile, "   => Dealias Basis Set <=\n\n");
-            dealias_->print_by_level(outfile,print_);
-        }
-    }
-}
-void PSJK::preiterations()
-{
-    // PS requires constant sieve, must be static througout object life
-    if (!sieve_) {
-        sieve_ = boost::shared_ptr<ERISieve>(new ERISieve(primary_, cutoff_));
-    }
-
-    build_QR();
-
-    if (do_J_ || do_K_) {
-        build_Amn_disk(theta_,"(A|mn) JK");
-    }
-
-    if (do_wK_) {
-        throw FeatureNotImplemented("PSJK", "wK", __FILE__, __LINE__);
-    }
-}
-void PSJK::postiterations()
-{
-    Q_.reset();
-    R_.reset();
-    grid_.reset();
-}
-void PSJK::compute_JK()
-{
-    // Short Range
-    build_JK_SR();
-
-    // Long Range
-    build_JK_LR();
-
-
-    // TODO wK
-}
-void PSJK::build_QR()
-{
-    boost::shared_ptr<PseudospectralGrid> grid(new PseudospectralGrid(primary_->molecule(),
-        primary_, options_));
-    int npoints = grid->npoints();
-    int nbf = primary_->nbf();
-    int max_points = grid->max_points();
-    int max_functions = grid->max_functions();
-
-    // Grid
-    grid_ = SharedMatrix(new Matrix("xyzw", npoints, 4));
-    double** gridp = grid_->pointer();
-    double* x = grid->x();
-    double* y = grid->y();
-    double* z = grid->z();
-    double* w = grid->w();
-    for (int P = 0; P < npoints; P++) {
-        gridp[P][0] = x[P];
-        gridp[P][1] = y[P];
-        gridp[P][2] = z[P];
-        gridp[P][3] = w[P];
-    }
-
-    // R (Collocation)
-    R_ = SharedMatrix(new Matrix("R", nbf, npoints));
-    double** Rp = R_->pointer();
-    boost::shared_ptr<BasisFunctions> points(new BasisFunctions(primary_, max_points, max_functions));
-    const std::vector<boost::shared_ptr<BlockOPoints> >& blocks = grid->blocks();
-    int offset = 0;
-    for (int index = 0; index < blocks.size(); index++) {
-        points->compute_functions(blocks[index]);
-        SharedMatrix phi = points->basis_value("PHI");
-        double** phip = phi->pointer();
-        const std::vector<int>& funmap = blocks[index]->functions_local_to_global();
-        int nP = blocks[index]->npoints();
-
-        for (int i = 0; i < funmap.size(); i++) {
-            int iglobal = funmap[i];
-            C_DCOPY(nP,&phip[0][i],max_functions,&Rp[iglobal][offset],1);
-        }
-
-        offset += nP;
-    }
-
-    points.reset();
-    grid.reset();
-
-    // Q (Quadrature Rule)
-    if (dealiasing_ == "QUADRATURE") {
-        for (int P = 0; P < npoints; P++) {
-            C_DSCAL(nbf,sqrt(gridp[P][3]),&Rp[0][P],npoints);
-        }
-        Q_ = R_;
-    } else if (dealiasing_ == "RENORMALIZED") {
-
-        for (int P = 0; P < npoints; P++) {
-            C_DSCAL(nbf,sqrt(gridp[P][3]),&Rp[0][P],npoints);
-        }
-
-        bool warning;
-        SharedMatrix Rplus = R_->pseudoinverse(1.0E-10, &warning);
-        if (warning) {
-            fprintf(outfile, "    Warning, Renormalization had to be conditioned.\n\n");
-        }
-
-        boost::shared_ptr<IntegralFactory> factory(new IntegralFactory(primary_));
-        boost::shared_ptr<OneBodyAOInt> ints(factory->ao_overlap());
-        SharedMatrix S(new Matrix("S", nbf, nbf));
-        ints->compute(S);
-        ints.reset();
-
-        Q_ = SharedMatrix(R_->clone());
-        Q_->set_name("Q");
-
-        double** Qp = Q_->pointer();
-        double** Rp = Rplus->pointer();
-        double** Sp = S->pointer();
-
-        C_DGEMM('N','N',nbf,npoints,nbf,1.0,Sp[0],nbf,Rp[0],npoints,0.0,Qp[0],npoints);
-
-    } else if (dealiasing_ == "DEALIAS") {
-        // TODO
-        throw FeatureNotImplemented("PSJK", "Dealiasing", __FILE__, __LINE__);
-    }
-}
-void PSJK::build_Amn_disk(double theta, const std::string& entry)
-{
-    boost::shared_ptr<IntegralFactory> factory(new IntegralFactory(primary_));
-    std::vector<boost::shared_ptr<PseudospectralInt> > ints;
-    for (int i = 0; i < df_ints_num_threads_; i++) {
-        ints.push_back(boost::shared_ptr<PseudospectralInt>(static_cast<PseudospectralInt*>(factory->ao_pseudospectral())));
-        ints[i]->set_omega(theta);
-    }
-
-    int maxrows = max_rows();
-    int ntri  = sieve_->function_pairs().size();
-    int naux  = grid_->rowspi()[0];
-
-    const std::vector<long int>& function_pairs_r = sieve_->function_pairs_reverse();
-    const std::vector<std::pair<int,int> >& shell_pairs = sieve_->shell_pairs();
-
-    SharedMatrix Amn(new Matrix("Amn", maxrows, ntri));
-    double** Amnp = Amn->pointer();
-    double** Gp = grid_->pointer();
-
-    psio_->open(unit_,PSIO_OPEN_OLD);
-    psio_address addr = PSIO_ZERO;
-
-    for (int Pstart = 0; Pstart < naux; Pstart += maxrows) {
-        int nrows =  (Pstart + maxrows >= naux ? naux - Pstart : maxrows);
-
-        #pragma omp parallel for num_threads(df_ints_num_threads_)
-        for (int row = 0; row < (unsigned int)nrows; row++) {
-            int thread = 0;
-            #ifdef _OPENMP
-                thread = omp_get_thread_num();
-            #endif
-            boost::shared_ptr<PseudospectralInt> eri = ints[thread];
-            const double* buffer = eri->buffer();
-            eri->set_point(Gp[row + Pstart][0], Gp[row + Pstart][1], Gp[row + Pstart][2]);
-            double* Amp = Amnp[row];
-
-            for (int ind = 0; ind < shell_pairs.size(); ind++) {
-                int M = shell_pairs[ind].first;
-                int N = shell_pairs[ind].second;
-
-                eri->compute_shell(M,N);
-
-                int nM = primary_->shell(M).nfunction();
-                int nN = primary_->shell(N).nfunction();
-                int oM = primary_->shell(M).function_index();
-                int oN = primary_->shell(N).function_index();
-
-                for (int m = 0 ; m < nM; m++) {
-                    for (int n = 0; n < nN; n++) {
-                        int am = m + oM;
-                        int an = n + oN;
-                        if (am >= an) {
-                            int mn = (am *(am + 1) >> 1) + an;
-                            long int mn_local = function_pairs_r[mn];
-                            if (mn >= 0) {
-                                Amp[mn_local] = buffer[m * nN + n];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        psio_->write(unit_, entry.c_str(), (char*) Amnp[0], sizeof(double) * ntri * nrows, addr, &addr);
-    }
-
-    psio_->close(unit_, 1);
-}
-int PSJK::max_rows()
-{
-    int ntri = sieve_->function_pairs().size();
-    int naux = grid_->rowspi()[0];
-    unsigned long int effective_memory = memory_ - memory_overhead();
-    unsigned long int rows = effective_memory / ntri;
-    rows = (rows > naux ? naux : rows);
-    rows = (rows < 1 ? 1 : rows);
-    return (int) rows;
-}
-void PSJK::block_J(double** Amnp, int Pstart, int nP, const std::vector<SharedMatrix>& J)
-{
-    int nbf = primary_->nbf();
-    int npoints = grid_->rowspi()[0];
-    const std::vector<std::pair<int,int> >& funmap = sieve_->function_pairs();
-    int ntri = funmap.size();
-
-    double** Qp = Q_->pointer();
-    double** Rp = R_->pointer();
-    double** Vp = V_->pointer();
-    double*  dp = d_->pointer();
-    double* J2p = J_temp_->pointer();
-
-    for (int N = 0; N < D_ao_.size(); N++) {
-
-        double** Dp = D_ao_[N]->pointer();
-        double** Jp = J[N]->pointer();
-
-        C_DGEMM('T','N',nP,nbf,nbf,1.0,&Qp[0][Pstart],npoints,Dp[0],nbf,0.0,Vp[0],nbf);
-        for (int P = 0; P < nP; P++) {
-            dp[P] = C_DDOT(nbf,&Rp[0][Pstart + P],npoints,Vp[P],1);
-        }
-
-        C_DGEMV('T',nP,ntri,1.0,Amnp[0],ntri,dp,1,0.0,J2p,1);
-
-        for (long int mn = 0; mn < ntri; mn++) {
-            int m = funmap[mn].first;
-            int n = funmap[mn].second;
-            Jp[m][n] += J2p[mn];
-            Jp[n][m] += (m == n ? 0.0 : J2p[mn]);
-        }
-    }
-}
-void PSJK::block_K(double** Amnp, int Pstart, int nP, const std::vector<SharedMatrix>& K)
-{
-    int nbf = primary_->nbf();
-    int npoints = grid_->rowspi()[0];
-    const std::vector<std::pair<int,int> >& funmap = sieve_->function_pairs();
-    int ntri = funmap.size();
-
-    double** Qp = Q_->pointer();
-    double** Rp = R_->pointer();
-    double** Vp = V_->pointer();
-    double** Wp = W_->pointer();
-
-    for (int N = 0; N < D_ao_.size(); N++) {
-
-        double** Dp = D_ao_[N]->pointer();
-        double** Kp = K[N]->pointer();
-
-        C_DGEMM('T','N',nP,nbf,nbf,1.0,&Qp[0][Pstart],npoints,Dp[0],nbf,0.0,Vp[0],nbf);
-
-        W_->zero();
-        #pragma omp parallel for
-        for (int P = 0; P < nP; P++) {
-            double* Arp = Amnp[P];
-            double* Wrp = Wp[P];
-            double* Vrp = Vp[P];
-            for (long int mn = 0; mn < ntri; mn++) {
-                int m = funmap[mn].first;
-                int n = funmap[mn].second;
-                double Aval = Arp[mn];
-                Wrp[m] += Aval * Vrp[n];
-                Wrp[n] += (m == n ? 0.0 : Aval * Vrp[m]);
-            }
-        }
-
-        C_DGEMM('N','N',nbf,nbf,nP,1.0,&Rp[0][Pstart],npoints,Wp[0],nbf,1.0,Kp[0],nbf);
-    }
-}
-void PSJK::build_JK_SR()
-{
-    boost::shared_ptr<IntegralFactory> factory(new IntegralFactory(primary_));
-    boost::shared_ptr<TwoBodyAOInt> eri(factory->erf_complement_eri(theta_));
-    const double* buffer = eri->buffer();
-
-    double cutoff = sieve_->sieve();
-    const std::vector<std::pair<int,int> >& shellmap = sieve_->shell_pairs();
-    int nTRI = shellmap.size();
-    for (int MN = 0; MN < nTRI; MN++) {
-        int M = shellmap[MN].first;
-        int N = shellmap[MN].second;
-        int nM = primary_->shell(M).nfunction();
-        int nN = primary_->shell(N).nfunction();
-        int oM = primary_->shell(M).function_index();
-        int oN = primary_->shell(N).function_index();
-        for (int LS = 0; LS < nTRI; LS++) {
-            int L = shellmap[LS].first;
-            int S = shellmap[LS].second;
-            if (!sieve_->shell_significant(M,N,L,S)) continue;
-            // TODO: More sieving
-            int nL = primary_->shell(L).nfunction();
-            int nS = primary_->shell(S).nfunction();
-            int oL = primary_->shell(L).function_index();
-            int oS = primary_->shell(S).function_index();
-
-            eri->compute_shell(M,N,L,S);
-
-            for (int rM = 0, index = 0; rM < nM; rM++) {
-                for (int rN = 0; rN < nN; rN++) {
-                    for (int rL = 0; rL < nL; rL++) {
-                        for (int rS = 0; rS < nS; rS++, index++) {
-                            int m = rM + oM;
-                            int n = rN + oN;
-                            int l = rL + oL;
-                            int s = rS + oS;
-                            int mn = (m * (m + 1) >> 1) + n;
-                            int ls = (l * (l + 1) >> 1) + s;
-                            if (n > m || s > l || ls > mn) continue;
-                            double val = buffer[index];
-
-                            // J
-                            if (do_J_) {
-                                for (int A = 0; A < D_.size(); A++) {
-                                    double** Jp = J_ao_[A]->pointer();
-                                    double** Dp = D_ao_[A]->pointer();
-                                    if (mn == ls && m == n) {
-                                        // (mm|mm)
-                                        Jp[m][m] += val * Dp[m][m]; // (mm|mm)
-                                    } else if (m == n && l == s) {
-                                        // (mm|ll)
-                                        Jp[m][m] += val * Dp[l][l]; // (mm|ll)
-                                        Jp[l][l] += val * Dp[m][m]; // (ll|mm)
-                                    } else if (m == n) {
-                                        // (mm|ls)
-                                        Jp[m][m] += val * Dp[l][s]; // (mm|ls)
-                                        Jp[m][m] += val * Dp[s][l]; // (mm|sl)
-                                        Jp[l][s] += val * Dp[m][m]; // (ls|mm)
-                                        Jp[s][l] += val * Dp[m][m]; // (sl|mm)
-                                    } else if (l == s) {
-                                        // (mn|ll)
-                                        Jp[m][n] += val * Dp[l][l]; // (mn|ll)
-                                        Jp[n][m] += val * Dp[l][l]; // (nm|ll)
-                                        Jp[l][l] += val * Dp[m][n]; // (ll|mn)
-                                        Jp[l][l] += val * Dp[n][m]; // (ll|nm)
-                                    } else if (mn == ls) {
-                                        // (mn|mn)
-                                        Jp[m][n] += val * Dp[m][n]; // (mn|mn)
-                                        Jp[m][n] += val * Dp[n][m]; // (mn|nm)
-                                        Jp[n][m] += val * Dp[m][n]; // (nm|mn)
-                                        Jp[n][m] += val * Dp[n][m]; // (nm|nm)
-                                    } else {
-                                        // (mn|ls)
-                                        Jp[m][n] += val * Dp[l][s]; // (mn|ls)
-                                        Jp[m][n] += val * Dp[s][l]; // (mn|sl)
-                                        Jp[n][m] += val * Dp[l][s]; // (nm|ls)
-                                        Jp[n][m] += val * Dp[s][l]; // (nm|sl)
-                                        Jp[l][s] += val * Dp[m][n]; // (ls|mn)
-                                        Jp[l][s] += val * Dp[n][m]; // (ls|nm)
-                                        Jp[s][l] += val * Dp[m][n]; // (sl|mn)
-                                        Jp[s][l] += val * Dp[n][m]; // (sl|nm)
-                                    }
-                                }
-                            }
-                            // K
-                            if (do_K_) {
-                                for (int A = 0; A < D_.size(); A++) {
-                                    double** Kp = K_ao_[A]->pointer();
-                                    double** Dp = D_ao_[A]->pointer();
-                                    if (mn == ls && m == n) {
-                                        // (mm|mm)
-                                        Kp[m][m] += val * Dp[m][m]; // (mm|mm)
-                                    } else if (m == n && l == s) {
-                                        // (mm|ll)
-                                        Kp[m][l] += val * Dp[m][l]; // (mm|ll)
-                                        Kp[l][m] += val * Dp[l][m]; // (ll|mm)
-                                    } else if (m == n) {
-                                        // (mm|ls)
-                                        Kp[m][s] += val * Dp[m][l]; // (mm|ls)
-                                        Kp[m][l] += val * Dp[m][s]; // (mm|sl)
-                                        Kp[l][m] += val * Dp[s][m]; // (ls|mm)
-                                        Kp[s][m] += val * Dp[l][m]; // (sl|mm)
-                                    } else if (l == s) {
-                                        // (mn|ll)
-                                        Kp[m][l] += val * Dp[n][l]; // (mn|ll)
-                                        Kp[n][l] += val * Dp[m][l]; // (nm|ll)
-                                        Kp[l][n] += val * Dp[l][m]; // (ll|mn)
-                                        Kp[l][m] += val * Dp[l][n]; // (ll|nm)
-                                    } else if (mn == ls) {
-                                        // (mn|mn)
-                                        Kp[m][n] += val * Dp[n][m]; // (mn|mn)
-                                        Kp[m][m] += val * Dp[n][n]; // (mn|nm)
-                                        Kp[n][n] += val * Dp[m][m]; // (nm|mn)
-                                        Kp[n][m] += val * Dp[m][n]; // (nm|nm)
-                                    } else {
-                                        // (mn|ls)
-                                        Kp[m][s] += val * Dp[n][l]; // (mn|ls)
-                                        Kp[m][l] += val * Dp[n][s]; // (mn|sl)
-                                        Kp[n][s] += val * Dp[m][l]; // (nm|ls)
-                                        Kp[n][l] += val * Dp[m][s]; // (nm|sl)
-                                        Kp[l][n] += val * Dp[s][m]; // (ls|mn)
-                                        Kp[l][m] += val * Dp[s][n]; // (ls|nm)
-                                        Kp[s][n] += val * Dp[l][m]; // (sl|mn)
-                                        Kp[s][m] += val * Dp[l][n]; // (sl|nm)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-void PSJK::build_JK_LR()
-{
-    int nbf  = primary_->nbf();
-    int naux = grid_->rowspi()[0];
-    int ntri = sieve_->function_pairs().size();
-    int maxrows = max_rows();
-
-    SharedMatrix Amn(new Matrix("Amn",maxrows,ntri));
-    double** Amnp = Amn->pointer();
-
-    V_ = SharedMatrix(new Matrix("V", maxrows,nbf));
-    W_ = SharedMatrix(new Matrix("W", maxrows,nbf));
-    d_ = SharedVector(new Vector("d", maxrows));
-    J_temp_ = SharedVector(new Vector("J temp", ntri));
-
-    if (do_J_ || do_K_) {
-        psio_->open(unit_, PSIO_OPEN_OLD);
-        psio_address addr = PSIO_ZERO;
-        for (int Pstart = 0; Pstart < naux; Pstart += maxrows) {
-            int nrows = (naux - Pstart <= maxrows ? naux - Pstart : maxrows);
-            psio_->read(unit_,"(A|mn) JK", (char*) Amnp[0], sizeof(double)*nrows*ntri,addr,&addr);
-            if (do_J_) {
-                block_J(Amnp,Pstart,nrows,J_ao_);
-            }
-            if (do_K_) {
-                block_K(Amnp,Pstart,nrows,K_ao_);
-            }
-        }
-        psio_->close(unit_, 1);
-        if (lr_symmetric_ && do_K_) {
-            for (int N = 0; N < D_.size(); N++) {
-                K_ao_[N]->hermitivitize();
-            }
-        }
-    }
-
-    Amn.reset();
-    V_.reset();
-    W_.reset();
-    d_.reset();
-    J_temp_.reset();
-}
-void PSJK::build_JK_debug(const std::string& op, double theta)
-{
-    if (do_J_) {
-        for (int A = 0; A < D_.size(); A++) {
-            J_ao_[A]->zero();
-        }
-    }
-    if (do_K_) {
-        for (int A = 0; A < D_.size(); A++) {
-            K_ao_[A]->zero();
-        }
-    }
-
-    boost::shared_ptr<IntegralFactory> factory(new IntegralFactory(primary_));
-    boost::shared_ptr<TwoBodyAOInt> eri;
-    if (op == "") {
-        eri = boost::shared_ptr<TwoBodyAOInt>(factory->eri());
-    } else if (op == "SR") {
-        eri = boost::shared_ptr<TwoBodyAOInt>(factory->erf_complement_eri(theta));
-    } else if (op == "LR") {
-        eri = boost::shared_ptr<TwoBodyAOInt>(factory->erf_eri(theta));
-    } else {
-        throw PSIEXCEPTION("What is this?");
-    }
-    const double* buffer = eri->buffer();
-
-    double cutoff = sieve_->sieve();
-    const std::vector<std::pair<int,int> >& shellmap = sieve_->shell_pairs();
-    int nTRI = shellmap.size();
-    for (int MN = 0; MN < nTRI; MN++) {
-        int M = shellmap[MN].first;
-        int N = shellmap[MN].second;
-        int nM = primary_->shell(M).nfunction();
-        int nN = primary_->shell(N).nfunction();
-        int oM = primary_->shell(M).function_index();
-        int oN = primary_->shell(N).function_index();
-        for (int LS = 0; LS < nTRI; LS++) {
-            int L = shellmap[LS].first;
-            int S = shellmap[LS].second;
-            if (!sieve_->shell_significant(M,N,L,S)) continue;
-            // TODO: More sieving
-            int nL = primary_->shell(L).nfunction();
-            int nS = primary_->shell(S).nfunction();
-            int oL = primary_->shell(L).function_index();
-            int oS = primary_->shell(S).function_index();
-
-            eri->compute_shell(M,N,L,S);
-
-            for (int rM = 0, index = 0; rM < nM; rM++) {
-                for (int rN = 0; rN < nN; rN++) {
-                    for (int rL = 0; rL < nL; rL++) {
-                        for (int rS = 0; rS < nS; rS++, index++) {
-                            int m = rM + oM;
-                            int n = rN + oN;
-                            int l = rL + oL;
-                            int s = rS + oS;
-                            int mn = (m * (m + 1) >> 1) + n;
-                            int ls = (l * (l + 1) >> 1) + s;
-                            if (n > m || s > l || ls > mn) continue;
-                            double val = buffer[index];
-
-                            // J
-                            if (do_J_) {
-                                for (int A = 0; A < D_.size(); A++) {
-                                    double** Jp = J_ao_[A]->pointer();
-                                    double** Dp = D_ao_[A]->pointer();
-                                    if (mn == ls && m == n) {
-                                        // (mm|mm)
-                                        Jp[m][m] += val * Dp[m][m]; // (mm|mm)
-                                    } else if (m == n && l == s) {
-                                        // (mm|ll)
-                                        Jp[m][m] += val * Dp[l][l]; // (mm|ll)
-                                        Jp[l][l] += val * Dp[m][m]; // (ll|mm)
-                                    } else if (m == n) {
-                                        // (mm|ls)
-                                        Jp[m][m] += val * Dp[l][s]; // (mm|ls)
-                                        Jp[m][m] += val * Dp[s][l]; // (mm|sl)
-                                        Jp[l][s] += val * Dp[m][m]; // (ls|mm)
-                                        Jp[s][l] += val * Dp[m][m]; // (sl|mm)
-                                    } else if (l == s) {
-                                        // (mn|ll)
-                                        Jp[m][n] += val * Dp[l][l]; // (mn|ll)
-                                        Jp[n][m] += val * Dp[l][l]; // (nm|ll)
-                                        Jp[l][l] += val * Dp[m][n]; // (ll|mn)
-                                        Jp[l][l] += val * Dp[n][m]; // (ll|nm)
-                                    } else if (mn == ls) {
-                                        // (mn|mn)
-                                        Jp[m][n] += val * Dp[m][n]; // (mn|mn)
-                                        Jp[m][n] += val * Dp[n][m]; // (mn|nm)
-                                        Jp[n][m] += val * Dp[m][n]; // (nm|mn)
-                                        Jp[n][m] += val * Dp[n][m]; // (nm|nm)
-                                    } else {
-                                        // (mn|ls)
-                                        Jp[m][n] += val * Dp[l][s]; // (mn|ls)
-                                        Jp[m][n] += val * Dp[s][l]; // (mn|sl)
-                                        Jp[n][m] += val * Dp[l][s]; // (nm|ls)
-                                        Jp[n][m] += val * Dp[s][l]; // (nm|sl)
-                                        Jp[l][s] += val * Dp[m][n]; // (ls|mn)
-                                        Jp[l][s] += val * Dp[n][m]; // (ls|nm)
-                                        Jp[s][l] += val * Dp[m][n]; // (sl|mn)
-                                        Jp[s][l] += val * Dp[n][m]; // (sl|nm)
-                                    }
-                                }
-                            }
-                            // K
-                            if (do_K_) {
-                                for (int A = 0; A < D_.size(); A++) {
-                                    double** Kp = K_ao_[A]->pointer();
-                                    double** Dp = D_ao_[A]->pointer();
-                                    if (mn == ls && m == n) {
-                                        // (mm|mm)
-                                        Kp[m][m] += val * Dp[m][m]; // (mm|mm)
-                                    } else if (m == n && l == s) {
-                                        // (mm|ll)
-                                        Kp[m][l] += val * Dp[m][l]; // (mm|ll)
-                                        Kp[l][m] += val * Dp[l][m]; // (ll|mm)
-                                    } else if (m == n) {
-                                        // (mm|ls)
-                                        Kp[m][s] += val * Dp[m][l]; // (mm|ls)
-                                        Kp[m][l] += val * Dp[m][s]; // (mm|sl)
-                                        Kp[l][m] += val * Dp[s][m]; // (ls|mm)
-                                        Kp[s][m] += val * Dp[l][m]; // (sl|mm)
-                                    } else if (l == s) {
-                                        // (mn|ll)
-                                        Kp[m][l] += val * Dp[n][l]; // (mn|ll)
-                                        Kp[n][l] += val * Dp[m][l]; // (nm|ll)
-                                        Kp[l][n] += val * Dp[l][m]; // (ll|mn)
-                                        Kp[l][m] += val * Dp[l][n]; // (ll|nm)
-                                    } else if (mn == ls) {
-                                        // (mn|mn)
-                                        Kp[m][n] += val * Dp[n][m]; // (mn|mn)
-                                        Kp[m][m] += val * Dp[n][n]; // (mn|nm)
-                                        Kp[n][n] += val * Dp[m][m]; // (nm|mn)
-                                        Kp[n][m] += val * Dp[m][n]; // (nm|nm)
-                                    } else {
-                                        // (mn|ls)
-                                        Kp[m][s] += val * Dp[n][l]; // (mn|ls)
-                                        Kp[m][l] += val * Dp[n][s]; // (mn|sl)
-                                        Kp[n][s] += val * Dp[m][l]; // (nm|ls)
-                                        Kp[n][l] += val * Dp[m][s]; // (nm|sl)
-                                        Kp[l][n] += val * Dp[s][m]; // (ls|mn)
-                                        Kp[l][m] += val * Dp[s][n]; // (ls|nm)
-                                        Kp[s][n] += val * Dp[l][m]; // (sl|mn)
-                                        Kp[s][m] += val * Dp[l][n]; // (sl|nm)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fprintf(outfile, "  ==> JK Debug %s, theta = %11.3E <==\n\n", op.c_str(), theta);
-    for (int A = 0; A < D_.size(); A++) {
-        if (do_J_) {
-            J_ao_[A]->print();
-        }
-        if (do_K_) {
-            K_ao_[A]->print();
-        }
-    }
-}
-
-DirectJK::DirectJK(Process::Environment& process_environment_in, boost::shared_ptr<BasisSet> primary) :
-   JK(process_environment_in, primary)
-{
-    common_init();
-}
-DirectJK::~DirectJK()
-{
-}
-void DirectJK::common_init()
-{
-}
-void DirectJK::print_header() const
-{
-    if (print_) {
-        fprintf(outfile, "  ==> DirectJK: Integral-Direct J/K Matrices <==\n\n");
-
-        fprintf(outfile, "    J tasked:          %11s\n", (do_J_ ? "Yes" : "No"));
-        fprintf(outfile, "    K tasked:          %11s\n", (do_K_ ? "Yes" : "No"));
-        fprintf(outfile, "    wK tasked:         %11s\n", (do_wK_ ? "Yes" : "No"));
-        if (do_wK_)
-            fprintf(outfile, "    Omega:             %11.3E\n", omega_);
-        fprintf(outfile, "    OpenMP threads:    %11d\n", omp_nthread_);
-        fprintf(outfile, "    Memory (MB):       %11ld\n", (memory_ *8L) / (1024L * 1024L));
-        fprintf(outfile, "    Schwarz Cutoff:    %11.0E\n\n", cutoff_);
-    }
-}
-void DirectJK::preiterations()
-{
-    sieve_ = boost::shared_ptr<ERISieve>(new ERISieve(primary_, cutoff_));
-    factory_= boost::shared_ptr<IntegralFactory>(new IntegralFactory(primary_,primary_,primary_,primary_));
-    eri_.clear();
-    for (int thread = 0; thread < omp_nthread_; thread++) {
-        eri_.push_back(boost::shared_ptr<TwoBodyAOInt>(factory_->eri()));
-    }
-}
-void DirectJK::compute_JK()
-{
-    // Correctness always counts
-    const double* buffer = eri_[0]->buffer();
-    for (int M = 0; M < primary_->nshell(); ++M) {
-    for (int N = 0; N < primary_->nshell(); ++N) {
-    for (int R = 0; R < primary_->nshell(); ++R) {
-    for (int S = 0; S < primary_->nshell(); ++S) {
-
-        eri_[0]->compute_shell(M,N,R,S);
-
-        int nM = primary_->shell(M).nfunction();
-        int nN = primary_->shell(N).nfunction();
-        int nR = primary_->shell(R).nfunction();
-        int nS = primary_->shell(S).nfunction();
-
-        int sM = primary_->shell(M).function_index();
-        int sN = primary_->shell(N).function_index();
-        int sR = primary_->shell(R).function_index();
-        int sS = primary_->shell(S).function_index();
-
-        for (int oM = 0, index = 0; oM < nM; oM++) {
-        for (int oN = 0; oN < nN; oN++) {
-        for (int oR = 0; oR < nR; oR++) {
-        for (int oS = 0; oS < nS; oS++, index++) {
-
-            double val = buffer[index];
-
-            int m = oM + sM;
-            int n = oN + sN;
-            int r = oR + sR;
-            int s = oS + sS;
-
-            if (do_J_) {
-                for (int N = 0; N < J_ao_.size(); N++) {
-                    J_ao_[N]->add(0,m,n, D_ao_[N]->get(0,r,s)*val);
-                }
-            }
-
-            if (do_K_) {
-                for (int N = 0; N < K_ao_.size(); N++) {
-                    K_ao_[N]->add(0,m,s, D_ao_[N]->get(0,n,r)*val);
-                }
-            }
-
-        }}}}
-
-    }}}}
-
-    // Faster version, not finished
-    /**
-    sieve_->set_sieve(cutoff_);
-    const std::vector<std::pair<int,int> >& shell_pairs = sieve_->shell_pairs();
-    unsigned long int nMN = shell_pairs.size();
-    unsigned long int nMNRS = nMN * nMN;
-    int nthread = eri_.size();
-
-    #pragma omp parallel for schedule(dynamic,30) num_threads(nthread)
-    for (unsigned long int index = 0L; index < nMNRS; ++index) {
-
-        int thread = 0;
-        #ifdef _OPENMP
-            thread = omp_get_thread_num();
-        #endif
-
-        const double* buffer = eri_[thread]->buffer();
-
-        unsigned long int MN = index / nMN;
-        unsigned long int RS = index % nMN;
-        if (MN < RS) continue;
-
-        int M = shell_pairs[MN].first;
-        int N = shell_pairs[MN].second;
-        int R = shell_pairs[RS].first;
-        int S = shell_pairs[RS].second;
-
-        eri_[thread]->compute_shell(M,N,R,S);
-
-        int nM = primary_->shell(M)->nfunction();
-        int nN = primary_->shell(N)->nfunction();
-        int nR = primary_->shell(R)->nfunction();
-        int nS = primary_->shell(S)->nfunction();
-
-        int sM = primary_->shell(M)->function_index();
-        int sN = primary_->shell(N)->function_index();
-        int sR = primary_->shell(R)->function_index();
-        int sS = primary_->shell(S)->function_index();
-
-        for (int oM = 0, index = 0; oM < nM; oM++) {
-        for (int oN = 0; oN < nN; oN++) {
-        for (int oR = 0; oR < nR; oR++) {
-        for (int oS = 0; oS < nS; oS++, index++) {
-
-            int m = oM + sM;
-            int n = oN + sN;
-            int r = oR + sR;
-            int s = oS + sS;
-
-            if ((n > m) || (s > r) || ((r*(r+1) >> 1) + s > (m*(m+1) >> 1) + n)) continue;
-
-            double val = buffer[index];
-
-            if (do_J_) {
-                for (int N = 0; N < J_ao_.size(); N++) {
-                    double** Dp = D_ao_[N]->pointer();
-                    double** Jp = J_ao_[N]->pointer();
-
-                    // I've given you all the unique ones
-                    // Make sure to use #pragma omp atomic
-                    // TODO
-                }
-            }
-
-            if (do_K_) {
-                for (int N = 0; N < K_ao_.size(); N++) {
-                    double** Dp = D_ao_[N]->pointer();
-                    double** Kp = J_ao_[N]->pointer();
-
-                    // I've given you all the unique ones
-                    // Make sure to use #pragma omp atomic
-                    // TODO
-                }
-            }
-
-        }}}}
-
-    }
-    **/
-}
-
-#endif
 
 }

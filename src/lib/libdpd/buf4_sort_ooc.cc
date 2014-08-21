@@ -56,7 +56,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
     all_buf_irrep = InBuf->file.my_irrep;
 
 #ifdef DPD_TIMER
-    timer_on("buf4_sort");
+    //~ timer_on("buf4_sort");
 #endif
 
     buf4_init(&OutBuf, outfilenum, all_buf_irrep, pqnum, rsnum,
@@ -75,7 +75,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case pqsr:
 
 #ifdef DPD_TIMER
-            timer_on("pqsr");
+            //~ timer_on("pqsr");
 #endif
 
             /* p->p; q->q; s->r; r->s = pqsr */
@@ -186,14 +186,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             }
 
 #ifdef DPD_TIMER
-            timer_off("pqsr");
+            //~ timer_off("pqsr");
 #endif
             break;
 
         case prqs:
 
 #ifdef DPD_TIMER
-            timer_on("prqs");
+            //~ timer_on("prqs");
 #endif
 
             /* p->p; r->q; q->r; s->s = prqs */
@@ -240,7 +240,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("prqs");
+            //~ timer_off("prqs");
 #endif
 
             break;
@@ -248,7 +248,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case prsq:
 
 #ifdef DPD_TIMER
-            timer_on("prsq");
+            //~ timer_on("prsq");
 #endif
 
             /* p->p; r->q; s->r; q->s = psqr */
@@ -294,7 +294,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("prsq");
+            //~ timer_off("prsq");
 #endif
 
             break;
@@ -302,7 +302,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case psqr:
 
 #ifdef DPD_TIMER
-            timer_on("psqr");
+            //~ timer_on("psqr");
 #endif
 
             /* p->p; s->q; q->r; r->s = prsq */
@@ -347,14 +347,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("psqr");
+            //~ timer_off("psqr");
 #endif
             break;
 
         case psrq:
 
 #ifdef DPD_TIMER
-            timer_on("psrq");
+            //~ timer_on("psrq");
 #endif
 
             /* p->p; s->q; r->r; q->s = psrq */
@@ -399,14 +399,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("psrq");
+            //~ timer_off("psrq");
 #endif
             break;
 
         case qprs:
 
 #ifdef DPD_TIMER
-            timer_on("qprs");
+            //~ timer_on("qprs");
 #endif
 
             /* q->p; p->q; r->r; s->s = qprs */
@@ -435,14 +435,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("qprs");
+            //~ timer_off("qprs");
 #endif
             break;
 
         case qpsr:
 
 #ifdef DPD_TIMER
-            timer_on("qpsr");
+            //~ timer_on("qpsr");
 #endif
 
             /* q->p; p->q; s->r; r->s = qpsr */
@@ -470,13 +470,13 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("qpsr");
+            //~ timer_off("qpsr");
 #endif
             break;
 
         case qrps:
 #ifdef DPD_TIMER
-            timer_on("qrps");
+            //~ timer_on("qrps");
 #endif
 
             /* q->p; r->q; p->r; s->s = rpqs */
@@ -522,14 +522,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("qrps");
+            //~ timer_off("qrps");
 #endif
             break;
 
         case qrsp:
 
 #ifdef DPD_TIMER
-            timer_on("qrsp");
+            //~ timer_on("qrsp");
 #endif
 
             /* q->p; r->q; s->r; p->s = spqr */
@@ -575,7 +575,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("qrsp");
+            //~ timer_off("qrsp");
 #endif
             break;
 
@@ -592,7 +592,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case rqps:
 
 #ifdef DPD_TIMER
-            timer_on("rqps");
+            //~ timer_on("rqps");
 #endif
 
             /* r->p; q->q; p->r; s->s = rqps */
@@ -637,14 +637,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rqps");
+            //~ timer_off("rqps");
 #endif
             break;
 
         case rqsp:
 
 #ifdef DPD_TIMER
-            timer_on("rqsp");
+            //~ timer_on("rqsp");
 #endif
 
             /* r->p; q->q; s->r; p->s = sqpr */
@@ -690,7 +690,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rqsp");
+            //~ timer_off("rqsp");
 #endif
 
             break;
@@ -698,7 +698,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case rpqs:
 
 #ifdef DPD_TIMER
-            timer_on("rpqs");
+            //~ timer_on("rpqs");
 #endif
 
             /* r->p; p->q; q->r; s->s = qrps */
@@ -744,7 +744,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rpqs");
+            //~ timer_off("rpqs");
 #endif
 
             break;
@@ -752,7 +752,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case rpsq:
 
 #ifdef DPD_TIMER
-            timer_on("rpsq");
+            //~ timer_on("rpsq");
 #endif
 
             /* r->p; p->q; s->r; q->s = qspr */
@@ -798,7 +798,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rpsq");
+            //~ timer_off("rpsq");
 #endif
 
             break;
@@ -806,7 +806,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case rsqp:
 
 #ifdef DPD_TIMER
-            timer_on("rsqp");
+            //~ timer_on("rsqp");
 #endif
 
             /* r->p; s->q; q->r; p->s = srpq */
@@ -838,7 +838,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rsqp");
+            //~ timer_off("rsqp");
 #endif
 
             break;
@@ -846,7 +846,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case rspq:
 
 #ifdef DPD_TIMER
-            timer_on("rspq");
+            //~ timer_on("rspq");
 #endif
 
             /* r->p; s->q; p->r; q->s = rspq */
@@ -878,7 +878,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("rspq");
+            //~ timer_off("rspq");
 #endif
 
             break;
@@ -886,7 +886,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case sqrp:
 
 #ifdef DPD_TIMER
-            timer_on("sqrp");
+            //~ timer_on("sqrp");
 #endif
 
             /* s->p; q->q; r->r; p->s = sqrp */
@@ -930,7 +930,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("sqrp");
+            //~ timer_off("sqrp");
 #endif
             break;
 
@@ -942,7 +942,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case srqp:
 
 #ifdef DPD_TIMER
-            timer_on("srqp");
+            //~ timer_on("srqp");
 #endif
 
             /* s->p; r->q; q->r; p->s = srqp */
@@ -974,13 +974,13 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("srqp");
+            //~ timer_off("srqp");
 #endif
             break;
 
         case srpq:
 #ifdef DPD_TIMER
-            timer_on("srpq");
+            //~ timer_on("srpq");
 #endif
 
             /* s->p; r->q; p->r; q->s = rsqp */
@@ -1012,7 +1012,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("srpq");
+            //~ timer_off("srpq");
 #endif
 
             break;
@@ -1020,7 +1020,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
         case spqr:
 
 #ifdef DPD_TIMER
-            timer_on("spqr");
+            //~ timer_on("spqr");
 #endif
 
             /* s->p; p->q; q->r; r->s = qrsp */
@@ -1064,14 +1064,14 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("spqr");
+            //~ timer_off("spqr");
 #endif
             break;
 
         case sprq:
 
 #ifdef DPD_TIMER
-            timer_on("sprq");
+            //~ timer_on("sprq");
 #endif
 
             /* s->p; p->q; r->r; q->s = qsrp */
@@ -1116,7 +1116,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
             buf4_mat_irrep_close(&OutBuf, h);
 
 #ifdef DPD_TIMER
-            timer_off("sprq");
+            //~ timer_off("sprq");
 #endif
             break;
         }
@@ -1126,7 +1126,7 @@ int DPD::buf4_sort_ooc(dpdbuf4 *InBuf, int outfilenum, enum indices index,
     buf4_close(&OutBuf);
 
 #ifdef DPD_TIMER
-    timer_off("buf4_sort");
+    //~ timer_off("buf4_sort");
 #endif
     return 0;
 }

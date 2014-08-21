@@ -68,7 +68,7 @@ int DPD::buf4_scm(dpdbuf4 *InBuf, double alpha)
     all_buf_irrep = InBuf->file.my_irrep;
 
 #ifdef DPD_TIMER
-    timer_on("buf4_scm");
+    //~ timer_on("buf4_scm");
 #endif
 
     /* Look first for the TOC entry on disk */
@@ -138,7 +138,7 @@ int DPD::buf4_scm(dpdbuf4 *InBuf, double alpha)
     }
 
 #ifdef DPD_TIMER
-    timer_off("buf4_scm");
+    //~ timer_off("buf4_scm");
 #endif
 
     return 0;

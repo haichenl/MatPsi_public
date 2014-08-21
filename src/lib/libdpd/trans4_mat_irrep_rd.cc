@@ -41,7 +41,7 @@ int DPD::trans4_mat_irrep_rd(dpdtrans4 *Trans, int irrep)
     all_buf_irrep = Buf->file.my_irrep;
 
 #ifdef DPD_TIMER
-    timer_on("trans4_rw");
+    //~ timer_on("trans4_rw");
 #endif
 
     /* Loop over rows of transpose */
@@ -65,7 +65,7 @@ int DPD::trans4_mat_irrep_rd(dpdtrans4 *Trans, int irrep)
     }
 
 #ifdef DPD_TIMER
-    timer_off("trans4_rw");
+    //~ timer_off("trans4_rw");
 #endif
 
     return 0;

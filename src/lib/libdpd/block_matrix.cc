@@ -64,7 +64,7 @@ DPD::dpd_block_matrix(size_t n, size_t m)
     double **A, *B;
 
 #ifdef DPD_TIMER
-    timer_on("block_mat");
+    //~ timer_on("block_mat");
 #endif
 
     A = NULL;  B = NULL;
@@ -97,7 +97,7 @@ DPD::dpd_block_matrix(size_t n, size_t m)
 
     if(!m || !n) {
 #ifdef DPD_TIMER
-        timer_off("block_mat");
+        //~ timer_off("block_mat");
 #endif
         return(NULL);
     }
@@ -141,7 +141,7 @@ DPD::dpd_block_matrix(size_t n, size_t m)
     dpd_main.memused += n*m;
 
 #ifdef DPD_TIMER
-    timer_off("block_mat");
+    //~ timer_off("block_mat");
 #endif
 
     return(A);

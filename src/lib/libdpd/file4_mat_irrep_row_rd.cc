@@ -39,7 +39,7 @@ int DPD::file4_mat_irrep_row_rd(dpdfile4 *File, int irrep, int row)
     if(File->incore) return 0;  /* We already have this data in core */
 
 #ifdef DPD_TIMER
-    timer_on("f4_rowrd");
+    //~ timer_on("f4_rowrd");
 #endif
 
     my_irrep = File->my_irrep;
@@ -64,7 +64,7 @@ int DPD::file4_mat_irrep_row_rd(dpdfile4 *File, int irrep, int row)
                 coltot*sizeof(double), row_ptr, &next_address);
 
 #ifdef DPD_TIMER
-    timer_off("f4_rowrd");
+    //~ timer_off("f4_rowrd");
 #endif
 
     return 0;

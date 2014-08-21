@@ -61,7 +61,7 @@ int DPD::trace42_13(dpdbuf4 *A, dpdfile2 *B, int transb, double alpha, double be
     file2_mat_rd(B);
 
 #ifdef DPD_TIMER
-    timer_on("trace42");
+    //~ timer_on("trace42");
 #endif
 
     /* Read all of A into core */
@@ -108,7 +108,7 @@ int DPD::trace42_13(dpdbuf4 *A, dpdfile2 *B, int transb, double alpha, double be
     }
 
 #ifdef DPD_TIMER
-    timer_off("trace42");
+    //~ timer_off("trace42");
 #endif
 
     /* Close the two-index quantities */

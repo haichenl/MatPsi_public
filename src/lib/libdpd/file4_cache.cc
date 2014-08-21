@@ -78,7 +78,7 @@ DPD::file4_cache_scan(int filenum, int irrep, int pqnum, int rsnum, const char *
     dpd_file4_cache_entry *this_entry;
 
 #ifdef DPD_TIMER
-    timer_on("file4_cache");
+    //~ timer_on("file4_cache");
 #endif
 
     this_entry = dpd_main.file4_cache;
@@ -91,7 +91,7 @@ DPD::file4_cache_scan(int filenum, int irrep, int pqnum, int rsnum, const char *
                 this_entry->dpdnum == dpdnum &&
                 !strcmp(this_entry->label,label)) {
 #ifdef DPD_TIMER
-            timer_off("file4_cache");
+            //~ timer_off("file4_cache");
 #endif
             /* increment the access timers */
             dpd_main.file4_cache_most_recent++;
@@ -107,7 +107,7 @@ DPD::file4_cache_scan(int filenum, int irrep, int pqnum, int rsnum, const char *
     }
 
 #ifdef DPD_TIMER
-    timer_off("file4_cache");
+    //~ timer_off("file4_cache");
 #endif
     return(this_entry);
 }
@@ -379,14 +379,14 @@ int DPD::file4_cache_del_lru(void)
     dpd_file4_cache_entry *this_entry;
 
 #ifdef DPD_TIMER
-    timer_on("cache_lru");
+    //~ timer_on("cache_lru");
 #endif
 
     this_entry = file4_cache_find_lru();
 
     if(this_entry == NULL) {
 #ifdef DPD_TIMER
-        timer_off("cache_lru");
+        //~ timer_off("cache_lru");
 #endif
         return 1; /* there is no cache or all entries are locked */
     }
@@ -416,7 +416,7 @@ int DPD::file4_cache_del_lru(void)
         dpd_set_default(dpdnum);
 
 #ifdef DPD_TIMER
-        timer_off("cache_lru");
+        //~ timer_off("cache_lru");
 #endif
 
         return 0;
@@ -493,14 +493,14 @@ int DPD::file4_cache_del_low(void)
     dpd_file4_cache_entry *this_entry;
 
 #ifdef DPD_TIMER
-    timer_on("cache_low");
+    //~ timer_on("cache_low");
 #endif
 
     this_entry = dpd_file4_cache_find_low();
 
     if(this_entry == NULL) {
 #ifdef DPD_TIMER
-        timer_off("cache_low");
+        //~ timer_off("cache_low");
 #endif
         return 1; /* there is no cache or everything is locked */
     }
@@ -530,7 +530,7 @@ int DPD::file4_cache_del_low(void)
         dpd_set_default(dpdnum);
 
 #ifdef DPD_TIMER
-        timer_off("cache_low");
+        //~ timer_off("cache_low");
 #endif
 
         return 0;

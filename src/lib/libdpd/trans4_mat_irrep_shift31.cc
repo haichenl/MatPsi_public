@@ -42,7 +42,7 @@ int DPD::trans4_mat_irrep_shift31(dpdtrans4 *Trans, int buf_block)
     long int pqcol;
 
 #ifdef DPD_TIMER
-    timer_on("shift");
+    //~ timer_on("shift");
 #endif
     if(Trans->shift.shift_type) {
         fprintf(stderr, "\n\tShift is already on! %d\n",
@@ -116,7 +116,7 @@ int DPD::trans4_mat_irrep_shift31(dpdtrans4 *Trans, int buf_block)
     free(count); free(rowoff); free (blocklen);
 
 #ifdef DPD_TIMER
-    timer_off("shift");
+    //~ timer_off("shift");
 #endif
 
     return 0;

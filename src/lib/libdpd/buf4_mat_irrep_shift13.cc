@@ -41,7 +41,7 @@ int DPD::buf4_mat_irrep_shift13(dpdbuf4 *Buf, int buf_block)
     double *data;
 
 #ifdef DPD_TIMER
-    timer_on("shift");
+    //~ timer_on("shift");
 #endif
 
     all_buf_irrep = Buf->file.my_irrep;
@@ -98,7 +98,7 @@ int DPD::buf4_mat_irrep_shift13(dpdbuf4 *Buf, int buf_block)
     free(count); free(dataoff);
 
 #ifdef DPD_TIMER
-    timer_off("shift");
+    //~ timer_off("shift");
 #endif
 
     return 0;

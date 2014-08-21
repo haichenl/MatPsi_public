@@ -61,71 +61,71 @@ double SAPT2p::compute_energy()
 {
   print_header();
 
-  timer_on("DF Integrals       ");
+  //~ timer_on("DF Integrals       ");
     df_integrals();
-  timer_off("DF Integrals       ");
-  timer_on("Omega Integrals    ");
+  //~ timer_off("DF Integrals       ");
+  //~ timer_on("Omega Integrals    ");
     w_integrals();
-  timer_off("Omega Integrals    ");
-  timer_on("Amplitudes         "); 
+  //~ timer_off("Omega Integrals    ");
+  //~ timer_on("Amplitudes         "); 
     amplitudes();
-  timer_off("Amplitudes         "); 
-  timer_on("Elst10             ");
+  //~ timer_off("Amplitudes         "); 
+  //~ timer_on("Elst10             ");
     elst10();
-  timer_off("Elst10             ");
-  timer_on("Exch10 S^2         ");
+  //~ timer_off("Elst10             ");
+  //~ timer_on("Exch10 S^2         ");
     exch10_s2();
-  timer_off("Exch10 S^2         ");
-  timer_on("Exch10             ");
+  //~ timer_off("Exch10 S^2         ");
+  //~ timer_on("Exch10             ");
     exch10();
-  timer_off("Exch10             ");
-  timer_on("Ind20,r            ");
+  //~ timer_off("Exch10             ");
+  //~ timer_on("Ind20,r            ");
     ind20r();
-  timer_off("Ind20,r            ");
-  timer_on("Exch-Ind20,r       ");
+  //~ timer_off("Ind20,r            ");
+  //~ timer_on("Exch-Ind20,r       ");
     exch_ind20r();
-  timer_off("Exch-Ind20,r       ");
-  timer_on("Disp20             ");
+  //~ timer_off("Exch-Ind20,r       ");
+  //~ timer_on("Disp20             ");
     disp20();
-  timer_off("Disp20             ");
-  timer_on("Exch-Disp20        ");
+  //~ timer_off("Disp20             ");
+  //~ timer_on("Exch-Disp20        ");
     exch_disp20();
-  timer_off("Exch-Disp20        ");
-  timer_on("Elst12             ");
+  //~ timer_off("Exch-Disp20        ");
+  //~ timer_on("Elst12             ");
     elst12();
-  timer_off("Elst12             ");
-  timer_on("Exch11             ");
+  //~ timer_off("Elst12             ");
+  //~ timer_on("Exch11             ");
     exch11();
-  timer_off("Exch11             ");
-  timer_on("Exch12             ");
+  //~ timer_off("Exch11             ");
+  //~ timer_on("Exch12             ");
     exch12();
-  timer_off("Exch12             ");
-  timer_on("Ind22              ");
+  //~ timer_off("Exch12             ");
+  //~ timer_on("Ind22              ");
     ind22();
-  timer_off("Ind22              ");
-  timer_on("Disp21             ");
+  //~ timer_off("Ind22              ");
+  //~ timer_on("Disp21             ");
     disp21();
-  timer_off("Disp21             ");
+  //~ timer_off("Disp21             ");
 
   if (mbpt_disp_) {
 
-  timer_on("Disp22 (SDQ)       ");
+  //~ timer_on("Disp22 (SDQ)       ");
     disp22sdq();
-  timer_off("Disp22 (SDQ)       ");
-  timer_on("Disp22 (T)         ");
+  //~ timer_off("Disp22 (SDQ)       ");
+  //~ timer_on("Disp22 (T)         ");
     disp22t();
-  timer_off("Disp22 (T)         ");
+  //~ timer_off("Disp22 (T)         ");
 
   }
 
   if (ccd_disp_) {
  
-  timer_on("Disp2(CCD)         ");
+  //~ timer_on("Disp2(CCD)         ");
     disp2ccd();
-  timer_off("Disp2(CCD)         ");
-  timer_on("Disp22 (T) (CCD)   ");
+  //~ timer_off("Disp2(CCD)         ");
+  //~ timer_on("Disp22 (T) (CCD)   ");
     disp22tccd();
-  timer_off("Disp22 (T) (CCD)   ");
+  //~ timer_off("Disp22 (T) (CCD)   ");
 
   }
 
