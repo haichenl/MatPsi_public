@@ -14,12 +14,21 @@ classdef MatPsi < handle
             elseif(exist('./@MatPsi/share/basis', 'file'))
                 this.path = [pwd, '/@MatPsi'] ;
             else
-                toppath = regexp(path(), '[^:]*', 'match', 'once');
-                if(exist([toppath, '/share/basis'], 'file'))
-                    this.path = toppath;
-                elseif(exist([toppath, '/@MatPsi/share/basis'], 'file'))
-                    this.path = [toppath, '/@MatPsi'];
-                else
+                currpath = path();
+                paths_num = length(regexp(currpath, ':', 'match')) + 1;
+                for i = 1:paths_num
+                    toppath = regexp(currpath, '[^:]*', 'match', 'once');
+                    if(exist([toppath, '/share/basis'], 'file'))
+                        this.path = toppath;
+                        break;
+                    elseif(exist([toppath, '/@MatPsi/share/basis'], 'file'))
+                        this.path = [toppath, '/@MatPsi'];
+                        break;
+                    else
+                        currpath = currpath(length(toppath)+2:end);
+                    end
+                end
+                if(i>=paths_num)
                     throw(MException('MatPsi:MatPsi','MatPsi cannot find basis set files.'));
                 end
             end
