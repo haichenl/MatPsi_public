@@ -63,7 +63,7 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('basis_name', this.objectHandle, varargin{:});
         end
         
-        % matpsi.set_basis(integer); 
+        % matpsi.set_basis(string); 
         % Set basis set 
         function varargout = set_basis(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('set_basis', this.objectHandle, varargin{:});
@@ -226,6 +226,12 @@ classdef MatPsi < handle
         end
         
         %% JK related 
+        % matpsi.InitJK(string); 
+        % Initialize JK object 
+        function varargout = InitJK(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('InitJK', this.objectHandle, varargin{:});
+        end
+        
         % matpsi.UseDirectJK(); 
         % Enable DirectJK object that computes J and K with direct algoritm 
         function varargout = UseDirectJK(this, varargin)

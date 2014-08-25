@@ -499,6 +499,28 @@ void MatPsi::UseMatlabJK() {
     jk_->initialize();
 }
 
+void MatPsi::InitJK(std::string jktype) {
+    if(jk_ != NULL)
+        jk_->finalize();
+    if(boost::iequals(jktype, "PKJK")) {
+        jk_ = boost::shared_ptr<JK>(new PKJK(process_environment_, basis_, psio_));
+    } else if(boost::iequals(jktype, "DFJK")) {
+        boost::shared_ptr<BasisSetParser> parser(new Gaussian94BasisSetParser());
+        molecule_->set_basis_all_atoms("CC-PVDZ-JKFIT", "DF_BASIS_SCF");
+        boost::shared_ptr<BasisSet> auxiliary = BasisSet::construct(process_environment_, parser, molecule_, "DF_BASIS_SCF");
+        jk_ = boost::shared_ptr<JK>(new DFJK(process_environment_, basis_, auxiliary, psio_));
+        molecule_->set_basis_all_atoms(basisname_);
+    } else if(boost::iequals(jktype, "ICJK")) {
+        jk_ = boost::shared_ptr<JK>(new ICJK(process_environment_, basis_));
+    } else if(boost::iequals(jktype, "DirectJK")) {
+        jk_ = boost::shared_ptr<JK>(new DirectJK(process_environment_, basis_));
+    } else {
+        throw PSIEXCEPTION("InitJK: JK type not recognized.");
+    }
+    jk_->set_memory(process_environment_.get_memory());
+    jk_->initialize();
+}
+
 const std::string& MatPsi::JKtype() {
     if(jk_ == NULL)
         throw PSIEXCEPTION("JKtype: JK object has not been initialized.");

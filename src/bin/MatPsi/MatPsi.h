@@ -111,6 +111,7 @@ public:
     
     //*** JK related
     // use different types of JK 
+    void InitJK(std::string jktype);
     void UseDirectJK();
     void UsePKJK();
     void UseICJK();

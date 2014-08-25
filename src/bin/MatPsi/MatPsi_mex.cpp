@@ -107,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (!strcmp("set_basis", cmd)) {
         if ( nrhs!=3 || !mxIsChar(prhs[2]))
             mexErrMsgTxt("set_basis(\"basis\"): String input expected.");
-            MatPsi_obj->set_basis((std::string)mxArrayToString(prhs[2]));
+        MatPsi_obj->set_basis((std::string)mxArrayToString(prhs[2]));
         return;
     }
     
@@ -341,6 +341,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     
     //*** JK related 
+    // InitJK 
+    if (!strcmp("InitJK", cmd)) {
+        if ( nrhs!=3 || !mxIsChar(prhs[2]))
+            mexErrMsgTxt("InitJK(\"jktype\"): String input expected.");
+        MatPsi_obj->InitJK((std::string)mxArrayToString(prhs[2]));
+        return;
+    }
+    
     // UseDirectJK 
     if (!strcmp("UseDirectJK", cmd)) {
         MatPsi_obj->UseDirectJK();
