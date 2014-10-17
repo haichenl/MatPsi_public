@@ -193,9 +193,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     
     //*** Basis set properties 
-    // nbasis
-    if (!strcmp("nbasis", cmd)) {
-        OutputScalar(plhs[0], (double)MatPsi_obj->nbasis());
+    // nbf
+    if (!strcmp("nbasis", cmd) || !strcmp("nbf", cmd)) {
+        OutputScalar(plhs[0], (double)MatPsi_obj->nbf());
+        return;
+    }
+    
+    // nshell
+    if (!strcmp("nshell", cmd)) {
+        OutputScalar(plhs[0], (double)MatPsi_obj->nshell());
+        return;
+    }
+    
+    // shellTypes 
+    if (!strcmp("shellTypes", cmd)) {
+        SharedVector shellTypesVec = MatPsi_obj->shellTypes();
+        OutputVector(plhs[0], shellTypesVec);
+        return;
+    }
+    
+    // shellNprims 
+    if (!strcmp("shellNprims", cmd)) {
+        SharedVector shellNprimsVec = MatPsi_obj->shellNprims();
+        OutputVector(plhs[0], shellNprimsVec);
         return;
     }
     
@@ -211,6 +231,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // func2am 
     if (!strcmp("func2am", cmd)) {
         OutputVector(plhs[0], MatPsi_obj->func2am());
+        return;
+    }
+    
+    // primExps 
+    if (!strcmp("primExps", cmd)) {
+        OutputVector(plhs[0], MatPsi_obj->primExps());
+        return;
+    }
+    
+    // primCoefs 
+    if (!strcmp("primCoefs", cmd)) {
+        OutputVector(plhs[0], MatPsi_obj->primCoefs());
         return;
     }
     
@@ -299,7 +331,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         int ind[4];
         for(int i = 0; i < 4; i++) {
             ind[i] = (int)mxGetScalar(prhs[2+i]) - 1; // -1 convert Matlab convention to C++ convention
-        if(ind[i] < 0 || ind[i] >= MatPsi_obj->nbasis())
+        if(ind[i] < 0 || ind[i] >= MatPsi_obj->nbf())
                 mexErrMsgTxt("tei_ijkl: Required index not within scale.");
         }
         OutputScalar(plhs[0], MatPsi_obj->tei_ijkl(ind[0], ind[1], ind[2], ind[3]));
@@ -322,7 +354,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     // tei_allfull 
     if (!strcmp("tei_allfull", cmd)) {
-        mwSize dims[4] = {MatPsi_obj->nbasis(), MatPsi_obj->nbasis(), MatPsi_obj->nbasis(), MatPsi_obj->nbasis()};
+        mwSize dims[4] = {MatPsi_obj->nbf(), MatPsi_obj->nbf(), MatPsi_obj->nbf(), MatPsi_obj->nbf()};
         plhs[0] = mxCreateNumericArray(4, dims, mxDOUBLE_CLASS, mxREAL);
         double* matpt = mxGetPr(plhs[0]);
         MatPsi_obj->tei_allfull(matpt);
@@ -381,17 +413,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     // SetMatlabJK 
     if (!strcmp("SetMatlabJK", cmd)) {
-        int nbasis = MatPsi_obj->nbasis();
-        if (nrhs!=4 || mxGetM(prhs[2]) != nbasis || mxGetN(prhs[2]) != nbasis || mxGetM(prhs[3]) != nbasis || mxGetN(prhs[3]) != nbasis)
+        int nbf = MatPsi_obj->nbf();
+        if (nrhs!=4 || mxGetM(prhs[2]) != nbf || mxGetN(prhs[2]) != nbf || mxGetM(prhs[3]) != nbf || mxGetN(prhs[3]) != nbf)
             mexErrMsgTxt("SetMatlabJK(Jcell, Kcell): 2 nbasis by nbasis cell arrays input expected.");
-        boost::shared_array<double*> Jcell_ptr_in(new double* [nbasis * nbasis]);
-        boost::shared_array<double*> Kcell_ptr_in(new double* [nbasis * nbasis]);
+        boost::shared_array<double*> Jcell_ptr_in(new double* [nbf * nbf]);
+        boost::shared_array<double*> Kcell_ptr_in(new double* [nbf * nbf]);
         mxArray* Jcell = (mxArray*)prhs[2];
         mxArray* Kcell = (mxArray*)prhs[3];
-        for( int i = 0; i < nbasis * nbasis; i++) {
+        for( int i = 0; i < nbf * nbf; i++) {
             mxArray* Jelement = mxGetCell(Jcell, i);
             mxArray* Kelement = mxGetCell(Kcell, i);
-            if (mxGetM(Jelement) != nbasis || mxGetN(Jelement) != nbasis || mxGetM(Kelement) != nbasis || mxGetN(Kelement) != nbasis)
+            if (mxGetM(Jelement) != nbf || mxGetN(Jelement) != nbf || mxGetM(Kelement) != nbf || mxGetN(Kelement) != nbf)
                 mexErrMsgTxt("SetMatlabJK(Jcell, Kcell): Element not having nbasis by nbasis dimension detected.");
             Jcell_ptr_in[i] = mxGetPr(Jelement);
             Kcell_ptr_in[i] = mxGetPr(Kelement);
@@ -409,7 +441,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Density2J 
     if (!strcmp("Density2J", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf() || mxGetN(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("Density2J(MOmat): nbasis by nbasis matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->Density2J(InputMatrix(prhs[2])));
@@ -419,7 +451,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Density2K 
     if (!strcmp("Density2K", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf() || mxGetN(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("Density2K(MOmat): nbasis by nbasis matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->Density2K(InputMatrix(prhs[2])));
@@ -429,7 +461,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Density2G 
     if (!strcmp("Density2G", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis() || mxGetN(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf() || mxGetN(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("Density2G(MOmat): nbasis by nbasis matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->Density2G(InputMatrix(prhs[2])));
@@ -439,7 +471,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // OccMO2J 
     if (!strcmp("OccMO2J", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("OccMO2J(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->OccMO2J(InputMatrix(prhs[2])));
@@ -449,7 +481,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // OccMO2K 
     if (!strcmp("OccMO2K", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("OccMO2K(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->OccMO2K(InputMatrix(prhs[2])));
@@ -459,7 +491,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // OccMO2G 
     if (!strcmp("OccMO2G", cmd)) {
         // Check parameters
-        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbasis())
+        if (nrhs!=3 || mxGetM(prhs[2]) != MatPsi_obj->nbf())
             mexErrMsgTxt("OccMO2G(MOmat): nbasis by noccupy matrix input expected.");
         // Call the method
         OutputMatrix(plhs[0], MatPsi_obj->OccMO2G(InputMatrix(prhs[2])));
@@ -509,7 +541,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if (nrhs!=3)
             mexErrMsgTxt("RHFenv(EnvMat): nbasis by nbasis matrix input expected.");
         SharedMatrix EnvMat = InputMatrix(prhs[2]);
-        if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbasis() || EnvMat->ncol() != MatPsi_obj->nbasis())
+        if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbf() || EnvMat->ncol() != MatPsi_obj->nbf())
             mexErrMsgTxt("RHFenv(EnvMat): Environment potential energy matrix dimensions do not agree.");
         // Call the method
         OutputScalar(plhs[0], MatPsi_obj->RHFenv(EnvMat));
@@ -522,7 +554,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if (nrhs!=3)
             mexErrMsgTxt("RHF_fromC(MO): nbasis by nbasis matrix input expected.");
         SharedMatrix C_in = InputMatrix(prhs[2]);
-        if(C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbasis() || C_in->ncol() != MatPsi_obj->nbasis())
+        if(C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbf() || C_in->ncol() != MatPsi_obj->nbf())
             mexErrMsgTxt("RHF_fromC(MO): MO matrix dimensions do not agree.");
         // Call the method
         OutputScalar(plhs[0], MatPsi_obj->RHF_fromC(C_in));
@@ -536,8 +568,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             mexErrMsgTxt("RHFenv_fromC(EnvMat, MO): nbasis by nbasis matrix input expected.");
         SharedMatrix EnvMat = InputMatrix(prhs[2]);
         SharedMatrix C_in = InputMatrix(prhs[3]);
-        if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbasis() || EnvMat->ncol() != MatPsi_obj->nbasis()
-            || C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbasis() || C_in->ncol() != MatPsi_obj->nbasis())
+        if(EnvMat->nirrep() != 1 || EnvMat->nrow() != MatPsi_obj->nbf() || EnvMat->ncol() != MatPsi_obj->nbf()
+            || C_in->nirrep() != 1 || C_in->nrow() != MatPsi_obj->nbf() || C_in->ncol() != MatPsi_obj->nbf())
             mexErrMsgTxt("RHFenv_fromC(EnvMat, MO): MO matrix dimensions do not agree.");
         // Call the method
         OutputScalar(plhs[0], MatPsi_obj->RHFenv_fromC(EnvMat, C_in));

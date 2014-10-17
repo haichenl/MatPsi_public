@@ -241,6 +241,22 @@ int MatPsi::nelec() {
     return nelectron;
 }
 
+SharedVector MatPsi::shellTypes() {
+    SharedVector shellTypesVec(new Vector(basis_->nshell()));
+    for(int i = 0; i < basis_->nshell(); i++) {
+        shellTypesVec->set(i, (double)basis_->shell(i).am());
+    }
+    return shellTypesVec;
+}
+
+SharedVector MatPsi::shellNprims() {
+    SharedVector shellNprimsVec(new Vector(basis_->nshell()));
+    for(int i = 0; i < basis_->nshell(); i++) {
+        shellNprimsVec->set(i, (double)basis_->shell(i).nprimitive());
+    }
+    return shellNprimsVec;
+}
+
 SharedVector MatPsi::func2center() {
     SharedVector func2centerVec(new Vector(basis_->nbf()));
     for(int i = 0; i < basis_->nbf(); i++) {
@@ -255,6 +271,32 @@ SharedVector MatPsi::func2am() {
         func2amVec->set(i, (double)basis_->shell(basis_->function_to_shell(i)).am());
     }
     return func2amVec;
+}
+
+SharedVector MatPsi::primExps() {
+    SharedVector primExpsVec(new Vector(basis_->nprimitive()));
+    std::vector<double> temp;
+    for(int i = 0; i < basis_->nshell(); i++) {
+        std::vector<double> currExps = basis_->shell(i).exps();
+        temp.insert(temp.end(), currExps.begin(), currExps.end());
+    }
+    for(int i = 0; i < basis_->nprimitive(); i++) {
+        primExpsVec->set(i, temp[i]);
+    }
+    return primExpsVec;
+}
+
+SharedVector MatPsi::primCoefs() {
+    SharedVector primCoefsVec(new Vector(basis_->nprimitive()));
+    std::vector<double> temp;
+    for(int i = 0; i < basis_->nshell(); i++) {
+        std::vector<double> currCoefs = basis_->shell(i).coefs();
+        temp.insert(temp.end(), currCoefs.begin(), currCoefs.end());
+    }
+    for(int i = 0; i < basis_->nprimitive(); i++) {
+        primCoefsVec->set(i, temp[i]);
+    }
+    return primCoefsVec;
 }
 
 SharedMatrix MatPsi::overlap() {

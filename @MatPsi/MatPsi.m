@@ -140,7 +140,31 @@ classdef MatPsi < handle
         % integer = matpsi.nbasis(); 
         % Number of basis functions 
         function varargout = nbasis(this, varargin)
-            [varargout{1:nargout}] = MatPsi_mex('nbasis', this.objectHandle, varargin{:});
+            [varargout{1:nargout}] = MatPsi_mex('nbf', this.objectHandle, varargin{:});
+        end
+        
+        % integer = matpsi.nbf(); 
+        % Number of basis functions 
+        function varargout = nbf(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('nbf', this.objectHandle, varargin{:});
+        end
+        
+        % integer = matpsi.nshell(); 
+        % Number of contracted shells 
+        function varargout = nshell(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('nshell', this.objectHandle, varargin{:});
+        end
+        
+        % vector(nshell) = matpsi.shellTypes(); 
+        % shellTypes 
+        function varargout = shellTypes(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('shellTypes', this.objectHandle, varargin{:});
+        end
+        
+        % vector(nshell) = matpsi.shellNprims(); 
+        % shellNprims 
+        function varargout = shellNprims(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('shellNprims', this.objectHandle, varargin{:});
         end
         
         % vector(nbasis) = matpsi.func2center(); 
@@ -153,6 +177,18 @@ classdef MatPsi < handle
         % A mapping from every basis function to its angular momentum quantum number 
         function varargout = func2am(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('func2am', this.objectHandle, varargin{:});
+        end
+        
+        % vector(nprim) = matpsi.primExps; 
+        % primExps 
+        function varargout = primExps(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('primExps', this.objectHandle, varargin{:});
+        end
+        
+        % vector(nprim) = matpsi.primCoefs; 
+        % primCoefs 
+        function varargout = primCoefs(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('primCoefs', this.objectHandle, varargin{:});
         end
         
         
