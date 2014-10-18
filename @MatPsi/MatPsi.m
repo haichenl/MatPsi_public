@@ -167,6 +167,12 @@ classdef MatPsi < handle
             [varargout{1:nargout}] = MatPsi_mex('shellNprims', this.objectHandle, varargin{:});
         end
         
+        % vector(nshell) = matpsi.shell2center(); 
+        % shell2center 
+        function varargout = shell2center(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('shell2center', this.objectHandle, varargin{:});
+        end
+        
         % vector(nbasis) = matpsi.func2center(); 
         % A mapping from every basis function to the number of atom it is centered on 
         function varargout = func2center(this, varargin)

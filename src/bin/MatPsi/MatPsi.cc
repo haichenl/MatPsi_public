@@ -257,6 +257,14 @@ SharedVector MatPsi::shellNprims() {
     return shellNprimsVec;
 }
 
+SharedVector MatPsi::shell2center() {
+    SharedVector shell2centerVec(new Vector(basis_->nshell()));
+    for(int i = 0; i < basis_->nshell(); i++) {
+        shell2centerVec->set(i, (double)basis_->shell_to_center(i));
+    }
+    return shell2centerVec;
+}
+
 SharedVector MatPsi::func2center() {
     SharedVector func2centerVec(new Vector(basis_->nbf()));
     for(int i = 0; i < basis_->nbf(); i++) {
@@ -286,11 +294,11 @@ SharedVector MatPsi::primExps() {
     return primExpsVec;
 }
 
-SharedVector MatPsi::primCoefs() {
+SharedVector MatPsi::primCoefs() { // unnormalized 
     SharedVector primCoefsVec(new Vector(basis_->nprimitive()));
     std::vector<double> temp;
     for(int i = 0; i < basis_->nshell(); i++) {
-        std::vector<double> currCoefs = basis_->shell(i).coefs();
+        std::vector<double> currCoefs = basis_->shell(i).original_coefs();
         temp.insert(temp.end(), currCoefs.begin(), currCoefs.end());
     }
     for(int i = 0; i < basis_->nprimitive(); i++) {

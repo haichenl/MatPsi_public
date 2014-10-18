@@ -88,6 +88,7 @@ public:
     int nshell() { return basis_->nshell(); }
     SharedVector shellTypes();
     SharedVector shellNprims();
+    SharedVector shell2center();
     SharedVector func2center(); // map basis function number to the number of atom it is centred on 
     SharedVector func2am(); // map basis function number to its angular momentum 
     SharedVector primExps();

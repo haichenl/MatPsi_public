@@ -219,6 +219,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         return;
     }
     
+    // shell2center 
+    if (!strcmp("shell2center", cmd)) {
+        SharedVector shell2centerVec = MatPsi_obj->shell2center();
+        for(int i = 0; i < shell2centerVec->dim(); i++)
+            shell2centerVec->add(i, 1.0); // + 1 convert C++ convention to Matlab convention 
+        OutputVector(plhs[0], shell2centerVec);
+        return;
+    }
+    
     // func2center 
     if (!strcmp("func2center", cmd)) {
         SharedVector func2centerVec = MatPsi_obj->func2center();

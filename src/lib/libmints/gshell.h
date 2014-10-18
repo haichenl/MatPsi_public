@@ -147,6 +147,9 @@ public:
     const std::vector<double>& exps() const { return exp_; }
     /// Return coefficient of pi'th primitive and ci'th contraction
     const std::vector<double>& coefs() const { return coef_; }
+    
+    // Return original coefficient of pi'th primitive and ci'th contraction
+    const std::vector<double>& original_coefs() const { return original_coef_; }
 
     /// Print out the shell
     void print(FILE *out) const;
