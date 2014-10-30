@@ -48,16 +48,45 @@ GaussianShell::GaussianShell(int am, const std::vector<double> &c,
         normalize_shell();
 }
 
+GaussianShell::GaussianShell(int am, const std::vector<double> &c, const std::vector<double> &ori_c,
+                             const std::vector<double> &e, GaussianType pure,
+                             int nc, const Vector3 &center, int start,
+                             PrimitiveType pt)
+    : l_(am), puream_(pure), exp_(e), coef_(c), original_coef_(ori_c),
+      nc_(nc), center_(center), start_(start)
+{
+    ncartesian_ = INT_NCART(l_);
+    nfunction_  = INT_NFUNC(puream_, l_);
+
+    // Compute the normalization constants
+    if (pt == Unnormalized)
+        normalize_shell();
+}
+
+//~ GaussianShell GaussianShell::copy()
+//~ {
+    //~ return GaussianShell(l_, coef_, exp_,
+                         //~ GaussianType(puream_),
+                         //~ nc_, center_, start_);
+//~ }
+
+//~ GaussianShell GaussianShell::copy(int nc, const Vector3& c)
+//~ {
+    //~ return GaussianShell(l_, coef_, exp_,
+                         //~ GaussianType(puream_),
+                         //~ nc, c, start_);
+//~ }
+
 GaussianShell GaussianShell::copy()
 {
-    return GaussianShell(l_, coef_, exp_,
+    return GaussianShell(l_, coef_, original_coef_, exp_,
                          GaussianType(puream_),
                          nc_, center_, start_);
 }
 
 GaussianShell GaussianShell::copy(int nc, const Vector3& c)
 {
-    return GaussianShell(l_, coef_, exp_,
+    return GaussianShell(l_, coef_, original_coef_, exp_,
                          GaussianType(puream_),
                          nc, c, start_);
 }

@@ -249,6 +249,14 @@ SharedVector MatPsi::shellTypes() {
     return shellTypesVec;
 }
 
+SharedVector MatPsi::shellNfuncs() {
+    SharedVector shellNfuncsVec(new Vector(basis_->nshell()));
+    for(int i = 0; i < basis_->nshell(); i++) {
+        shellNfuncsVec->set(i, (double)basis_->shell(i).nfunction());
+    }
+    return shellNfuncsVec;
+}
+
 SharedVector MatPsi::shellNprims() {
     SharedVector shellNprimsVec(new Vector(basis_->nshell()));
     for(int i = 0; i < basis_->nshell(); i++) {
@@ -294,7 +302,7 @@ SharedVector MatPsi::primExps() {
     return primExpsVec;
 }
 
-SharedVector MatPsi::primCoefs() { // unnormalized 
+SharedVector MatPsi::primCoefs() { // should have been normalized 
     SharedVector primCoefsVec(new Vector(basis_->nprimitive()));
     std::vector<double> temp;
     for(int i = 0; i < basis_->nshell(); i++) {

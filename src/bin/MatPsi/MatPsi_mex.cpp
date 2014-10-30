@@ -193,13 +193,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     
     //*** Basis set properties 
-    // nbf
+    // basis_has_puream 
+    if (!strcmp("basis_has_puream", cmd)) {
+        OutputScalar(plhs[0], (double)MatPsi_obj->basis_has_puream());
+        return;
+    }
+    
+    // nbf 
     if (!strcmp("nbasis", cmd) || !strcmp("nbf", cmd)) {
         OutputScalar(plhs[0], (double)MatPsi_obj->nbf());
         return;
     }
     
-    // nshell
+    // nshell 
     if (!strcmp("nshell", cmd)) {
         OutputScalar(plhs[0], (double)MatPsi_obj->nshell());
         return;
@@ -216,6 +222,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (!strcmp("shellNprims", cmd)) {
         SharedVector shellNprimsVec = MatPsi_obj->shellNprims();
         OutputVector(plhs[0], shellNprimsVec);
+        return;
+    }
+    
+    // shellNfuncs 
+    if (!strcmp("shellNfuncs", cmd)) {
+        SharedVector shellNfuncsVec = MatPsi_obj->shellNfuncs();
+        OutputVector(plhs[0], shellNfuncsVec);
         return;
     }
     

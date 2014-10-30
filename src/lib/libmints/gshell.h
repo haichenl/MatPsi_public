@@ -107,6 +107,14 @@ public:
                   const Vector3& center,
                   int start,
                   PrimitiveType pt = Normalized);
+    GaussianShell(int am, 
+                  const std::vector<double> &c, const std::vector<double> &ori_c,
+                  const std::vector<double> &e, 
+                  GaussianType pure,
+                  int nc, 
+                  const Vector3 &center, 
+                  int start,
+                  PrimitiveType pt = Normalized);
 
     /** Handles calling primitive_normalization and contraction_normalization for you. */
     void normalize_shell();

@@ -84,10 +84,12 @@ public:
     
     //*** Basis set properties 
     void set_basis(const std::string& basisname); // set a new basis set 
+    bool basis_has_puream() { return basis_->has_puream(); }
     int nbf() { return basis_->nbf(); } // number of basis functions 
     int nshell() { return basis_->nshell(); }
     SharedVector shellTypes();
     SharedVector shellNprims();
+    SharedVector shellNfuncs();
     SharedVector shell2center();
     SharedVector func2center(); // map basis function number to the number of atom it is centred on 
     SharedVector func2am(); // map basis function number to its angular momentum 

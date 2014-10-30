@@ -137,6 +137,12 @@ classdef MatPsi < handle
         
         
         %% Basis set properties 
+        % boolean = matpsi.basis_has_puream(); 
+        % pure/cartesian 
+        function varargout = basis_has_puream(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('basis_has_puream', this.objectHandle, varargin{:});
+        end
+        
         % integer = matpsi.nbasis(); 
         % Number of basis functions 
         function varargout = nbasis(this, varargin)
@@ -165,6 +171,12 @@ classdef MatPsi < handle
         % shellNprims 
         function varargout = shellNprims(this, varargin)
             [varargout{1:nargout}] = MatPsi_mex('shellNprims', this.objectHandle, varargin{:});
+        end
+        
+        % vector(nshell) = matpsi.shellNfuncs(); 
+        % shellNfuncs 
+        function varargout = shellNfuncs(this, varargin)
+            [varargout{1:nargout}] = MatPsi_mex('shellNfuncs', this.objectHandle, varargin{:});
         end
         
         % vector(nshell) = matpsi.shell2center(); 
