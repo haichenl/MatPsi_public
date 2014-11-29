@@ -49,5 +49,4 @@ include ../MakeRules
 
 install:: $(PSITARGET)
 	$(MKDIRS) $(prefix)
-	$(INSTALL) `dirname $(PSITARGET)`/*.mex* $(prefix)
 	-cp `dirname $(PSITARGET)`/@MatPsi $(prefix) -r
