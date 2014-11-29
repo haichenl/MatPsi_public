@@ -45,8 +45,8 @@ all: default
 $(PSITARGET): $(MEXOBJ) $(LIBOBJ) 
 	$(MEX) $< $(LIBOBJ) $(MEXFLAGS) $(LIBDIRS) $(START_EXPORT) $(PSILIBS) $(END_EXPORT) $(FILTEREDLDLIBS) $(CXXINCLUDE) 
 	$(MKDIRS) `dirname $(PSITARGET)`
-	$(INSTALL) *.mex* `dirname $(PSITARGET)`
 	-cp $(top_srcdir)/@MatPsi `dirname $(PSITARGET)` -r
+	$(INSTALL) *.mex* `dirname $(PSITARGET)`/@MatPsi
 
 #
 # clean up
