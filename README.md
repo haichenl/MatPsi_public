@@ -367,3 +367,4 @@ Apr. 13: ```<libscf_solver/hf.h>``` and ```<libscf_solver/rhf.h>``` are slightly
 turned off and ```finalize()``` method wrapped in ```public extern_finalize()```, as well as canceling a python external field interface. 
 
 
+In oeprop.cc look for if(fabs( there is a bug.
